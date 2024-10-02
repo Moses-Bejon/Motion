@@ -4,19 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Motion project</title>
+    <link href="projectStyles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
     <div id="banner">
-        <button id="saveButton">Save</button>
-        <button id="loadButton">Load</button>
-        <button id="undoButton">Undo</button>
-        <button id="redoButton">Redo</button>
+        <button id="saveButton" class="bannerButton">Save</button>
+        <button id="loadButton" class="bannerButton">Load</button>
+        <button id="undoButton" class="bannerButton">Undo</button>
+        <button id="redoButton" class="bannerButton">Redo</button>
     </div>
 
-    <div id="rootWindow">
-    </div>
+    <sub-edge class="topSubEdge"></sub-edge>
+    <sub-edge class="bottomSubEdge"></sub-edge>
+    <sub-edge class="leftSubEdge"></sub-edge>
+    <sub-edge class="rightSubEdge"></sub-edge>
 
+    <script src="./subEdge.js" type="module"></script>
 </body>
 
 </html>

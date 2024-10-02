@@ -1,0 +1,50 @@
+:root{
+    --banner-height: 25px;
+}
+
+#banner{
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: var(--banner-height);
+}
+
+.bannerButton{
+    height: 100%;
+}
+
+sub-edge{
+    position: fixed;
+    background-color: black;
+
+    --margin: 3px;
+    --thickness: 10px;
+}
+
+.topSubEdge{
+    top: calc(var(--banner-height) + var(--margin));
+    left: var(--margin);
+    height:var(--thickness);
+    width: calc(100% - 2*var(--margin));
+}
+
+.bottomSubEdge{
+    bottom: var(--margin);
+    left: var(--margin);
+    height: var(--thickness);
+    width: calc(100% - 2*var(--margin));
+}
+
+.leftSubEdge{
+    top: calc(var(--banner-height) + var(--margin));
+    left: var(--margin);
+    height: calc(100vh - 2*var(--margin) - var(--banner-height));
+    width: var(--thickness);
+}
+
+.rightSubEdge{
+    top: calc(var(--banner-height) + var(--margin));
+    right: var(--margin);
+    height: calc(100vh - 2*var(--margin) - var(--banner-height));
+    width: var(--thickness);
+}
