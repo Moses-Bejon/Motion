@@ -15,12 +15,14 @@
         <button id="redoButton" class="bannerButton">Redo</button>
     </div>
 
-    <sub-edge class="topSubEdge"></sub-edge>
-    <sub-edge class="bottomSubEdge"></sub-edge>
-    <sub-edge class="leftSubEdge"></sub-edge>
-    <sub-edge class="rightSubEdge"></sub-edge>
+    <!-- <border-edge> is a custom web component defined by the script "./borderEdge.js" -->
+    <!-- It is the implemented class shown in the class diagram in my design for the window manager -->
+    <border-edge class="topSubEdge" type="horizontal"></border-edge>
+    <border-edge class="bottomSubEdge" type="horizontal"></border-edge>
+    <border-edge class="leftSubEdge" type="vertical"></border-edge>
+    <border-edge class="rightSubEdge" type="vertical"></border-edge>
 
-    <script src="./subEdge.js" type="module"></script>
+    <script src="borderEdge.js" type="module"></script>
 </body>
 
 </html>
