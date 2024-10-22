@@ -1,0 +1,94 @@
+:root{
+    --banner-height: 25px;
+    --margin: 10px;
+    --edgeThickness: 5px;
+    --edgeColour: black;
+}
+
+#banner{
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: var(--banner-height);
+}
+
+.bannerButton{
+    height: 100%;
+}
+
+#rootWindow{
+    position: fixed;
+    background-color: lightgray;
+
+    top: calc(var(--banner-height) + var(--margin) + var(--edgeThickness));
+    bottom: calc(var(--margin) + var(--edgeThickness));
+    left: calc(var(--margin) + var(--edgeThickness));
+    right: calc(var(--margin) + var(--edgeThickness));
+}
+
+border-edge{
+    position: fixed;
+    background-color: var(--edgeColour);
+}
+
+#topEdge{
+    top: calc(var(--banner-height) + var(--margin));
+    left: calc(var(--margin) + var(--edgeThickness));
+    right: calc(var(--margin) + var(--edgeThickness));
+    height:var(--edgeThickness);
+}
+
+#bottomEdge{
+    bottom: var(--margin);
+    left: calc(var(--margin) + var(--edgeThickness));
+    right: calc(var(--margin) + var(--edgeThickness));
+    height: var(--edgeThickness);
+}
+
+#leftEdge{
+    top: calc(var(--banner-height) + var(--margin) + var(--edgeThickness));
+    bottom: calc(var(--margin) + var(--edgeThickness));
+    left: var(--margin);
+    width: var(--edgeThickness);
+}
+
+#rightEdge{
+    top: calc(var(--banner-height) + var(--margin) + var(--edgeThickness));
+    bottom: calc(var(--margin) + var(--edgeThickness));
+    right: var(--margin);
+    width: var(--edgeThickness);
+}
+
+.corner {
+
+    position: fixed;
+
+    /* the corner size is double the thickness so that a quarter of it is shown as the corner */
+    /* this relies on the root window being rendered on top of the corners, ensured by setting the z-index to 0 */
+    width: calc(2 * var(--edgeThickness));
+    height: calc(2 * var(--edgeThickness));
+    z-index: -1;
+
+    background-color: var(--edgeColour);
+    border-radius: 30%;
+}
+
+#topLeftCorner {
+    top: calc(var(--banner-height) + var(--margin));
+    left: var(--margin);
+}
+
+#topRightCorner {
+    top: calc(var(--banner-height) + var(--margin));
+    right: var(--margin);
+}
+
+#bottomLeftCorner {
+    bottom: var(--margin);
+    left: var(--margin);
+}
+
+#bottomRightCorner {
+    bottom: var(--margin);
+    right: var(--margin);
+}

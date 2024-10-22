@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Motion project</title>
-    <link href="projectStyles.css" rel="stylesheet" type="text/css">
+    <link href="index.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -15,14 +15,21 @@
         <button id="redoButton" class="bannerButton">Redo</button>
     </div>
 
-    <!-- <border-edge> is a custom web component defined by the script "./borderEdge.js" -->
-    <!-- It is the implemented class shown in the class diagram in my design for the window manager -->
-    <border-edge class="topSubEdge" type="horizontal"></border-edge>
-    <border-edge class="bottomSubEdge" type="horizontal"></border-edge>
-    <border-edge class="leftSubEdge" type="vertical"></border-edge>
-    <border-edge class="rightSubEdge" type="vertical"></border-edge>
+    <border-edge id="topEdge" type="horizontal"></border-edge>
+    <border-edge id="bottomEdge" type="horizontal"></border-edge>
+    <border-edge id="leftEdge" type="vertical"></border-edge>
+    <border-edge id="rightEdge" type="vertical"></border-edge>
+
+    <div id="topLeftCorner" class="corner"></div>
+    <div id="topRightCorner" class="corner"></div>
+    <div id="bottomLeftCorner" class="corner"></div>
+    <div id="bottomRightCorner" class="corner"></div>
+
+    <abstract-window id="rootWindow"></abstract-window>
 
     <script src="borderEdge.js" type="module"></script>
+    <script src="windows.js" type="module"></script>
+    <script src="index.js" type="module"></script>
 </body>
 
 </html>

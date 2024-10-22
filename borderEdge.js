@@ -1,13 +1,12 @@
+
+// The border edge contains and manages the creation of subEdges
 export class borderEdge extends HTMLElement{
     static observedAttributes = ["type"]
 
     constructor() {
         super()
-    }
 
-    connectedCallback(){
         this.attachShadow({mode:"open"})
-        //this.shadowRoot.appendChild(template.content.cloneNode(true))
     }
 
     attributeChangedCallback(name,oldValue,newValue){
@@ -21,6 +20,7 @@ export class borderEdge extends HTMLElement{
                 this.start = "top"
                 this.end = "bottom"
                 this.thickness = "width"
+
             } else if (newValue === "horizontal") {
                 this.start = "left"
                 this.end = "right"
@@ -29,6 +29,70 @@ export class borderEdge extends HTMLElement{
         }
     }
 
+    // gives the border a reference to the borders it should call when it wants to add new subedges
+    // this is separate from the constructor because they need to exist before they can know about each other
+    // all borderEdges need to be activated
+    activate(edgeBefore,edgeAfter,window,subEdgeLabel,newWindowFunction){
+        this.newWindow = newWindowFunction
+        this.subEdgeLabel = subEdgeLabel
+
+        // creates the first subEdge on this border edge
+        const firstSubEdge = this.createNewSubEdge(window)
+        firstSubEdge.style[this.start] = 0
+        firstSubEdge.style[this.end] = 0
+
+        firstSubEdge.previousSubEdge = null
+        firstSubEdge.nextSubEdge = null
+
+        this.shadowRoot.appendChild(firstSubEdge)
+
+        return firstSubEdge
+    }
+
+    createNewSubEdge(associatedWindow){
+        const subEdge = document.createElement("div")
+        subEdge.associatedWindow = associatedWindow
+        subEdge.label = this.subEdgeLabel
+        subEdge.style.position = "absolute"
+        subEdge.style[this.thickness] = "100%"
+
+        // handles the task of splitting a window when the new subEdge is clicked
+        subEdge.onmousedown = () => {
+
+            // calls the new window function passed in from activate
+            this.newWindow(subEdge)
+        }
+
+        // if a window's edge moves, the start of the sub edge will be updated
+        subEdge.updateStart = (newStart) => {
+
+            if (subEdge.previousSubEdge) {
+                subEdge.previousSubEdge.style[this.end] = (1-newStart)*100 + "%"
+            }
+            subEdge.style[this.start] = newStart*100 + "%"
+        }
+
+        // splits a sub edge in to if a window gets replaced with a split window
+        subEdge.split = () => {
+
+            const newSubEdge = this.createNewSubEdge()
+
+            if (subEdge.nextSubEdge) {
+                newSubEdge.nextSubEdge = subEdge.nextSubEdge
+                subEdge.nextSubEdge.previousSubEdge = newSubEdge
+            }
+            subEdge.nextSubEdge = newSubEdge
+            newSubEdge.previousSubEdge = subEdge
+
+            newSubEdge.style[this.end] = subEdge.style[this.end]
+
+            this.shadowRoot.appendChild(newSubEdge)
+
+            return newSubEdge
+        }
+
+        return subEdge
+    }
 
 }
 
