@@ -57,10 +57,21 @@ export class borderEdge extends HTMLElement{
         subEdge.style[this.thickness] = "100%"
 
         // handles the task of splitting a window when the new subEdge is clicked
-        subEdge.onmousedown = () => {
+        subEdge.onmousedown = (mouseEvent) => {
+
+            // prevents the document attempting to drag the div/highlight text/other default behaviour
+            // while user is dragging edge
+            mouseEvent.preventDefault()
 
             // calls the new window function passed in from activate
-            this.newWindow(subEdge)
+            const newWindow = this.newWindow(subEdge)
+
+            newWindow.dragEdge(mouseEvent)
+
+            document.addEventListener("mousemove",newWindow.dragEdge)
+            document.addEventListener("mouseup",() => {
+                document.removeEventListener("mousemove",newWindow.dragEdge)
+            }, {once: true})
         }
 
         // if a window's edge moves, the start of the sub edge will be updated

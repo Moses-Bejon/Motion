@@ -1,6 +1,8 @@
 // This file contains the classes for the most fundamental types of window for the window manager
 
 import {innerEdgeThicknessInt,innerEdgeThickness} from "./constants.js"
+import {clamp} from "./maths.js"
+import {addDragLogicTo} from "./dragLogic.js"
 
 // The base window class that all types of window are inherited from
 export class abstractWindow extends HTMLElement{
@@ -10,17 +12,28 @@ export class abstractWindow extends HTMLElement{
         // used to declare the sets of vertical and horizontal subEdges
         this.resetSubEdges()
 
-        // called when this window is switched to alert the parent window
-        // the parent window will modify this function if it exists/needs to
+        // these values will only be used if we don't have a parent (when we are the root).
+        // they are changed in the receiveParent function
+
+        // parents have different things they want done when a child window changes
         this.updateParentFunction = () => {}
 
-        // saved as a proportion across the root window
-        this.globalLeftPosition = 0
-        this.globalRightPosition = 1
-        this.globalTopPosition = 0
-        this.globalBottomPosition = 1
+        // as the root, this is our position, otherwise these functions are recursive eventually reaching the root
+        this.getGlobalLeftPosition = () => {return 0}
+        this.getGlobalRightPosition = () => {return 1}
+        this.getGlobalTopPosition = () => {return 0}
+        this.getGlobalBottomPosition = () => {return 1}
+    }
 
-        this.attachShadow({mode:"open"})
+    receiveParent(parent,updateParentFunction){
+
+        // parents may modify these functions further, depending on how the window is positioned within them
+        this.getGlobalLeftPosition = () => {return parent.getGlobalLeftPosition()}
+        this.getGlobalRightPosition = () => {return parent.getGlobalRightPosition()}
+        this.getGlobalTopPosition = () => {return parent.getGlobalTopPosition()}
+        this.getGlobalBottomPosition = () => {return parent.getGlobalBottomPosition()}
+
+        this.updateParentFunction = updateParentFunction
     }
 
     resetSubEdges(){
@@ -72,6 +85,11 @@ export class abstractWindow extends HTMLElement{
         // gives the subEdge a pointer to us for when it gets clicked and such
         subEdge.associatedWindow = this
     }
+
+    // this function exists for polymorphism,
+    // so that if a window without an edge is told to update its edge it will not raise an error
+    updateEdgePosition(newPosition){
+    }
 }
 
 // To be removed later once view is complete ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -83,12 +101,17 @@ export class verticallySplitWindow extends abstractWindow{
         super()
 
         // proportion along this window the edge is located
-        this.edgePosition = 0.5
+        this.edgePosition = 0
 
         this.subEdgesToUpdateWhenEdgeMoves = new Set()
+
+        // ensures the scope of this is not lost when this function is connected to an event listener
+        this.dragEdge = this.dragEdge.bind(this)
     }
 
     connectedCallback(){
+        this.attachShadow({mode:"open"})
+
         this.setTopWindow(document.createElement("abstract-window"))
 
         this.edge = document.createElement("div")
@@ -98,9 +121,11 @@ export class verticallySplitWindow extends abstractWindow{
         this.edge.style.position = "absolute"
         this.shadowRoot.appendChild(this.edge)
 
+        addDragLogicTo(this.edge,this.dragEdge)
+
         this.setBottomWindow(document.createElement("abstract-window"))
 
-        this.updateEdgePosition(0.5)
+        this.updateEdgePosition(0)
     }
 
     addSubEdgeToUpdateWhenEdgeMoves(newSubEdge){
@@ -147,9 +172,9 @@ export class verticallySplitWindow extends abstractWindow{
 
         this.topWindow = topWindow
 
-        this.topWindow.globalTopPosition = this.globalTopPosition
-        this.topWindow.globalLeftPosition = this.globalLeftPosition
-        this.topWindow.globalRightPosition = this.globalRightPosition
+        this.topWindow.receiveParent(this,this.updateTopWindow.bind(this))
+
+        this.topWindow.getGlobalBottomPosition = this.getGlobalEdgePosition.bind(this)
 
         this.topWindow.style.position = "absolute"
         this.topWindow.style.top = "0"
@@ -157,8 +182,6 @@ export class verticallySplitWindow extends abstractWindow{
         this.topWindow.style.right = "0"
 
         this.shadowRoot.appendChild(this.topWindow)
-
-        this.topWindow.updateParentFunction = this.updateTopWindow.bind(this)
     }
 
     // Used to switch out the bottom window after it has been created
@@ -172,9 +195,9 @@ export class verticallySplitWindow extends abstractWindow{
 
         this.bottomWindow = bottomWindow
 
-        this.bottomWindow.globalBottomPosition = this.globalBottomPosition
-        this.bottomWindow.globalLeftPosition = this.globalLeftPosition
-        this.bottomWindow.globalRightPosition = this.globalRightPosition
+        this.bottomWindow.receiveParent(this,this.updateBottomWindow.bind(this))
+
+        this.bottomWindow.getGlobalTopPosition = this.getGlobalEdgePosition.bind(this)
 
         this.bottomWindow.style.position = "absolute"
         this.bottomWindow.style.bottom = "0"
@@ -182,54 +205,67 @@ export class verticallySplitWindow extends abstractWindow{
         this.bottomWindow.style.right = "0"
 
         this.shadowRoot.appendChild(this.bottomWindow)
-
-        this.bottomWindow.updateParentFunction = this.updateBottomWindow.bind(this)
     }
 
+    // this function is called both when the edge changes position or something occurs,
+    // like a parent window moving, that requires positioning to be updated.
     updateEdgePosition(newPosition){
 
-        /*
-        if (newPosition < 0){
-            this.updateEdgePosition(0)
-            return
-        }
-        if (newPosition > 1){
-            this.updateEdgePosition(1)
-            return
-        }
-         */
+        // as the edge position is a proportion of the window, it should be between 0 and 1
+        this.edgePosition = clamp(newPosition,0,1)
 
-        this.edgePosition = newPosition
-
-        const topPercentage = newPosition*100 + "%"
-        const bottomPercentage = (1-newPosition)*100 + "%"
+        const topPercentage = this.edgePosition*100 + "%"
+        const bottomPercentage = (1-this.edgePosition)*100 + "%"
 
         this.topWindow.style.bottom = `calc(${bottomPercentage} + ${innerEdgeThicknessInt/2}px)`
         this.edge.style.top = `calc(${topPercentage} - ${innerEdgeThicknessInt/2}px)`
         this.bottomWindow.style.top = `calc(${topPercentage} + ${innerEdgeThicknessInt/2}px)`
 
-        const globalEdgePosition = this.globalTopPosition + newPosition*(this.globalBottomPosition-this.globalTopPosition)
-        this.topWindow.globalBottomPosition = globalEdgePosition
-        this.bottomWindow.globalTopPosition = globalEdgePosition
+        // when the edge position of a parent changes, child edge positions need to be updated as well.
+        this.topWindow.updateEdgePosition(this.topWindow.edgePosition)
+        this.bottomWindow.updateEdgePosition(this.bottomWindow.edgePosition)
+
+        const globalEdgePosition = this.getGlobalEdgePosition()
 
         for (const subEdge of this.subEdgesToUpdateWhenEdgeMoves){
             subEdge.updateStart(globalEdgePosition)
         }
     }
+
+    getGlobalEdgePosition(){
+        // as these functions are recursive, each call is quite expensive, so constant is defined to only call it once
+        // calling this.getGlobalTopPosition() twice calls each recursive function twice which in turn call their
+        // recursive functions twice, meaning calling this function a times here results in a^n calls where n
+        // is the number of windows. To avoid large time complexities, it is imperative a = 1.
+        const globalTopPosition = this.getGlobalTopPosition()
+        return globalTopPosition + this.edgePosition * (this.getGlobalBottomPosition() - globalTopPosition)
+    }
+
+    // function is called every time the mouse changes position during a drag
+    dragEdge(mouseEvent){
+        const boundingRectangle = this.getBoundingClientRect()
+
+        this.updateEdgePosition((mouseEvent.clientY-boundingRectangle.top)/boundingRectangle.height)
+    }
 }
 
 window.customElements.define("vertically-split-window",verticallySplitWindow)
 
+// A window with a vertical edge splitting it horizontally
 export class horizontallySplitWindow extends abstractWindow{
     constructor() {
         super()
 
-        this.edgePosition = 0.5
+        this.edgePosition = 0
 
         this.subEdgesToUpdateWhenEdgeMoves = new Set()
+
+        // ensures the scope of this is not lost when this function is connected to an event listener
+        this.dragEdge = this.dragEdge.bind(this)
     }
 
     connectedCallback(){
+        this.attachShadow({mode:"open"})
 
         this.setLeftWindow(document.createElement("abstract-window"))
 
@@ -240,9 +276,11 @@ export class horizontallySplitWindow extends abstractWindow{
         this.edge.style.position = "absolute"
         this.shadowRoot.appendChild(this.edge)
 
+        addDragLogicTo(this.edge,this.dragEdge)
+
         this.setRightWindow(document.createElement("abstract-window"))
 
-        this.updateEdgePosition(0.5)
+        this.updateEdgePosition(0)
     }
 
     addSubEdgeToUpdateWhenEdgeMoves(newSubEdge){
@@ -285,64 +323,66 @@ export class horizontallySplitWindow extends abstractWindow{
     setLeftWindow(leftWindow){
         this.leftWindow = leftWindow
 
-        this.leftWindow.globalLeftPosition = this.globalLeftPosition
-        this.leftWindow.globalTopPosition = this.globalTopPosition
-        this.leftWindow.globalBottomPosition = this.globalBottomPosition
+        this.leftWindow.receiveParent(this,this.updateLeftWindow.bind(this))
+
+        this.leftWindow.getGlobalRightPosition = this.getGlobalEdgePosition.bind(this)
 
         this.leftWindow.style.position = "absolute"
         this.leftWindow.style.left = "0"
         this.leftWindow.style.top = "0"
         this.leftWindow.style.bottom = "0"
         this.shadowRoot.appendChild(this.leftWindow)
-
-        this.leftWindow.updateParentFunction = this.updateLeftWindow.bind(this)
     }
 
     setRightWindow(rightWindow){
         this.rightWindow = rightWindow
 
-        this.rightWindow.globalRightPosition = this.globalRightPosition
-        this.rightWindow.globalTopPosition = this.globalTopPosition
-        this.rightWindow.globalBottomPosition = this.globalBottomPosition
+        this.rightWindow.receiveParent(this,this.updateRightWindow.bind(this))
+
+        this.rightWindow.getGlobalLeftPosition = this.getGlobalEdgePosition.bind(this)
 
         this.rightWindow.style.position = "absolute"
         this.rightWindow.style.right = "0"
         this.rightWindow.style.top = "0"
         this.rightWindow.style.bottom = "0"
         this.shadowRoot.appendChild(this.rightWindow)
-
-        this.rightWindow.updateParentFunction = this.updateRightWindow.bind(this)
     }
 
     updateEdgePosition(newPosition){
 
-        /*
-        if (newPosition < 0){
-            this.updateEdgePosition(0)
-            return
-        }
-        if (newPosition > 1){
-            this.updateEdgePosition(1)
-            return
-        }
-         */
+        this.edgePosition = clamp(newPosition,0,1)
 
-        this.edgePosition = newPosition
-
-        const leftPercentage = newPosition*100 + "%"
-        const rightPercentage = (1-newPosition)*100 + "%"
+        const leftPercentage = this.edgePosition*100 + "%"
+        const rightPercentage = (1-this.edgePosition)*100 + "%"
 
         this.leftWindow.style.right = `calc(${rightPercentage} + ${innerEdgeThicknessInt/2}px)`
         this.edge.style.left = `calc(${leftPercentage} - ${innerEdgeThicknessInt/2}px)`
         this.rightWindow.style.left = `calc(${leftPercentage} + ${innerEdgeThicknessInt/2}px)`
 
-        const globalEdgePosition = this.globalLeftPosition + newPosition*(this.globalRightPosition-this.globalLeftPosition)
-        this.leftWindow.globalRightPosition = globalEdgePosition
-        this.rightWindow.globalLeftPosition = globalEdgePosition
+        this.leftWindow.updateEdgePosition(this.leftWindow.edgePosition)
+        this.rightWindow.updateEdgePosition(this.rightWindow.edgePosition)
+
+        const globalEdgePosition = this.getGlobalEdgePosition()
 
         for (const subEdge of this.subEdgesToUpdateWhenEdgeMoves){
             subEdge.updateStart(globalEdgePosition)
         }
+    }
+
+    getGlobalEdgePosition(){
+        // as these functions are recursive, each call is quite expensive, so constant is defined to only call it once
+        // calling this.getGlobalLeftPosition() twice calls each recursive function twice which in turn call their
+        // recursive functions twice, meaning calling this function a times here results in a^n calls where n
+        // is the number of windows. To avoid large time complexities, it is imperative a = 1.
+        const globalLeftPosition = this.getGlobalLeftPosition()
+        return globalLeftPosition + this.edgePosition*(this.getGlobalRightPosition()-globalLeftPosition)
+    }
+
+    // called when the edge of the window is dragged
+    dragEdge(mouseEvent){
+        const boundingRectangle = this.getBoundingClientRect()
+
+        this.updateEdgePosition((mouseEvent.clientX - boundingRectangle.left)/boundingRectangle.width)
     }
 }
 
