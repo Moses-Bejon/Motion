@@ -30,7 +30,7 @@ export class borderEdge extends HTMLElement{
         }
     }
 
-    // gives the border a reference to the borders it should call when it wants to add new subedges
+    // gives the border a reference to the borders it should call when it wants to add new subEdges
     // this is separate from the constructor because they need to exist before they can know about each other
     // all borderEdges need to be activated
     activate(edgeBefore,edgeAfter,window,subEdgeLabel,newWindowFunction){
