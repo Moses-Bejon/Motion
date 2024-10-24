@@ -45,16 +45,19 @@ const firstRightSubEdge = rightEdge.activate(topEdge,bottomEdge,rootWindow,"righ
         return replaceWindowWith
 })
 
-rootWindow.updateParentFunction = (newRootWindow) => {
-
-        // if the root window is changed the old root window shouldn't still have the id "rootWindow"
+function setNewRootWindow(newRootWindow){
         rootWindow.removeAttribute("id")
         newRootWindow.id = "rootWindow"
+        newRootWindow.removeAttribute("style")
+
+        newRootWindow.updateParentFunction = setNewRootWindow
 
         rootWindow = newRootWindow
 
         document.body.appendChild(newRootWindow)
 }
+
+setNewRootWindow(rootWindow)
 
 rootWindow.addVerticalSubEdge(firstRightSubEdge)
 rootWindow.addVerticalSubEdge(firstLeftSubEdge)

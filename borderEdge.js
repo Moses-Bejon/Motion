@@ -1,3 +1,4 @@
+import {addCreateLogicTo} from "./dragLogic.js";
 
 // The border edge contains and manages the creation of subEdges
 export class borderEdge extends HTMLElement{
@@ -57,22 +58,10 @@ export class borderEdge extends HTMLElement{
         subEdge.style[this.thickness] = "100%"
 
         // handles the task of splitting a window when the new subEdge is clicked
-        subEdge.onmousedown = (mouseEvent) => {
-
-            // prevents the document attempting to drag the div/highlight text/other default behaviour
-            // while user is dragging edge
-            mouseEvent.preventDefault()
-
+        addCreateLogicTo(subEdge,() => {
             // calls the new window function passed in from activate
-            const newWindow = this.newWindow(subEdge)
-
-            newWindow.dragEdge(mouseEvent)
-
-            document.addEventListener("mousemove",newWindow.dragEdge)
-            document.addEventListener("mouseup",() => {
-                document.removeEventListener("mousemove",newWindow.dragEdge)
-            }, {once: true})
-        }
+            return this.newWindow(subEdge)
+        })
 
         // if a window's edge moves, the start of the sub edge will be updated
         subEdge.updateStart = (newStart) => {
@@ -91,6 +80,8 @@ export class borderEdge extends HTMLElement{
             if (subEdge.nextSubEdge) {
                 newSubEdge.nextSubEdge = subEdge.nextSubEdge
                 subEdge.nextSubEdge.previousSubEdge = newSubEdge
+            } else {
+                newSubEdge.nextSubEdge = null
             }
             subEdge.nextSubEdge = newSubEdge
             newSubEdge.previousSubEdge = subEdge
@@ -100,6 +91,42 @@ export class borderEdge extends HTMLElement{
             this.shadowRoot.appendChild(newSubEdge)
 
             return newSubEdge
+        }
+
+        subEdge.mergeBackward = (endAt = null) => {
+
+            let subEdgeToRemove = subEdge
+
+            while (subEdgeToRemove.previousSubEdge !== endAt){
+                subEdgeToRemove = subEdgeToRemove.previousSubEdge
+                subEdgeToRemove.remove()
+            }
+
+            subEdge.previousSubEdge = subEdgeToRemove.previousSubEdge
+
+            if (subEdge.previousSubEdge) {
+                subEdge.previousSubEdge.nextSubEdge = subEdge
+            }
+
+            subEdge.style[this.start] = subEdgeToRemove.style[this.start]
+        }
+
+        subEdge.mergeForward = (endAt = null) => {
+
+            let subEdgeToRemove = subEdge
+
+            while (subEdgeToRemove.nextSubEdge !== endAt){
+                subEdgeToRemove = subEdgeToRemove.nextSubEdge
+                subEdgeToRemove.remove()
+            }
+
+            subEdge.nextSubEdge = subEdgeToRemove.nextSubEdge
+
+            if (subEdge.nextSubEdge) {
+                subEdge.nextSubEdge.previousSubEdge = subEdge
+            }
+
+            subEdge.style[this.end] = subEdgeToRemove.style[this.end]
         }
 
         return subEdge
