@@ -161,17 +161,17 @@ class horizontallySplitWindow extends abstractWindow{
     }
 
     // called when the edge of the window is dragged
-    drag(mouseEvent){
+    drag(pointerEvent){
         const boundingRectangle = this.getBoundingClientRect()
 
-        this.updateEdgePosition((mouseEvent.clientX - boundingRectangle.left)/boundingRectangle.width)
+        this.updateEdgePosition((pointerEvent.clientX - boundingRectangle.left)/boundingRectangle.width)
     }
 
-    endDrag(mouseEvent){
+    endDrag(pointerEvent){
         const boundingRectangle = this.getBoundingClientRect()
 
         // if the left window is being closed
-        if (mouseEvent.clientX < boundingRectangle.left){
+        if (pointerEvent.clientX < boundingRectangle.left){
             const allLeftSubEdges = this.getAllSubEdgesOfLabel("left")
 
             // merging all subEdges of the edge we are closing into (if they exist)
@@ -198,7 +198,7 @@ class horizontallySplitWindow extends abstractWindow{
             this.updateParentFunction(this.rightWindow)
             this.remove()
 
-        } else if (mouseEvent.clientX > boundingRectangle.right){
+        } else if (pointerEvent.clientX > boundingRectangle.right){
 
             const allRightSubEdges = this.getAllSubEdgesOfLabel("right")
 

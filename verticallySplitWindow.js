@@ -163,18 +163,18 @@ class verticallySplitWindow extends abstractWindow{
         return globalTopPosition + this.edgePosition * (this.getGlobalBottomPosition() - globalTopPosition)
     }
 
-    // function is called every time the mouse changes position during a drag
-    drag(mouseEvent){
+    // function is called every time the pointer changes position during a drag
+    drag(pointerEvent){
         const boundingRectangle = this.getBoundingClientRect()
 
-        this.updateEdgePosition((mouseEvent.clientY-boundingRectangle.top)/boundingRectangle.height)
+        this.updateEdgePosition((pointerEvent.clientY-boundingRectangle.top)/boundingRectangle.height)
     }
 
-    endDrag(mouseEvent){
+    endDrag(pointerEvent){
         const boundingRectangle = this.getBoundingClientRect()
 
         // if the top window is being closed
-        if (mouseEvent.clientY < boundingRectangle.top){
+        if (pointerEvent.clientY < boundingRectangle.top){
 
             const allTopSubEdges = this.getAllSubEdgesOfLabel("top")
 
@@ -204,7 +204,7 @@ class verticallySplitWindow extends abstractWindow{
             this.updateParentFunction(this.bottomWindow)
             this.remove()
 
-        } else if (mouseEvent.clientY > boundingRectangle.bottom){
+        } else if (pointerEvent.clientY > boundingRectangle.bottom){
 
             const allBottomSubEdges = this.getAllSubEdgesOfLabel("bottom")
 
