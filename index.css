@@ -64,7 +64,7 @@ border-edge{
     position: fixed;
 
     /* the corner size is double the thickness so that a quarter of it is shown as the corner */
-    /* this relies on the root window being rendered on top of the corners, ensured by setting the z-index to 0 */
+    /* this relies on the root window being rendered on top of the corners, ensured by setting the z-index to -1 */
     width: calc(2 * var(--edgeThickness));
     height: calc(2 * var(--edgeThickness));
     z-index: -1;
