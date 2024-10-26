@@ -130,6 +130,3 @@ export class abstractWindow extends HTMLElement{
     updateEdgePosition(newPosition){
     }
 }
-
-// To be removed later once view is complete ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-window.customElements.define("abstract-window",abstractWindow)
