@@ -30,8 +30,11 @@ template.innerHTML = `
     height: 20px;
 }
 #switchWindowDropDown{
-    /*If the width were 20px a section of the default arrow can be seen*/
-    width: 19px;
+
+    /*The opacity is 0 so it does not show up, as the fake dropdown UI is being used*/
+    opacity: 0;
+    
+    width: 20px;
     height: 20px;
     background-color: transparent;
     border: none;
