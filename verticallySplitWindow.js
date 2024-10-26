@@ -74,6 +74,9 @@ class verticallySplitWindow extends abstractWindow{
                 throw "there was a subEdge in the horizontal set that wasn't either top or bottom"
             }
         }
+
+        // ensures the new subEdges have the correct positions
+        this.updateEdgePosition(this.edgePosition)
     }
 
     getAllSubEdgesOfLabel(label) {
