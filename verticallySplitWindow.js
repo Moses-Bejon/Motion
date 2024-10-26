@@ -20,7 +20,7 @@ class verticallySplitWindow extends abstractWindow{
 
         this.attachShadow({mode:"open"})
 
-        this.setTopWindow(document.createElement("abstract-window"))
+        this.setTopWindow(document.createElement("abstract-view"))
 
         this.edge = document.createElement("div")
         this.edge.style.background = "black"
@@ -31,9 +31,16 @@ class verticallySplitWindow extends abstractWindow{
 
         addDragLogicTo(this.edge,this.drag,this.endDrag)
 
-        this.setBottomWindow(document.createElement("abstract-window"))
+        this.setBottomWindow(document.createElement("abstract-view"))
 
         this.updateEdgePosition(defaultEdgePosition)
+    }
+
+    setFullScreen(newFullScreen) {
+        super.setFullScreen(newFullScreen)
+
+        this.topWindow.setFullScreen(newFullScreen)
+        this.bottomWindow.setFullScreen(newFullScreen)
     }
 
     addSubEdgeToUpdateWhenEdgeMoves(newSubEdge){
@@ -87,6 +94,7 @@ class verticallySplitWindow extends abstractWindow{
     updateTopWindow(newTopWindow){
         this.setTopWindow(newTopWindow)
         this.updateEdgePosition(this.edgePosition)
+        this.topWindow.setFullScreen(this.fullScreen)
     }
 
     // Used to set up a topWindow, with correct references, styles etc.
@@ -110,6 +118,7 @@ class verticallySplitWindow extends abstractWindow{
     updateBottomWindow(newBottomWindow){
         this.setBottomWindow(newBottomWindow)
         this.updateEdgePosition(this.edgePosition)
+        this.bottomWindow.setFullScreen(this.fullScreen)
     }
 
     // Used to set up a bottomWindow, with correct references, styles etc.

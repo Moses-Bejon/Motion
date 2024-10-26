@@ -45,7 +45,7 @@ export class borderEdge extends HTMLElement{
         firstSubEdge.previousSubEdge = null
         firstSubEdge.nextSubEdge = null
 
-        this.shadowRoot.appendChild(firstSubEdge)
+        this.shadowRoot.replaceChildren(firstSubEdge)
 
         return firstSubEdge
     }

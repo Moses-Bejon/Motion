@@ -21,7 +21,7 @@ class horizontallySplitWindow extends abstractWindow{
 
         this.attachShadow({mode:"open"})
 
-        this.setLeftWindow(document.createElement("abstract-window"))
+        this.setLeftWindow(document.createElement("abstract-view"))
 
         this.edge = document.createElement("div")
         this.edge.style.background = "black"
@@ -32,9 +32,16 @@ class horizontallySplitWindow extends abstractWindow{
 
         addDragLogicTo(this.edge,this.drag,this.endDrag)
 
-        this.setRightWindow(document.createElement("abstract-window"))
+        this.setRightWindow(document.createElement("abstract-view"))
 
         this.updateEdgePosition(defaultEdgePosition)
+    }
+
+    setFullScreen(newFullScreen) {
+        super.setFullScreen(newFullScreen)
+
+        this.leftWindow.setFullScreen(newFullScreen)
+        this.rightWindow.setFullScreen(newFullScreen)
     }
 
     addSubEdgeToUpdateWhenEdgeMoves(newSubEdge){
@@ -108,6 +115,9 @@ class horizontallySplitWindow extends abstractWindow{
         this.leftWindow.style.left = "0"
         this.leftWindow.style.top = "0"
         this.leftWindow.style.bottom = "0"
+
+        this.leftWindow.setFullScreen(this.fullScreen)
+
         this.shadowRoot.appendChild(this.leftWindow)
     }
 
@@ -123,6 +133,9 @@ class horizontallySplitWindow extends abstractWindow{
         this.rightWindow.style.right = "0"
         this.rightWindow.style.top = "0"
         this.rightWindow.style.bottom = "0"
+
+        this.rightWindow.setFullScreen(this.fullScreen)
+
         this.shadowRoot.appendChild(this.rightWindow)
     }
 

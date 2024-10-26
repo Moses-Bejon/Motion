@@ -1,7 +1,7 @@
 // The base window class that all types of window are inherited from
 export class abstractWindow extends HTMLElement{
     constructor() {
-        super();
+        super()
 
         // used to declare the sets of vertical and horizontal subEdges
         this.resetSubEdges()
@@ -17,6 +17,15 @@ export class abstractWindow extends HTMLElement{
         this.getGlobalRightPosition = () => {return 1}
         this.getGlobalTopPosition = () => {return 0}
         this.getGlobalBottomPosition = () => {return 1}
+    }
+
+    setFullScreen(newFullScreen){
+        this.fullScreen = newFullScreen
+    }
+
+    connectedCallback(){
+        // this ensures no content is displayed outside the window
+        this.style.overflow = "hidden"
     }
 
     receiveParent(parent,updateParentFunction){
