@@ -1,3 +1,5 @@
+// anything draggable uses functions from this file
+
 export function addDragLogicTo(element,drag,endDrag){
     element.onpointerdown = (pointerEvent) => {
 

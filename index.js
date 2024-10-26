@@ -1,3 +1,5 @@
+// main javascript file for the project
+
 const topEdge = document.getElementById("topEdge")
 const leftEdge = document.getElementById("leftEdge")
 const bottomEdge = document.getElementById("bottomEdge")

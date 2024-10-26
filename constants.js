@@ -1,3 +1,4 @@
+// global constants are defined here
 
 export const innerEdgeThicknessInt = 5
 export const innerEdgeThickness = innerEdgeThicknessInt + "px"

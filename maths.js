@@ -1,3 +1,5 @@
+// mathematical constants are defined here
+
 export function clamp(number,lower,upper){
     if (number < lower){
         return lower
