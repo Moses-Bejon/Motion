@@ -1,7 +1,9 @@
-//
+// all views, like canvas, timeline etc. inherit from this class
 
 import {abstractWindow} from "./window.js"
 
+// All types of window listed here can be switched to by a user
+// The data is of the form {"name displayed to user":"type of window I should create"}
 const typesOfWindow = {
     "view":"abstract-view",
     "horizontallySplit":"horizontally-split-window",
@@ -50,6 +52,7 @@ template.innerHTML = `
 <div id="fullScreenAndDropDownContainer">
     <div id="fullScreenButton"></div>
     <div id="switchWindowDropDownContainer">
+        <!-- This SVG is a triangle -->
         <svg id="fakeDropDown" viewBox="0 0 1 1">
             <polygon points="0, 0, 0.5, 1, 1, 0">
         </svg>
