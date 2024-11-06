@@ -9,7 +9,6 @@ export function addDragLogicTo(element,drag,endDrag,cursorHover = "grab",cursor 
 
 export function addCreateLogicTo(element,create,cursorHover = "grab",cursor = "grabbing"){
     element.style.cursor = cursorHover
-    console.log(cursorHover)
     element.onpointerdown = (pointerEvent) => {
         const newElement = create(pointerEvent)
 
@@ -23,14 +22,20 @@ function beginDragging(drag,endDrag,pointerEvent,cursor){
     // while user is dragging edge
     pointerEvent.preventDefault()
 
-    document.body.style.cursor = cursor
+    const overRideElement = document.createElement("div")
+    overRideElement.style.position = "fixed"
+    overRideElement.style.inset = "0"
+    overRideElement.style.zIndex = "1"
+    document.body.appendChild(overRideElement)
+
+    overRideElement.style.cursor = cursor
 
     drag(pointerEvent)
 
     document.addEventListener("pointermove",drag)
     document.addEventListener("pointerup",(pointerEvent) => {
         endDrag(pointerEvent)
-        document.body.style.cursor = "auto"
+        overRideElement.remove()
         document.removeEventListener("pointermove",drag)
     },{
         once: true

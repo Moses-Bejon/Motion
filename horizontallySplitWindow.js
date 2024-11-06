@@ -30,7 +30,7 @@ class horizontallySplitWindow extends abstractWindow{
         this.edge.style.position = "absolute"
         this.shadowRoot.appendChild(this.edge)
 
-        addDragLogicTo(this.edge,this.drag,this.endDrag)
+        addDragLogicTo(this.edge,this.drag,this.endDrag,"col-resize","col-resize")
 
         this.setRightWindow(document.createElement("abstract-view"))
 
