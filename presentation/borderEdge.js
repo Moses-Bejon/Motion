@@ -1,4 +1,4 @@
-import {addCreateLogicTo} from "./dragLogic.js";
+import {addCreateLogicTo} from "../dragLogic.js";
 
 // The border edge contains and manages the creation of subEdges
 export class borderEdge extends HTMLElement{

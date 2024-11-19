@@ -1,9 +1,9 @@
 // A window with a vertical edge splitting it horizontally
 
 import {abstractWindow} from "./window.js"
-import {addDragLogicTo} from "./dragLogic.js"
-import {clamp} from "./maths.js"
-import {innerEdgeThickness, innerEdgeThicknessInt, defaultEdgePosition} from "./constants.js"
+import {addDragLogicTo} from "../dragLogic.js"
+import {clamp} from "../maths.js"
+import {innerEdgeThickness, innerEdgeThicknessInt, defaultEdgePosition} from "../constants.js"
 
 
 class horizontallySplitWindow extends abstractWindow{
