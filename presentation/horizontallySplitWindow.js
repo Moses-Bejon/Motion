@@ -142,10 +142,7 @@ class horizontallySplitWindow extends abstractWindow{
         this.shadowRoot.appendChild(this.rightWindow)
     }
 
-    // this function is called both when the edge changes position or something occurs,
-    // like a parent window moving, that requires positioning to be updated.
-    updateEdgePosition(newPosition){
-
+    updateEdgePositionWithoutUpdatingSubEdges(newPosition){
         // as the edge position is a proportion, it should be between 0 and 1
         this.edgePosition = clamp(newPosition,0,1)
 
@@ -155,6 +152,13 @@ class horizontallySplitWindow extends abstractWindow{
         this.leftWindow.style.right = `calc(${rightPercentage} + ${innerEdgeThicknessInt/2}px)`
         this.edge.style.left = `calc(${leftPercentage} - ${innerEdgeThicknessInt/2}px)`
         this.rightWindow.style.left = `calc(${leftPercentage} + ${innerEdgeThicknessInt/2}px)`
+    }
+
+    // this function is called both when the edge changes position or something occurs,
+    // like a parent window moving, that requires positioning to be updated.
+    updateEdgePosition(newPosition){
+
+        this.updateEdgePositionWithoutUpdatingSubEdges(newPosition)
 
         // when the edge position of a parent changes, child edge positions need to be updated
         this.leftWindow.updateEdgePosition(this.leftWindow.edgePosition)
@@ -180,11 +184,13 @@ class horizontallySplitWindow extends abstractWindow{
     drag(pointerEvent){
         const boundingRectangle = this.getBoundingClientRect()
 
-        this.updateEdgePosition((pointerEvent.clientX - boundingRectangle.left)/boundingRectangle.width)
+        this.updateEdgePositionWithoutUpdatingSubEdges((pointerEvent.clientX - boundingRectangle.left)/boundingRectangle.width)
     }
 
     endDrag(pointerEvent){
         const boundingRectangle = this.getBoundingClientRect()
+
+        this.updateEdgePosition((pointerEvent.clientX - boundingRectangle.left)/boundingRectangle.width)
 
         // if the left window is being closed
         if (pointerEvent.clientX < boundingRectangle.left){
