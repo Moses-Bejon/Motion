@@ -142,6 +142,7 @@ class horizontallySplitWindow extends abstractWindow{
         this.shadowRoot.appendChild(this.rightWindow)
     }
 
+    // for efficiency when mid-drag
     updateEdgePositionWithoutUpdatingSubEdges(newPosition){
         // as the edge position is a proportion, it should be between 0 and 1
         this.edgePosition = clamp(newPosition,0,1)
