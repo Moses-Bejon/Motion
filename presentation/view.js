@@ -5,7 +5,6 @@ import {abstractWindow} from "./window.js"
 // All types of window listed here can be switched to by a user
 // The data is of the form {"name displayed to user":"type of window I should create"}
 const typesOfWindow = {
-    "view":"abstract-view",
     "horizontallySplit":"horizontally-split-window",
     "verticallySplit":"vertically-split-window",
     "canvas":"canvas-view"
