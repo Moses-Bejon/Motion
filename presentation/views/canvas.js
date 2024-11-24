@@ -93,9 +93,9 @@ template.innerHTML = `
 </style>
 <div id="toolBox"></div>
 <div id="zoom">
-<img id="zoomOut" src="zoomOut.svg" alt="zoom in button">
+<img id="zoomOut" src="./zoomOut.svg" alt="zoom in button">
 <input id="zoomBar" type="range" min="0" max="5" value="1" step="0.001">
-<img id="zoomIn" src="zoomIn.svg" alt="zoom out button">
+<img id="zoomIn" src="./zoomIn.svg" alt="zoom out button">
 </div>
 <svg id="canvas"></svg>
 `
