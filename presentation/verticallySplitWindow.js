@@ -141,11 +141,9 @@ class verticallySplitWindow extends abstractWindow{
         this.shadowRoot.appendChild(this.bottomWindow)
     }
 
-    // this function is called both when the edge changes position or something occurs,
-    // like a parent window moving, that requires positioning to be updated.
-    updateEdgePosition(newPosition){
-
-        // as the edge position is a proportion of the window, it should be between 0 and 1
+    // for efficiency when mid-drag
+    updateEdgePositionWithoutUpdatingSubEdges(newPosition){
+        // as the edge position is a proportion, it should be between 0 and 1
         this.edgePosition = clamp(newPosition,0,1)
 
         const topPercentage = this.edgePosition*100 + "%"
@@ -154,6 +152,13 @@ class verticallySplitWindow extends abstractWindow{
         this.topWindow.style.bottom = `calc(${bottomPercentage} + ${innerEdgeThicknessInt/2}px)`
         this.edge.style.top = `calc(${topPercentage} - ${innerEdgeThicknessInt/2}px)`
         this.bottomWindow.style.top = `calc(${topPercentage} + ${innerEdgeThicknessInt/2}px)`
+    }
+
+    // this function is called both when the edge changes position or something occurs,
+    // like a parent window moving, that requires positioning to be updated.
+    updateEdgePosition(newPosition){
+
+        this.updateEdgePositionWithoutUpdatingSubEdges(newPosition)
 
         // when the edge position of a parent changes, child edge positions need to be updated as well.
         this.topWindow.updateEdgePosition(this.topWindow.edgePosition)
@@ -179,11 +184,13 @@ class verticallySplitWindow extends abstractWindow{
     drag(pointerEvent){
         const boundingRectangle = this.getBoundingClientRect()
 
-        this.updateEdgePosition((pointerEvent.clientY-boundingRectangle.top)/boundingRectangle.height)
+        this.updateEdgePositionWithoutUpdatingSubEdges((pointerEvent.clientY-boundingRectangle.top)/boundingRectangle.height)
     }
 
     endDrag(pointerEvent){
         const boundingRectangle = this.getBoundingClientRect()
+
+        this.updateEdgePosition((pointerEvent.clientY-boundingRectangle.top)/boundingRectangle.height)
 
         // if the top window is being closed
         if (pointerEvent.clientY < boundingRectangle.top){
