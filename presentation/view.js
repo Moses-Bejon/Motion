@@ -7,25 +7,33 @@ import {abstractWindow} from "./window.js"
 const typesOfWindow = {
     "view":"abstract-view",
     "horizontallySplit":"horizontally-split-window",
-    "verticallySplit":"vertically-split-window"
+    "verticallySplit":"vertically-split-window",
+    "canvas":"canvas-view"
 }
 
 const template = document.createElement("template")
 template.innerHTML = `
 <style>
 #fullScreenAndDropDownContainer{
+
+    /*To ensure this element does not interfere with the positioning of elements behind it (as this is an overlay)*/
+    position: absolute;
+
     background-color: darkgray;
     width: 60px;
     height: 30px;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    
+    z-index: 3;
 }
 #fullScreenButton{
     border: 5px solid;
     width: 10px;
     height: 10px;
     border-radius: 10%;
+    cursor: pointer;
 }
 #switchWindowDropDownContainer{
     width: 20px;
@@ -42,6 +50,7 @@ template.innerHTML = `
     border: none;
     outline: none;
     position: absolute;
+    cursor: pointer;
 }
 #fakeDropDown{
     width: 20px;

@@ -25,7 +25,8 @@ function beginDragging(drag,endDrag,pointerEvent,cursor){
     const overRideElement = document.createElement("div")
     overRideElement.style.position = "fixed"
     overRideElement.style.inset = "0"
-    overRideElement.style.zIndex = "1"
+    overRideElement.style.zIndex = "10"
+
     document.body.appendChild(overRideElement)
 
     overRideElement.style.cursor = cursor
