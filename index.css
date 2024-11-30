@@ -10,6 +10,8 @@
     top: 0;
     left: 0;
     height: var(--banner-height);
+
+    user-select: none;
 }
 
 .bannerButton{

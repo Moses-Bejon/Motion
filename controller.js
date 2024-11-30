@@ -49,7 +49,7 @@ class controllerClass{
     keyDown(event){
 
         // item that is being hovered over is the top priority for inputs
-        if (this.hoveringOver.acceptKeyDown(event)){
+        if (this.hoveringOver?.acceptKeyDown(event)){
 
             // once a view has accepted an input, it goes to the top of the hierarchy
             // this means it is second in line when a user moves on to hover over something else
@@ -68,7 +68,7 @@ class controllerClass{
 
     keyUp(event){
 
-        if (this.hoveringOver.acceptKeyUp(event)){
+        if (this.hoveringOver?.acceptKeyUp(event)){
             this.setFocus(this.hoveringOver)
             return
         }
