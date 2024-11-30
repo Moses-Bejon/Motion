@@ -41,7 +41,7 @@ template.innerHTML = `
     max-width: ${canvasOffsetX}px;
     min-width: 200px;
     
-    height: 70%;starts
+    height: 70%;
     min-height: 250px;
 }
 
