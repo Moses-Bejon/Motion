@@ -42,7 +42,7 @@ template.innerHTML = `
     min-width: 200px;
     
     height: 70%;
-    min-height: 250px;
+    min-height: 265px;
 }
 
 #edit,#create{    
