@@ -379,13 +379,10 @@ export class canvas extends abstractView{
             // account for different keys both indicating +
             if (key === "+" || key === "="){
 
-                // prevents the browser from zooming in to the whole webpage
-                keyboardEvent.preventDefault()
                 this.zoomIn()
                 return true
 
             } else if (key === "-" || key === "_"){
-                keyboardEvent.preventDefault()
                 this.zoomOut()
                 return true
             } else {

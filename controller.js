@@ -50,6 +50,7 @@ class controllerClass{
 
         // item that is being hovered over is the top priority for inputs
         if (this.hoveringOver?.acceptKeyDown(event)){
+            event.preventDefault()
 
             // once a view has accepted an input, it goes to the top of the hierarchy
             // this means it is second in line when a user moves on to hover over something else
@@ -60,6 +61,10 @@ class controllerClass{
         // find top subscriber in hierarchy who accepts the input
         for (const inputSubscriber of this.inputSubscribersHierarchy){
             if (inputSubscriber.acceptKeyDown(event)){
+
+                // if we are accepting a keyboard input, using it as an input, we don't want the browser doing the same
+                event.preventDefault()
+
                 this.setFocus(inputSubscriber)
                 return
             }
@@ -69,12 +74,16 @@ class controllerClass{
     keyUp(event){
 
         if (this.hoveringOver?.acceptKeyUp(event)){
+            event.preventDefault()
+
             this.setFocus(this.hoveringOver)
             return
         }
 
         for (const inputSubscriber of this.inputSubscribersHierarchy){
             if (inputSubscriber.acceptKeyUp(event)){
+                event.preventDefault()
+
                 this.setFocus(inputSubscriber)
                 return
             }
