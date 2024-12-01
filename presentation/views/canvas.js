@@ -256,11 +256,12 @@ p{
 </div>
 
 <div id="edit">
-<button id="setKeyframe" class="editButton">Set keyframe</button>
-<button id="copy" class="editButton">Copy</button>
-<button id="paste" class="editButton">Paste</button>
-<button id="mergeShapes" class="editButton">Merge shapes</button>
-<button id="deleteShapes" class="editButton">Delete shapes</button>
+    <button id="duplicate" class="duplicate">Duplicate</button>
+    <button id="copy" class="editButton">Copy</button>
+    <button id="paste" class="editButton">Paste</button>
+    <button id="merge" class="editButton">Merge</button>
+    <button id="delete" class="editButton">Delete</button>
+    <button id="transform" class="editButton">Transform</button>
 </div>
 </div>
 
