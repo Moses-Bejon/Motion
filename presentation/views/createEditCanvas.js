@@ -187,10 +187,11 @@ export class createEditCanvas extends canvas{
         }
 
         /* outline colour can be none, so toggle is used for switching between none and the colour */
-        this.outlineColourToggled = true
+        /* by default, outline is off */
+        this.outlineColourToggled = false
         this.outlineColour = this.shadowRoot.getElementById("outlineColour")
         this.noOutlineColour = this.shadowRoot.getElementById("noOutlineColour")
-        this.noOutlineColour.style.display = "none"
+        this.outlineColour.style.display = "none"
 
         this.shadowRoot.getElementById("outlineColourLabel").onclick = this.toggleOutlineColour.bind(this)
         this.noOutlineColour.onclick = this.toggleOutlineColour.bind(this)
