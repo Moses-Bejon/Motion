@@ -71,7 +71,7 @@ class verticallySplitWindow extends abstractWindow{
             } else {
 
                 // Raises an error if a subEdge is found with an unexpected label
-                throw "there was a subEdge in the horizontal set that wasn't either top or bottom"
+                throw new Error("there was a subEdge in the horizontal set that wasn't either top or bottom")
             }
         }
 
@@ -90,7 +90,7 @@ class verticallySplitWindow extends abstractWindow{
             return this.bottomWindow.getAllSubEdgesOfLabel(label)
         }
 
-        throw "you asked to get a subEdge without one of the following labels: top/left/right/bottom"
+        throw new Error("you asked to get a subEdge without one of the following labels: top/left/right/bottom")
     }
 
     // Used to switch out the top window after it has been created

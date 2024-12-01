@@ -1,12 +1,36 @@
 class controllerClass{
     constructor() {
 
+        this.aggregateModels = {
+            "displayShapes": {
+                "models": new Set(),
+                "subscribers": new Set()
+            }
+        }
+
         // ordered list of views that hear about keyboard inputs
         // the higher in the hierarchy, the more likely informed (more "in focus")
         this.inputSubscribersHierarchy = []
 
         document.addEventListener("keydown",this.keyDown.bind(this))
         document.addEventListener("keyup",this.keyUp.bind(this))
+    }
+
+    subscribeTo(subscriber,aggregateModel){
+        this.aggregateModels[aggregateModel].subscribers.add(subscriber)
+
+        this.updateSubscriber(subscriber,aggregateModel)
+    }
+
+    unsubscribeTo(subscriber,aggregateModel){
+        this.aggregateModels[aggregateModel].subscribers.delete(subscriber)
+    }
+
+    updateSubscriber(subscriber,aggregateModel){
+        subscriber.clearModel(aggregateModel)
+        for (const model of this.aggregateModels[aggregateModel].models){
+            subscriber.addModel(aggregateModel,model)
+        }
     }
 
     newFocus(focus){

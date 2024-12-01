@@ -7,7 +7,7 @@ import {abstractWindow} from "./window.js"
 const typesOfWindow = {
     "horizontally split":"horizontally-split-window",
     "vertically split":"vertically-split-window",
-    "canvas":"canvas-view"
+    "canvas":"create-edit-canvas"
 }
 
 const template = document.createElement("template")
