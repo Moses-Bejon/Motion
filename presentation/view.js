@@ -5,8 +5,8 @@ import {abstractWindow} from "./window.js"
 // All types of window listed here can be switched to by a user
 // The data is of the form {"name displayed to user":"type of window I should create"}
 const typesOfWindow = {
-    "horizontallySplit":"horizontally-split-window",
-    "verticallySplit":"vertically-split-window",
+    "horizontally split":"horizontally-split-window",
+    "vertically split":"vertically-split-window",
     "canvas":"canvas-view"
 }
 
@@ -64,7 +64,9 @@ template.innerHTML = `
         <svg id="fakeDropDown" viewBox="0 0 1 1">
             <polygon points="0, 0, 0.5, 1, 1, 0">
         </svg>
-        <select id="switchWindowDropDown"></select>
+        <select id="switchWindowDropDown">
+        <option disabled selected="selected">Pick a new window</option>
+        </select>
     </div>
 </div>
 `
