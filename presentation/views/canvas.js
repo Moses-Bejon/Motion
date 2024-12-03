@@ -106,6 +106,8 @@ template.innerHTML = `
     width: ${canvasWidth}px;
     height: ${canvasHeight}px;
     
+    overflow: visible;
+    
     border: dashed;
 }
 </style>
@@ -115,7 +117,7 @@ template.innerHTML = `
 <img id="zoomIn" src="assets/zoomIn.svg" alt="zoom out button">
 </div>
 
-<svg id="canvas"></svg>
+<svg id="canvas" viewBox="0 0 ${canvasWidth} ${canvasHeight}" preserveAspectRatio="none"></svg>
 `
 
 export class canvas extends abstractView{
@@ -181,6 +183,15 @@ export class canvas extends abstractView{
                 this+" is hearing about updates from "+aggregateModel+" which it shouldn't be subscribed to"
             )
         }
+
+        this.canvas.appendChild(model.geometry)
+    }
+
+    toCanvasCoordinates(x,y){
+
+        const boundingRect = this.canvas.getBoundingClientRect()
+
+        return [canvasWidth*(x-boundingRect.x)/boundingRect.width, canvasHeight*(y-boundingRect.y)/boundingRect.height]
     }
 
     move(){

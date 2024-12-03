@@ -1,8 +1,9 @@
 // anything draggable uses functions from this file
 
-export function addDragLogicTo(element,drag,endDrag,cursorHover = "grab",cursor = "grabbing"){
+export function addDragLogicTo(element,drag,endDrag,beginDrag=()=>{},cursorHover = "grab",cursor = "grabbing"){
     element.style.cursor = cursorHover
     element.onpointerdown = (pointerEvent) => {
+        beginDrag(pointerEvent)
         beginDragging(drag,endDrag,pointerEvent,cursor)
     }
 }

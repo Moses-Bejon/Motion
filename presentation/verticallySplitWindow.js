@@ -29,7 +29,7 @@ class verticallySplitWindow extends abstractWindow{
         this.edge.style.position = "absolute"
         this.shadowRoot.appendChild(this.edge)
 
-        addDragLogicTo(this.edge,this.drag,this.endDrag,"row-resize","row-resize")
+        addDragLogicTo(this.edge,this.drag,this.endDrag,()=>{},"row-resize","row-resize")
 
         this.setBottomWindow(document.createElement("abstract-view"))
 

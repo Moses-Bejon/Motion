@@ -1,12 +1,9 @@
+import {model} from "./model/model.js";
+
 class controllerClass{
     constructor() {
 
-        this.aggregateModels = {
-            "displayShapes": {
-                "models": new Set(),
-                "subscribers": new Set()
-            }
-        }
+        this.aggregateModels = model
 
         // ordered list of views that hear about keyboard inputs
         // the higher in the hierarchy, the more likely informed (more "in focus")
@@ -28,8 +25,58 @@ class controllerClass{
 
     updateSubscriber(subscriber,aggregateModel){
         subscriber.clearModel(aggregateModel)
-        for (const model of this.aggregateModels[aggregateModel].models){
+        for (const model of this.aggregateModels[aggregateModel].content){
             subscriber.addModel(aggregateModel,model)
+        }
+    }
+
+    addModel(aggregateModel,model){
+        for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
+            subscriber.addModel(aggregateModel,model)
+        }
+    }
+
+    newShape(shape){
+        this.aggregateModels.allShapes.content.add(shape)
+        this.addModel("allShapes",shape)
+
+        this.addTimeLineEvent({"type": "appearance","shape": shape,"time": shape.appearanceTime})
+        this.addTimeLineEvent({"type": "disappearance","shape": shape,"time": shape.disappearanceTime})
+
+        if (shape.appearanceTime <= this.aggregateModels.clock.content <= shape.disappearanceTime){
+            this.aggregateModels.displayShapes.content.add(shape)
+            this.addModel("displayShapes",shape)
+        }
+    }
+
+    addTimeLineEvent(event){
+        const length = this.aggregateModels.timelineEvents.content.length
+
+        if (length === 0){
+            this.aggregateModels.timelineEvents.content.push(event)
+            return
+        }
+
+        let left = 0
+        let right = length
+
+        while (left !== right){
+            const middle = Math.trunc((left+right)/2)
+            if (this.aggregateModels.timelineEvents.content[middle].time > event.time){
+                right = middle
+            } else {
+                left = middle + 1
+            }
+        }
+
+        this.aggregateModels.timelineEvents.content.splice(right-1,0,event)
+
+        this.addModel("timelineEvents",event)
+
+    }
+
+    modelUpdate(model){
+        for (const aggregateModel in this.aggregateModels){
         }
     }
 

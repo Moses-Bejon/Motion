@@ -1,12 +1,18 @@
 import {
     canvasOffsetY,
     canvasOffsetX,
+    canvasWidth,
+    canvasHeight,
     fontSize,
     fontFamily,
     minimumThickness,
-    maximumThickness
+    maximumThickness,
+    animationEndTimeSeconds
 } from "../../constants.js";
 import {canvas} from "./canvas.js";
+import {drawing} from "../../model/drawing.js";
+import {addDragLogicTo} from "../../dragLogic.js";
+import {controller} from "../../controller.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -186,6 +192,12 @@ export class createEditCanvas extends canvas{
             this.edit.style.display = "none"
         }
 
+        this.thicknessSlider = this.shadowRoot.getElementById("thicknessSlider")
+
+        this.shadowRoot.getElementById("draw").onclick = () => {
+            addDragLogicTo(this.canvas,this.continueDrawing.bind(this),this.endDrawing.bind(this),this.beginDrawing.bind(this),"auto","auto")
+        }
+
         /* outline colour can be none, so toggle is used for switching between none and the colour */
         /* by default, outline is off */
         this.outlineColourToggled = false
@@ -203,6 +215,31 @@ export class createEditCanvas extends canvas{
 
         this.shadowRoot.getElementById("fillColourLabel").onclick = this.toggleFillColour.bind(this)
         this.noFillColour.onclick = this.toggleFillColour.bind(this)
+    }
+
+    beginDrawing(pointerEvent){
+
+        let colour
+        if (this.outlineColourToggled){
+            colour = this.outlineColour.value
+        } else {
+            colour = this.fillColour.value
+        }
+
+        this.currentShape = new drawing(
+            this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
+            // thickness slider is the wrong way up when facing vertical, so need to subtract value from total
+            0,animationEndTimeSeconds,colour,maximumThickness-this.thicknessSlider.value)
+
+        this.canvas.appendChild(this.currentShape.geometry)
+    }
+
+    continueDrawing(pointerEvent){
+        this.currentShape.addPoints([this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)])
+    }
+
+    endDrawing(pointerEvent){
+        controller.newShape(this.currentShape)
     }
 
     toggleOutlineColour(){

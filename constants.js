@@ -21,4 +21,7 @@ export const sensitivity = 0.75
 
 // the minimum/maximum outline thickness for the slider on the canvas
 export const minimumThickness = 0
-export const maximumThickness = 1
+export const maximumThickness = 100
+
+// the number of seconds the animation lasts
+export const animationEndTimeSeconds = 10
