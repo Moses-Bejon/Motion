@@ -185,6 +185,7 @@ export class canvas extends abstractView{
             )
         }
 
+        // shapes are organised in groups
         const shape = document.createElementNS("http://www.w3.org/2000/svg", "g")
 
         shape.innerHTML = model.geometry
@@ -196,6 +197,7 @@ export class canvas extends abstractView{
 
         const boundingRect = this.canvas.getBoundingClientRect()
 
+        // this is required due to the fact the user has the option to zoom in and out
         return [canvasWidth*(x-boundingRect.x)/boundingRect.width, canvasHeight*(y-boundingRect.y)/boundingRect.height]
     }
 

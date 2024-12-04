@@ -57,6 +57,7 @@ class controllerClass{
             return
         }
 
+        // binary search to ensure inserted in position to maintain ascending order
         let left = 0
         let right = length
 

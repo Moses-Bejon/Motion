@@ -219,47 +219,64 @@ export class createEditCanvas extends canvas{
 
     beginDrawing(pointerEvent){
 
-        let colour
+        /* A drawing is made up of a list of points, stored here */
+        this.pointArray = []
+
         if (this.outlineColourToggled){
-            colour = this.outlineColour.value
+            this.drawingColour = this.outlineColour.value
         } else {
-            colour = this.fillColour.value
+            this.drawingColour = this.fillColour.value
         }
 
+        /* The slider is upside down and it's quite complicated to make it the right way round :s */
+        this.thickness = maximumThickness-this.thicknessSlider.value
+
+        /* each of my shapes is composed of a group of SVG shapes */
         this.currentShape = document.createElementNS("http://www.w3.org/2000/svg", "g")
 
-        this.drawing = document.createElementNS("http://www.w3.org/2000/svg", "polyline")
-        this.drawing.style.fill = "none"
-        this.drawing.style.stroke = colour
-        this.drawing.style.strokeWidth = maximumThickness-this.thicknessSlider.value
-
-        this.drawing.pointArray = []
-
-        this.currentShape.appendChild(this.drawing)
         this.canvas.appendChild(this.currentShape)
 
+        /* the previous point is kept track of to draw lines with */
+        this.previousPoint = this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
         this.continueDrawing(pointerEvent)
     }
 
     continueDrawing(pointerEvent){
-        this.drawing.pointArray.push(this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY))
+        const canvasCoordinates = this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+        this.pointArray.push(canvasCoordinates)
 
-        let points = ""
-        for (const point of this.drawing.pointArray){
-            points += String(point[0]) + "," + String(point[1]) + " "
-        }
+        /* line between previous point and current point */
+        const newLine = document.createElementNS("http://www.w3.org/2000/svg","line")
+        newLine.setAttribute("x1",this.previousPoint[0])
+        newLine.setAttribute("y1",this.previousPoint[1])
+        newLine.setAttribute("x2",canvasCoordinates[0])
+        newLine.setAttribute("y2",canvasCoordinates[1])
+        newLine.style.stroke = this.drawingColour
+        newLine.style.strokeWidth = this.thickness
 
-        this.drawing.setAttribute("points",points)
+        this.previousPoint = canvasCoordinates
+
+        /* circle at each vertex to prevent a gap between the lines */
+        const newCircle = document.createElementNS("http://www.w3.org/2000/svg","circle")
+        newCircle.setAttribute("cx",canvasCoordinates[0])
+        newCircle.setAttribute("cy",canvasCoordinates[1])
+        newCircle.setAttribute("r",this.thickness/2)
+        newCircle.style.fill = this.drawingColour
+
+        this.currentShape.appendChild(newCircle)
+        this.currentShape.appendChild(newLine)
     }
 
     endDrawing(pointerEvent){
         controller.newShape(new drawing(this.currentShape.innerHTML,
             0,
             animationEndTimeSeconds,
-            this.drawing.style.stroke,
-            maximumThickness-this.thicknessSlider.value,
-            this.drawing.pointArray)
+            this.drawingColour,
+            this.thickness,
+            this.pointArray)
         )
+
+        /* the controller will tell us to add it again */
         this.currentShape.remove()
     }
 
