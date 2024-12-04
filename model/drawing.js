@@ -1,31 +1,26 @@
 import {shape} from "./shape.js";
+import {maximumOfArray,isLess} from "../maths.js";
 
 export class drawing extends shape{
-    constructor(position,appearanceTime,disappearanceTime,colour,thickness,zIndex="") {
-        super(position,appearanceTime,disappearanceTime,zIndex)
+    constructor(geometry,appearanceTime,disappearanceTime,colour,thickness,points,zIndex="") {
 
-        this.points = []
+        super(geometry,appearanceTime,disappearanceTime,zIndex)
 
-        this.geometry = document.createElementNS("http://www.w3.org/2000/svg", "path")
-        this.geometry.style.fill = "none"
-        this.geometry.style.stroke = colour
-        this.geometry.style.strokeWidth = thickness
+        this.colour = colour
+        this.thickness = thickness
+        this.points = points
     }
 
-    updatePoints() {
-        let d = `M ${this.position[0]} ${this.position[1]}`
-
-        for(const point of this.points){
-            d += ` L ${point[0]} ${point[1]}`
-        }
-
-        this.geometry.setAttribute("d",d)
-
-        this.updateGeometry()
+    getTop(){
+        return maximumOfArray(this.points,(point)=>{point[1]},isLess)
     }
-
-    addPoints(points){
-        this.points = this.points.concat(points)
-        this.updatePoints()
+    getBottom(){
+        return maximumOfArray(this.points,(point)=>{point[1]})
+    }
+    getLeft(){
+        return maximumOfArray(this.points,(point) => {point[0]},isLess)
+    }
+    getRight(){
+        return maximumOfArray(this.points,(point) => {point[0]})
     }
 }

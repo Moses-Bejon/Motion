@@ -32,6 +32,7 @@ class controllerClass{
 
     addModel(aggregateModel,model){
         for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
+            console.log(subscriber)
             subscriber.addModel(aggregateModel,model)
         }
     }

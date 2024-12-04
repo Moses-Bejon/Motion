@@ -2,11 +2,12 @@ import {controller} from "../../controller.js"
 import {increment2dVectorBy,decrement2dVectorBy,multiply2dVectorByScalar} from "../../maths.js";
 import {abstractView} from "../view.js"
 
-import {canvasOffsetX,
+import {
+    canvasOffsetX,
     canvasOffsetY,
     canvasWidth,
     canvasHeight,
-    sensitivity
+    sensitivity, maximumThickness
 } from "../../constants.js";
 
 // maps keys to their intended movement vectors
@@ -178,13 +179,19 @@ export class canvas extends abstractView{
     }
 
     addModel(aggregateModel,model){
+        console.log("adding")
         if (aggregateModel !== "displayShapes"){
             throw new Error(
                 this+" is hearing about updates from "+aggregateModel+" which it shouldn't be subscribed to"
             )
         }
 
-        this.canvas.appendChild(model.geometry)
+        const shape = document.createElementNS("http://www.w3.org/2000/svg", "g")
+
+        shape.innerHTML = model.geometry
+        console.log(model.geometry)
+
+        this.canvas.appendChild(shape)
     }
 
     toCanvasCoordinates(x,y){

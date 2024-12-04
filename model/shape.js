@@ -1,15 +1,14 @@
 import {controller} from "../controller.js";
 
 export class shape{
-    constructor(position,appearanceTime,disappearanceTime,zIndex) {
-        this.position = position
+    constructor(geometry,appearanceTime,disappearanceTime,zIndex) {
+        this.geometry = geometry
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
         this.zIndex = zIndex
     }
 
-    // abstract function
-    updateGeometry(){
-        controller.modelUpdate(this)
+    getPosition(){
+        return [(this.getLeft()+this.getRight())/2,(this.getTop()+this.getBottom())/2]
     }
 }

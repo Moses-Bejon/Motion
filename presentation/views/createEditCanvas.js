@@ -226,20 +226,41 @@ export class createEditCanvas extends canvas{
             colour = this.fillColour.value
         }
 
-        this.currentShape = new drawing(
-            this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
-            // thickness slider is the wrong way up when facing vertical, so need to subtract value from total
-            0,animationEndTimeSeconds,colour,maximumThickness-this.thicknessSlider.value)
+        this.currentShape = document.createElementNS("http://www.w3.org/2000/svg", "g")
 
-        this.canvas.appendChild(this.currentShape.geometry)
+        this.drawing = document.createElementNS("http://www.w3.org/2000/svg", "polyline")
+        this.drawing.style.fill = "none"
+        this.drawing.style.stroke = colour
+        this.drawing.style.strokeWidth = maximumThickness-this.thicknessSlider.value
+
+        this.drawing.pointArray = []
+
+        this.currentShape.appendChild(this.drawing)
+        this.canvas.appendChild(this.currentShape)
+
+        this.continueDrawing(pointerEvent)
     }
 
     continueDrawing(pointerEvent){
-        this.currentShape.addPoints([this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)])
+        this.drawing.pointArray.push(this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY))
+
+        let points = ""
+        for (const point of this.drawing.pointArray){
+            points += String(point[0]) + "," + String(point[1]) + " "
+        }
+
+        this.drawing.setAttribute("points",points)
     }
 
     endDrawing(pointerEvent){
-        controller.newShape(this.currentShape)
+        controller.newShape(new drawing(this.currentShape.innerHTML,
+            0,
+            animationEndTimeSeconds,
+            this.drawing.style.stroke,
+            maximumThickness-this.thicknessSlider.value,
+            this.drawing.pointArray)
+        )
+        this.currentShape.remove()
     }
 
     toggleOutlineColour(){

@@ -36,3 +36,24 @@ export function scale2dVectorBy(vector,by){
     vector[0] *= by
     vector[1] *= by
 }
+
+export function isGreater(a,b){
+    return a > b
+}
+
+export function isLess(a,b){
+    return a < b
+}
+
+export function maximumOfArray(array,key,comparison=isGreater){
+    let maximum = key(array[0])
+
+    for (let i = 1; i < array.length; i++){
+        const value = key(array[i])
+        if (comparison(value,maximum)){
+            maximum = value
+        }
+    }
+
+    return maximum
+}
