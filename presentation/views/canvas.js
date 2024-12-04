@@ -179,7 +179,6 @@ export class canvas extends abstractView{
     }
 
     addModel(aggregateModel,model){
-        console.log("adding")
         if (aggregateModel !== "displayShapes"){
             throw new Error(
                 this+" is hearing about updates from "+aggregateModel+" which it shouldn't be subscribed to"
@@ -189,7 +188,6 @@ export class canvas extends abstractView{
         const shape = document.createElementNS("http://www.w3.org/2000/svg", "g")
 
         shape.innerHTML = model.geometry
-        console.log(model.geometry)
 
         this.canvas.appendChild(shape)
     }
