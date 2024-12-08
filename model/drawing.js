@@ -12,15 +12,15 @@ export class drawing extends shape{
     }
 
     getTop(){
-        return maximumOfArray(this.points,(point)=>{point[1]},isLess)
+        return maximumOfArray(this.points,(point)=>{point[1]},isLess) - this.thickness/2
     }
     getBottom(){
-        return maximumOfArray(this.points,(point)=>{point[1]})
+        return maximumOfArray(this.points,(point)=>{point[1]}) + this.thickness/2
     }
     getLeft(){
-        return maximumOfArray(this.points,(point) => {point[0]},isLess)
+        return maximumOfArray(this.points,(point) => {point[0]},isLess) - this.thickness/2
     }
     getRight(){
-        return maximumOfArray(this.points,(point) => {point[0]})
+        return maximumOfArray(this.points,(point) => {point[0]}) + this.thickness/2
     }
 }

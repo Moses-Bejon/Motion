@@ -1,5 +1,5 @@
 import {controller} from "../../controller.js"
-import {increment2dVectorBy,decrement2dVectorBy,multiply2dVectorByScalar} from "../../maths.js";
+import {increment2dVectorBy, decrement2dVectorBy, multiply2dVectorByScalar, subtract2dVectors} from "../../maths.js";
 import {abstractView} from "../view.js"
 
 import {
@@ -114,7 +114,7 @@ template.innerHTML = `
 </style>
 <div id="zoom">
 <img id="zoomOut" src="assets/zoomOut.svg" alt="zoom in button">
-<input id="zoomBar" class="sliderHorizontal slider" type="range" min="0" max="5" value="1" step="any">
+<input id="zoomBar" class="sliderHorizontal slider" type="range" min="0.001" max="5" value="1" step="any">
 <img id="zoomIn" src="assets/zoomIn.svg" alt="zoom out button">
 </div>
 
@@ -134,6 +134,8 @@ export class canvas extends abstractView{
 
         // called whenever the position of the zoom bar changes
         this.zoomBar.oninput = this.updateZoom.bind(this)
+
+        this.previousCanvasScale = 1
 
         this.shadowRoot.getElementById("zoomIn").onclick = this.zoomIn.bind(this)
         this.shadowRoot.getElementById("zoomOut").onclick = this.zoomOut.bind(this)
@@ -201,7 +203,53 @@ export class canvas extends abstractView{
         return [canvasWidth*(x-boundingRect.x)/boundingRect.width, canvasHeight*(y-boundingRect.y)/boundingRect.height]
     }
 
-    move(){
+    lineBetween(x1,y1,x2,y2,thickness,colour){
+        const line = document.createElementNS("http://www.w3.org/2000/svg","line")
+        line.setAttribute("x1",x1)
+        line.setAttribute("y1",y1)
+        line.setAttribute("x2",x2)
+        line.setAttribute("y2",y2)
+        line.style.stroke = colour
+        line.style.strokeWidth = thickness
+
+        return line
+    }
+
+    circleAt(x,y,r,fill,outlineThickness=0,outlineColour="transparent"){
+        const circle = document.createElementNS("http://www.w3.org/2000/svg","circle")
+        circle.setAttribute("cx",x)
+        circle.setAttribute("cy",y)
+        circle.setAttribute("r",r)
+        circle.style.fill = fill
+        circle.style.stroke = outlineColour
+        circle.style.strokeWidth = outlineThickness
+
+        return circle
+    }
+
+    fillArea(points,fill){
+        const polygon = document.createElementNS("http://www.w3.org/2000/svg","polygon")
+
+        polygon.style.fill = fill
+
+        let polygonPoints = ""
+
+        for (const point of this.pointArray){
+            polygonPoints += point[0] + " " + point[1] +" "
+        }
+
+        polygon.setAttribute("points",polygonPoints)
+
+        return polygon
+    }
+
+    move(movementVector){
+        increment2dVectorBy(this.canvasPosition,movementVector)
+        this.canvas.style.left = this.canvasPosition[0]+"px"
+        this.canvas.style.top = this.canvasPosition[1]+"px"
+    }
+
+    animateMove(){
 
         // deltaTime logic
         const currentTime = performance.now()
@@ -209,12 +257,10 @@ export class canvas extends abstractView{
         this.previousTime = currentTime
 
         // updating position
-        increment2dVectorBy(this.canvasPosition,multiply2dVectorByScalar(deltaTime,this.movementVector))
-        this.canvas.style.left = this.canvasPosition[0]+"px"
-        this.canvas.style.top = this.canvasPosition[1]+"px"
+        this.move(multiply2dVectorByScalar(deltaTime,this.movementVector))
 
         // loop (for as long as the animation frame isn't cancelled which is done in this.acceptKeyUp)
-        this.nextAnimationFrame = requestAnimationFrame(this.move.bind(this))
+        this.nextAnimationFrame = requestAnimationFrame(this.animateMove.bind(this))
     }
 
     acceptKeyDown(keyboardEvent){
@@ -260,7 +306,7 @@ export class canvas extends abstractView{
         if (this.nextAnimationFrame === null){
             this.previousTime = performance.now()
 
-            this.move()
+            this.animateMove()
         }
 
         return true
@@ -302,11 +348,25 @@ export class canvas extends abstractView{
     }
 
     updateZoom(){
+
         const canvasScale = parseFloat(this.zoomBar.value)
 
         // scale canvas to zoom bar input
         this.canvas.style.width = canvasScale*canvasWidth + "px"
         this.canvas.style.height = canvasScale*canvasHeight + "px"
+
+        const windowRect = this.getBoundingClientRect()
+
+        const centreOfScale = [
+            (windowRect.width)/2,
+            (windowRect.height)/2]
+
+        // ensures the canvas scales about the centre of the window
+        this.move(multiply2dVectorByScalar(
+            1-(canvasScale/this.previousCanvasScale),
+            subtract2dVectors(centreOfScale,this.canvasPosition)))
+
+        this.previousCanvasScale = canvasScale
     }
 
     zoomIn(){

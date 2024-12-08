@@ -1,16 +1,19 @@
 import {
     canvasOffsetY,
     canvasOffsetX,
-    canvasWidth,
-    canvasHeight,
     fontSize,
     fontFamily,
     minimumThickness,
     maximumThickness,
-    animationEndTimeSeconds
+    animationEndTimeSeconds,
+    snappingDistance
 } from "../../constants.js";
+import {
+    distanceBetween2dPoints
+} from "../../maths.js";
 import {canvas} from "./canvas.js";
 import {drawing} from "../../model/drawing.js";
+import {polygon} from "../../model/polygon.js";
 import {addDragLogicTo} from "../../dragLogic.js";
 import {controller} from "../../controller.js";
 
@@ -195,7 +198,12 @@ export class createEditCanvas extends canvas{
         this.thicknessSlider = this.shadowRoot.getElementById("thicknessSlider")
 
         this.shadowRoot.getElementById("draw").onclick = () => {
-            addDragLogicTo(this.canvas,this.continueDrawing.bind(this),this.endDrawing.bind(this),this.beginDrawing.bind(this),"auto","auto")
+            addDragLogicTo(this.canvas,
+                this.continueDrawing.bind(this),
+                this.endDrawing.bind(this),
+                this.beginDrawing.bind(this),
+                "auto",
+                "auto")
         }
 
         /* outline colour can be none, so toggle is used for switching between none and the colour */
@@ -246,35 +254,52 @@ export class createEditCanvas extends canvas{
         this.pointArray.push(canvasCoordinates)
 
         /* line between previous point and current point */
-        const newLine = document.createElementNS("http://www.w3.org/2000/svg","line")
-        newLine.setAttribute("x1",this.previousPoint[0])
-        newLine.setAttribute("y1",this.previousPoint[1])
-        newLine.setAttribute("x2",canvasCoordinates[0])
-        newLine.setAttribute("y2",canvasCoordinates[1])
-        newLine.style.stroke = this.drawingColour
-        newLine.style.strokeWidth = this.thickness
+        this.currentShape.appendChild(
+            this.lineBetween(...this.previousPoint,...canvasCoordinates,this.thickness,this.drawingColour)
+        )
 
         this.previousPoint = canvasCoordinates
 
         /* circle at each vertex to prevent a gap between the lines */
-        const newCircle = document.createElementNS("http://www.w3.org/2000/svg","circle")
-        newCircle.setAttribute("cx",canvasCoordinates[0])
-        newCircle.setAttribute("cy",canvasCoordinates[1])
-        newCircle.setAttribute("r",this.thickness/2)
-        newCircle.style.fill = this.drawingColour
-
-        this.currentShape.appendChild(newCircle)
-        this.currentShape.appendChild(newLine)
+        this.currentShape.appendChild(this.circleAt(...canvasCoordinates,this.thickness/2,this.drawingColour))
     }
 
     endDrawing(pointerEvent){
-        controller.newShape(new drawing(this.currentShape.innerHTML,
-            0,
-            animationEndTimeSeconds,
-            this.drawingColour,
-            this.thickness,
-            this.pointArray)
-        )
+
+        /* If the last and first points drawn on the shape are close enough together or there is no fill*/
+        if (distanceBetween2dPoints(
+            this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),this.pointArray[0]
+        ) > Math.max(this.thickness,snappingDistance) || !this.fillColourToggled){
+
+            /* If they're not close together or there is no fill make a drawing*/
+            controller.newShape(new drawing(this.currentShape.innerHTML,
+                0,
+                animationEndTimeSeconds,
+                this.drawingColour,
+                this.thickness,
+                this.pointArray)
+            )
+        } else {
+
+            /* If they are, connect up the shape, make a polygon, and fill the polygon with the fill colour */
+            this.currentShape.appendChild(
+                this.lineBetween(
+                    ...this.pointArray[0],
+                    ...this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
+                    this.thickness,
+                    this.drawingColour)
+            )
+
+            this.currentShape.prepend(this.fillArea(this.pointArray,this.fillColour.value))
+
+            controller.newShape(new polygon(this.currentShape.innerHTML,
+                0,
+                animationEndTimeSeconds,
+                this.drawingColour,
+                this.fillColour,
+                this.thickness,
+                this.pointArray))
+        }
 
         /* the controller will tell us to add it again */
         this.currentShape.remove()
