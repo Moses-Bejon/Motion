@@ -234,7 +234,7 @@ export class canvas extends abstractView{
 
         let polygonPoints = ""
 
-        for (const point of this.pointArray){
+        for (const point of points){
             polygonPoints += point[0] + " " + point[1] +" "
         }
 
