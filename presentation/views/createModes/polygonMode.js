@@ -26,8 +26,6 @@ export class polygonMode extends manyPointsMode{
 
     acceptKeyDown(keyboardEvent) {
 
-        console.log(keyboardEvent)
-
         if (keyboardEvent.key === "Enter"){
 
             controller.newShape(new drawing(this.currentShape.innerHTML,
