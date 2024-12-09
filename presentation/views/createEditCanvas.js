@@ -143,12 +143,12 @@ p{
     </div>
 </div>
 <div id="outlineColourContainer">
-    <label id="outlineColourLabel">Outline</label>
+    <button id="outlineColourLabel">Outline</button>
     <input id="outlineColour" type="color">
     <p id="noOutlineColour">None</p>
 </div>
 <div id="fillColourContainer">
-    <label id="fillColourLabel">Fill</label>
+    <button id="fillColourLabel">Fill</button>
     <input id="fillColour" type="color">
     <p id="noFillColour">None</p>
 </div>
