@@ -1,6 +1,8 @@
 import {manyPointsMode} from "./manyPointsMode.js";
 import {distanceBetween2dPoints} from "../../../maths.js";
-import {snappingDistance} from "../../../constants.js";
+import {animationEndTimeSeconds, snappingDistance} from "../../../constants.js";
+import {controller} from "../../../controller.js";
+import {drawing} from "../../../model/drawing.js";
 
 export class polygonMode extends manyPointsMode{
     constructor(createCanvas) {
@@ -20,6 +22,30 @@ export class polygonMode extends manyPointsMode{
         this.createCanvas.canvas.removeEventListener("pointermove",this.bindedPreviewNextLine)
         this.line?.remove()
         this.currentShape?.remove()
+    }
+
+    acceptKeyDown(keyboardEvent) {
+
+        console.log(keyboardEvent)
+
+        if (keyboardEvent.key === "Enter"){
+
+            controller.newShape(new drawing(this.currentShape.innerHTML,
+                0,
+                animationEndTimeSeconds,
+                this.drawingColour,
+                this.thickness,
+                this.pointArray)
+            )
+
+            this.line.remove()
+            this.createCanvas.canvas.removeEventListener("pointermove",this.bindedPreviewNextLine)
+            this.createCanvas.canvas.onclick = this.beginPolygon.bind(this)
+
+            return true
+        } else {
+            return false
+        }
     }
 
     // called when a new polygon is created

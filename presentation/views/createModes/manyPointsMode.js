@@ -8,6 +8,10 @@ export class manyPointsMode{
         this.createCanvas = createCanvas
     }
 
+    acceptKeyDown(keyboardEvent){
+        return false
+    }
+
     begin(pointerEvent){
         /* Made up of a list of points, stored here */
         this.pointArray = []

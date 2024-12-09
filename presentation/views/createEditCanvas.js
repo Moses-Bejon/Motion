@@ -4,20 +4,11 @@ import {
     fontSize,
     fontFamily,
     minimumThickness,
-    maximumThickness,
-    animationEndTimeSeconds,
-    snappingDistance
+    maximumThickness
 } from "../../constants.js";
-import {
-    distanceBetween2dPoints
-} from "../../maths.js";
 import {canvas} from "./canvas.js";
-import {drawing} from "../../model/drawing.js";
 import {drawMode} from "./createModes/drawMode.js";
 import {polygonMode} from "./createModes/polygonMode.js";
-import {polygon} from "../../model/polygon.js";
-import {addDragLogicTo} from "../../dragLogic.js";
-import {controller} from "../../controller.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -255,6 +246,14 @@ export class createEditCanvas extends canvas{
 
             this.fillColourToggled = true
         }
+    }
+
+    acceptKeyDown(keyboardEvent) {
+        if (this.currentMode.acceptKeyDown(keyboardEvent)){
+            return true
+        }
+
+        return super.acceptKeyDown(keyboardEvent)
     }
 }
 window.customElements.define("create-edit-canvas",createEditCanvas)
