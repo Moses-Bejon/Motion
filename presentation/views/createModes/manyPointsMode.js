@@ -59,14 +59,24 @@ export class manyPointsMode{
                 this.drawingColour)
         )
 
-        this.currentShape.prepend(this.createCanvas.fillArea(this.pointArray,this.createCanvas.fillColour.value))
+        let fillColour
+
+        if (this.createCanvas.fillColourToggled){
+            fillColour = this.createCanvas.fillColour.value
+        } else {
+            fillColour = "transparent"
+        }
+
+        this.currentShape.prepend(this.createCanvas.fillArea(this.pointArray,fillColour))
 
         controller.newShape(new polygon(this.currentShape.innerHTML,
             0,
             animationEndTimeSeconds,
             this.drawingColour,
-            this.createCanvas.fillColour.value,
+            fillColour,
             this.thickness,
             this.pointArray))
+
+        this.currentShape.remove()
     }
 }

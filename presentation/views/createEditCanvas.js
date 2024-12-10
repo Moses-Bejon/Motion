@@ -9,6 +9,7 @@ import {
 import {canvas} from "./canvas.js";
 import {drawMode} from "./createModes/drawMode.js";
 import {polygonMode} from "./createModes/polygonMode.js";
+import {ellipseMode} from "./createModes/ellipseMode.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -198,6 +199,10 @@ export class createEditCanvas extends canvas{
         this.shadowRoot.getElementById("polygon").onclick = () => {
             this.currentMode.switchMode()
             this.currentMode = new polygonMode(this)
+        }
+        this.shadowRoot.getElementById("ellipse").onclick = () => {
+            this.currentMode.switchMode()
+            this.currentMode = new ellipseMode(this)
         }
 
         /* outline colour can be none, so toggle is used for switching between none and the colour */

@@ -2,9 +2,9 @@ import {shape} from "./shape.js";
 import {maximumOfArray,isLess} from "../maths.js";
 
 export class drawing extends shape{
-    constructor(geometry,appearanceTime,disappearanceTime,colour,thickness,points,zIndex="") {
+    constructor(geometry,appearanceTime,disappearanceTime,colour,thickness,points) {
 
-        super(geometry,appearanceTime,disappearanceTime,zIndex)
+        super(geometry,appearanceTime,disappearanceTime)
 
         this.colour = colour
         this.thickness = thickness

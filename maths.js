@@ -62,3 +62,7 @@ export function maximumOfArray(array,key,comparison=isGreater){
 export function distanceBetween2dPoints(point1,point2){
     return Math.hypot(point1[0]-point2[0],point1[1]-point2[1])
 }
+
+export function midPoint2d(point1,point2){
+    return [(point1[0]+point2[0])/2,(point1[1]+point2[1])/2]
+}

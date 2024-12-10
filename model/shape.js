@@ -1,14 +1,13 @@
-import {controller} from "../controller.js";
+import {midPoint2d} from "../maths.js";
 
 export class shape{
-    constructor(geometry,appearanceTime,disappearanceTime,zIndex) {
+    constructor(geometry,appearanceTime,disappearanceTime) {
         this.geometry = geometry
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
-        this.zIndex = zIndex
     }
 
     getPosition(){
-        return [(this.getLeft()+this.getRight())/2,(this.getTop()+this.getBottom())/2]
+        return midPoint2d([this.getLeft(),this.getTop()],[this.getRight(),this.getBottom()])
     }
 }
