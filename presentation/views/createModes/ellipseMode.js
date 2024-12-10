@@ -62,9 +62,7 @@ export class ellipseMode{
         const width = Math.abs(this.initialPosition[0]-currentPosition[0])
 
         /* check for edge case where there is not enough space in the user's ellipse for the outline */
-        if (this.thickness > height || this.thickness > width){
-
-            /* if there isn't the outline is removed and the entire ellipse becomes the outline */
+        if ((this.thickness > height || this.thickness > width) && this.createCanvas.outlineColourToggled){
 
             this.ellipse.style.stroke = "transparent"
             this.ellipse.style.fill = this.outlineColour
