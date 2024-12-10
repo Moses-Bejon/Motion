@@ -36,7 +36,7 @@ export class polygonMode extends manyPointsMode{
                 this.pointArray)
             )
 
-            this.line.remove()
+            this.line?.remove()
             this.createCanvas.canvas.removeEventListener("pointermove",this.bindedPreviewNextLine)
             this.createCanvas.canvas.onclick = this.beginPolygon.bind(this)
 
