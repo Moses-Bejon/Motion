@@ -10,6 +10,7 @@ import {canvas} from "./canvas.js";
 import {drawMode} from "./createModes/drawMode.js";
 import {polygonMode} from "./createModes/polygonMode.js";
 import {ellipseMode} from "./createModes/ellipseMode.js";
+import {textMode} from "./createModes/textMode.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -204,21 +205,25 @@ export class createEditCanvas extends canvas{
             this.currentMode.switchMode()
             this.currentMode = new ellipseMode(this)
         }
+        this.shadowRoot.getElementById("text").onclick = () => {
+            this.currentMode.switchMode()
+            this.currentMode = new textMode(this)
+        }
 
         /* outline colour can be none, so toggle is used for switching between none and the colour */
         /* by default, outline is off */
-        this.outlineColourToggled = false
+        this.outlineColourToggled = true
         this.outlineColour = this.shadowRoot.getElementById("outlineColour")
         this.noOutlineColour = this.shadowRoot.getElementById("noOutlineColour")
-        this.outlineColour.style.display = "none"
 
         this.shadowRoot.getElementById("outlineColourLabel").onclick = this.toggleOutlineColour.bind(this)
         this.noOutlineColour.onclick = this.toggleOutlineColour.bind(this)
+        this.noOutlineColour.style.display = "none"
 
-        this.fillColourToggled = true
+        this.fillColourToggled = false
         this.fillColour =  this.shadowRoot.getElementById("fillColour")
+        this.fillColour.style.display = "none"
         this.noFillColour = this.shadowRoot.getElementById("noFillColour")
-        this.noFillColour.style.display = "none"
 
         this.shadowRoot.getElementById("fillColourLabel").onclick = this.toggleFillColour.bind(this)
         this.noFillColour.onclick = this.toggleFillColour.bind(this)
