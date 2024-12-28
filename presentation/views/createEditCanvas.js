@@ -11,6 +11,7 @@ import {drawMode} from "./createModes/drawMode.js";
 import {polygonMode} from "./createModes/polygonMode.js";
 import {ellipseMode} from "./createModes/ellipseMode.js";
 import {textMode} from "./createModes/textMode.js";
+import {controller} from "../../controller.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -227,6 +228,18 @@ export class createEditCanvas extends canvas{
 
         this.shadowRoot.getElementById("fillColourLabel").onclick = this.toggleFillColour.bind(this)
         this.noFillColour.onclick = this.toggleFillColour.bind(this)
+    }
+
+    connectedCallback() {
+        super.connectedCallback()
+
+        controller.subscribeTo(this,"selectedShapes")
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback()
+
+        controller.unsubscribeTo(this,"selectedShapes")
     }
 
     toggleOutlineColour(){
