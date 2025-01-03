@@ -249,7 +249,7 @@ export class createEditCanvas extends canvas{
             fakeGraphic.style.backgroundColor = "#e5e5e5"
         }
         graphic.onpointerleave = () => {
-            fakeGraphic.style.backgroundColor = "#f0f0f0"
+            fakeGraphic.style.backgroundColor = ""
         }
 
         /* outline colour can be none, so toggle is used for switching between none and the colour */
