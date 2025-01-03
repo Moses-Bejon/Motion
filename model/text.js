@@ -1,14 +1,14 @@
 import {shape} from "./shape.js";
-import {fontSize,fontFamily,canvasWidth,canvasHeight} from "../constants.js";
+import {fontSize,fontFamily} from "../constants.js";
 
 export class text extends shape{
-    constructor(appearanceTime,disappearanceTime,topLeft,rotation,colour,size=fontSize,family=fontFamily){
+    constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size=fontSize,family=fontFamily){
         super(appearanceTime,disappearanceTime)
 
         this.text = "Begin typing"
         this.defaultTextReplaced = false
 
-        this.topLeft = topLeft
+        this.bottomLeft = bottomLeft
         this.rotation = rotation
         this.fontColour = colour
         this.fontSize = size
@@ -19,19 +19,19 @@ export class text extends shape{
     }
 
     getTop(){
-        return this.topLeft[1]
+        return this.bottomLeft[1]
     }
 
     getBottom(){
-        return this.topLeft[1] - this.height
+        return this.bottomLeft[1] - this.height
     }
 
     getLeft(){
-        return this.topLeft[0]
+        return this.bottomLeft[0]
     }
 
     getRight(){
-        return this.topLeft[0] + this.width
+        return this.bottomLeft[0] + this.width
     }
 
     updateWidthAndHeightFromText(){
@@ -52,8 +52,8 @@ export class text extends shape{
 
         const text = document.createElementNS("http://www.w3.org/2000/svg","text")
 
-        text.setAttribute("x",this.topLeft[0])
-        text.setAttribute("y",this.topLeft[1])
+        text.setAttribute("x",this.bottomLeft[0])
+        text.setAttribute("y",this.bottomLeft[1])
 
         text.style.fontFamily = this.fontFamily
         text.style.fontSize = this.fontSize

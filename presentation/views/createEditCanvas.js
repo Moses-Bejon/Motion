@@ -13,6 +13,7 @@ import {ellipseMode} from "./createModes/ellipseMode.js";
 import {textMode} from "./createModes/textMode.js";
 import {controller} from "../../controller.js";
 import {manyPointsMode} from "./createModes/manyPointsMode.js";
+import {graphicMode} from "./createModes/graphicMode.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -61,8 +62,9 @@ template.innerHTML = `
     writing-mode: vertical-lr;
 }
 
-button{
+button,#graphic,.realFakeButtonContainer{
     width: 100%;
+    height: 100%;
     
     flex-grow: 1;
     
@@ -72,6 +74,22 @@ button{
     font-family: ${fontFamily};
     font-size: ${fontSize};
 }
+
+/* ensures the fake graphic appears behind the real graphic */
+#fakeGraphic{
+    position: relative;
+    
+    /* when the JavaScript simulates a hover over, styling is lost for some reason, defining it here seems to work */
+    border: 1px solid #555;
+    border-radius: 2px;
+}
+
+#graphic{
+    opacity: 0;
+    position: relative;
+    top: -100%;
+}
+
 
 label,p{
     margin: 0;
@@ -142,7 +160,11 @@ p{
         <button id="polygon">Polygon</button>
         <button id="ellipse">Ellipse</button>
         <button id="text">Text</button>
-        <button id="graphic">Graphic</button>
+        
+        <div class="realFakeButtonContainer">
+            <button id="fakeGraphic">Graphic</button>
+            <input type="file" id="graphic">
+        </div>
     
     </div>
 </div>
@@ -210,6 +232,23 @@ export class createEditCanvas extends canvas{
         this.shadowRoot.getElementById("text").onclick = () => {
             this.currentMode.switchMode()
             this.currentMode = new textMode(this)
+        }
+
+        const graphic = this.shadowRoot.getElementById("graphic")
+
+        graphic.oninput = (input) => {
+            this.currentMode.switchMode()
+            this.currentMode = new graphicMode(input.target.files[0])
+        }
+
+        const fakeGraphic = this.shadowRoot.getElementById("fakeGraphic")
+
+        /* Simulating hover over button effect */
+        graphic.onpointerenter = () => {
+            fakeGraphic.style.backgroundColor = "#e5e5e5"
+        }
+        graphic.onpointerleave = () => {
+            fakeGraphic.style.backgroundColor = "#f0f0f0"
         }
 
         /* outline colour can be none, so toggle is used for switching between none and the colour */
@@ -284,6 +323,8 @@ export class createEditCanvas extends canvas{
                 return ellipseMode
             case "text":
                 return textMode
+            case "graphic":
+                return graphicMode
         }
     }
 
@@ -308,13 +349,17 @@ export class createEditCanvas extends canvas{
     }
 
     updateAggregateModel(aggregateModel, model){
-        if (aggregateModel !== "selectedShapes"){
-            throw new Error(
-                this+" is hearing about updates from "+aggregateModel+" which it shouldn't be subscribed to"
-            )
+        if (aggregateModel === "selectedShapes"){
+            this.selectedShapes = model
         }
+    }
 
-        this.selectedShapes = model
+    addModel(aggregateModel, model) {
+        if (aggregateModel === "selectedShapes"){
+            this.selectedShapes.add(model)
+        } else {
+            super.addModel(aggregateModel, model)
+        }
     }
 
     removeModel(aggregateModel, model) {
