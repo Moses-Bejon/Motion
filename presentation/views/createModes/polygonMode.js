@@ -28,8 +28,7 @@ export class polygonMode extends manyPointsMode{
 
         if (keyboardEvent.key === "Enter"){
 
-            controller.newShape(new drawing(this.currentShape.innerHTML,
-                0,
+            controller.newShape(new drawing(0,
                 animationEndTimeSeconds,
                 this.drawingColour,
                 this.thickness,
@@ -78,7 +77,7 @@ export class polygonMode extends manyPointsMode{
     // called for every mouse movement so the user can see where their line would be if they clicked
     previewNextLine(pointerEvent){
         this.line?.remove()
-        this.line = this.createCanvas.lineBetween(
+        this.line = drawing.lineBetween(
             ...this.previousPoint,
             ...this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
             this.thickness,

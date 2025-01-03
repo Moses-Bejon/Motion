@@ -140,6 +140,9 @@ export class canvas extends abstractView{
         this.shadowRoot.getElementById("zoomIn").onclick = this.zoomIn.bind(this)
         this.shadowRoot.getElementById("zoomOut").onclick = this.zoomOut.bind(this)
 
+        // mapping of shape objects to their group elements on the canvas
+        this.shapesToGeometry = new Map()
+
         // all keys that the user currently has pressed for this window
         this.keysDown = new Set()
 
@@ -180,19 +183,33 @@ export class canvas extends abstractView{
         }
     }
 
-    addModel(aggregateModel,model){
+    errorCheckAggregateModel(aggregateModel){
         if (aggregateModel !== "displayShapes"){
             throw new Error(
                 this+" is hearing about updates from "+aggregateModel+" which it shouldn't be subscribed to"
             )
         }
+    }
+
+    addModel(aggregateModel,model){
+        this.errorCheckAggregateModel(aggregateModel)
 
         // shapes are organised in groups
         const shape = document.createElementNS("http://www.w3.org/2000/svg", "g")
 
         shape.innerHTML = model.geometry
 
+        this.shapesToGeometry.set(model,shape)
+
         this.canvas.appendChild(shape)
+    }
+
+    removeModel(aggregateModel,model){
+        this.errorCheckAggregateModel(aggregateModel)
+
+        this.canvas.removeChild(this.shapesToGeometry.get(model))
+
+        this.shapesToGeometry.delete(model)
     }
 
     toCanvasCoordinates(x,y){
@@ -201,46 +218,6 @@ export class canvas extends abstractView{
 
         // this is required due to the fact the user has the option to zoom in and out
         return [canvasWidth*(x-boundingRect.x)/boundingRect.width, canvasHeight*(y-boundingRect.y)/boundingRect.height]
-    }
-
-    lineBetween(x1,y1,x2,y2,thickness,colour){
-        const line = document.createElementNS("http://www.w3.org/2000/svg","line")
-        line.setAttribute("x1",x1)
-        line.setAttribute("y1",y1)
-        line.setAttribute("x2",x2)
-        line.setAttribute("y2",y2)
-        line.style.stroke = colour
-        line.style.strokeWidth = thickness
-
-        return line
-    }
-
-    circleAt(x,y,r,fill,outlineThickness=0,outlineColour="transparent"){
-        const circle = document.createElementNS("http://www.w3.org/2000/svg","circle")
-        circle.setAttribute("cx",x)
-        circle.setAttribute("cy",y)
-        circle.setAttribute("r",r)
-        circle.style.fill = fill
-        circle.style.stroke = outlineColour
-        circle.style.strokeWidth = outlineThickness
-
-        return circle
-    }
-
-    fillArea(points,fill){
-        const polygon = document.createElementNS("http://www.w3.org/2000/svg","polygon")
-
-        polygon.style.fill = fill
-
-        let polygonPoints = ""
-
-        for (const point of points){
-            polygonPoints += point[0] + " " + point[1] +" "
-        }
-
-        polygon.setAttribute("points",polygonPoints)
-
-        return polygon
     }
 
     move(movementVector){

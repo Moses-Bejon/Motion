@@ -12,6 +12,7 @@ import {polygonMode} from "./createModes/polygonMode.js";
 import {ellipseMode} from "./createModes/ellipseMode.js";
 import {textMode} from "./createModes/textMode.js";
 import {controller} from "../../controller.js";
+import {manyPointsMode} from "./createModes/manyPointsMode.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -228,6 +229,8 @@ export class createEditCanvas extends canvas{
 
         this.shadowRoot.getElementById("fillColourLabel").onclick = this.toggleFillColour.bind(this)
         this.noFillColour.onclick = this.toggleFillColour.bind(this)
+
+        this.selectedShapes = new Set()
     }
 
     connectedCallback() {
@@ -271,12 +274,56 @@ export class createEditCanvas extends canvas{
         }
     }
 
+    shapeToMode(shape){
+        switch (shape.constructor.name){
+            case "drawing":
+                return manyPointsMode
+            case "polygon":
+                return manyPointsMode
+            case "ellipse":
+                return ellipseMode
+            case "text":
+                return textMode
+        }
+    }
+
     acceptKeyDown(keyboardEvent) {
         if (this.currentMode.acceptKeyDown(keyboardEvent)){
             return true
         }
 
+        let acceptedBySelectedShape = false
+
+        // if any selected shape accepts the input, we have accepted the input
+        // I cannot break early as the operation should apply to all selected shapes
+        for (const shape of this.selectedShapes){
+            acceptedBySelectedShape = acceptedBySelectedShape || this.shapeToMode(shape).acceptKeyDownOnShape(keyboardEvent,shape)
+        }
+
+        if (acceptedBySelectedShape){
+            return true
+        }
+
         return super.acceptKeyDown(keyboardEvent)
+    }
+
+    updateAggregateModel(aggregateModel, model){
+        if (aggregateModel !== "selectedShapes"){
+            throw new Error(
+                this+" is hearing about updates from "+aggregateModel+" which it shouldn't be subscribed to"
+            )
+        }
+
+        this.selectedShapes = model
+    }
+
+    removeModel(aggregateModel, model) {
+        switch (aggregateModel){
+            case "selectedShapes":
+                break
+            default:
+                super.removeModel(aggregateModel,model)
+        }
     }
 }
 window.customElements.define("create-edit-canvas",createEditCanvas)

@@ -31,8 +31,7 @@ export class drawMode extends manyPointsMode{
         ) > Math.max(this.thickness,snappingDistance) || !this.createCanvas.fillColourToggled){
 
             /* If they're not close together or there is no fill make a drawing*/
-            controller.newShape(new drawing(this.currentShape.innerHTML,
-                0,
+            controller.newShape(new drawing(0,
                 animationEndTimeSeconds,
                 this.drawingColour,
                 this.thickness,

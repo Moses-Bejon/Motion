@@ -36,6 +36,18 @@ class controllerClass{
         }
     }
 
+    removeModel(aggregateModel,model){
+        for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
+            subscriber.removeModel(aggregateModel,model)
+        }
+    }
+
+    updateAggregateModel(aggregateModel){
+        for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
+            subscriber.updateAggregateModel(aggregateModel,this.aggregateModels[aggregateModel].content)
+        }
+    }
+
     newShape(shape){
         this.aggregateModels.allShapes.content.add(shape)
         this.addModel("allShapes",shape)
@@ -46,6 +58,27 @@ class controllerClass{
         if (shape.appearanceTime <= this.aggregateModels.clock.content <= shape.disappearanceTime){
             this.aggregateModels.displayShapes.content.add(shape)
             this.addModel("displayShapes",shape)
+        }
+
+        // whenever a new shape is added, it is selected by default
+        this.aggregateModels.selectedShapes.content = new Set([shape])
+        this.updateAggregateModel("selectedShapes")
+    }
+
+    removeShape(shape){
+        this.aggregateModels.allShapes.content.delete(shape)
+        this.removeModel("allShapes",shape)
+
+        this.removeShapeFromTimeline(shape)
+
+        if (shape.appearanceTime <= this.aggregateModels.clock.content <= shape.disappearanceTime){
+            this.aggregateModels.displayShapes.content.delete(shape)
+            this.removeModel("displayShapes",shape)
+        }
+
+        if (this.aggregateModels.selectedShapes.content.has(shape)){
+            this.aggregateModels.selectedShapes.content.delete(shape)
+            this.removeModel("selectedShapes",shape)
         }
     }
 
@@ -73,12 +106,27 @@ class controllerClass{
         this.aggregateModels.timelineEvents.content.splice(right-1,0,event)
 
         this.addModel("timelineEvents",event)
-
     }
 
     modelUpdate(model){
         for (const aggregateModel in this.aggregateModels){
         }
+    }
+
+    removeShapeFromTimeline(shape){
+
+        const remainingEvents = []
+
+        for (const timeLineEvent of this.aggregateModels.timelineEvents.content) {
+            if (timeLineEvent.shape === shape) {
+                this.removeModel("timelineEvents",timeLineEvent)
+            } else {
+                remainingEvents.push(timeLineEvent)
+            }
+        }
+
+        this.aggregateModels.timelineEvents.content = remainingEvents
+
     }
 
     newFocus(focus){

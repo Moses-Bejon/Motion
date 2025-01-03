@@ -17,6 +17,10 @@ export class ellipseMode{
             "auto")
     }
 
+    static acceptKeyDownOnShape(keyboardEvent,shape){
+        return false
+    }
+
     acceptKeyDown(keyboardEvent){
         return false
     }
@@ -88,8 +92,8 @@ export class ellipseMode{
 
     endEllipse(pointerEvent){
         const [width,height,centre] = this.continueEllipse(pointerEvent)
-        controller.newShape(new ellipse(this.currentShape.innerHTML,
-            0,animationEndTimeSeconds,
+        controller.newShape(new ellipse(0,
+            animationEndTimeSeconds,
             centre,
             height,
             width,

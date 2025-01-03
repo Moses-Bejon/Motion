@@ -1,11 +1,16 @@
 import {animationEndTimeSeconds, maximumThickness} from "../../../constants.js";
 import {controller} from "../../../controller.js";
 import {polygon} from "../../../model/polygon.js";
+import {drawing} from "../../../model/drawing.js";
 
 export class manyPointsMode{
 
     constructor(createCanvas) {
         this.createCanvas = createCanvas
+    }
+
+    static acceptKeyDownOnShape(keyboardEvent,shape){
+        return false
     }
 
     acceptKeyDown(keyboardEvent){
@@ -41,18 +46,18 @@ export class manyPointsMode{
 
         /* line between previous point and current point */
         this.currentShape.appendChild(
-            this.createCanvas.lineBetween(...this.previousPoint,...canvasCoordinates,this.thickness,this.drawingColour)
+            drawing.lineBetween(...this.previousPoint,...canvasCoordinates,this.thickness,this.drawingColour)
         )
 
         this.previousPoint = canvasCoordinates
 
         /* circle at each vertex to prevent a gap between the lines */
-        this.currentShape.appendChild(this.createCanvas.circleAt(...canvasCoordinates,this.thickness/2,this.drawingColour))
+        this.currentShape.appendChild(drawing.circleAt(...canvasCoordinates,this.thickness/2,this.drawingColour))
     }
 
     completePolygon(pointerEvent){
         this.currentShape.appendChild(
-            this.createCanvas.lineBetween(
+            drawing.lineBetween(
                 ...this.pointArray[0],
                 ...this.pointArray[this.pointArray.length-1],
                 this.thickness,
@@ -67,10 +72,9 @@ export class manyPointsMode{
             fillColour = "transparent"
         }
 
-        this.currentShape.prepend(this.createCanvas.fillArea(this.pointArray,fillColour))
+        this.currentShape.prepend(polygon.fillArea(this.pointArray,fillColour))
 
-        controller.newShape(new polygon(this.currentShape.innerHTML,
-            0,
+        controller.newShape(new polygon(0,
             animationEndTimeSeconds,
             this.drawingColour,
             fillColour,
