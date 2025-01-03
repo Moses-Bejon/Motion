@@ -76,13 +76,21 @@ button,#graphic,.realFakeButtonContainer{
     font-size: ${fontSize};
 }
 
+/* defined here for consistency across browsers, which I'm generally not super concerned with */
+/* however, in this case javascript is changing these colours so I need a standard */
+button{
+    background-color: #f0f0f0;
+    border: 1px solid #555;
+    border-radius: 2px;
+}
+
+button:hover{
+    background-color: #e5e5e5;
+}
+
 /* ensures the fake graphic appears behind the real graphic */
 #fakeGraphic{
     position: relative;
-    
-    /* when the JavaScript simulates a hover over, styling is lost for some reason, defining it here seems to work */
-    border: 1px solid #555;
-    border-radius: 2px;
 }
 
 #graphic{
@@ -249,7 +257,7 @@ export class createEditCanvas extends canvas{
             fakeGraphic.style.backgroundColor = "#e5e5e5"
         }
         graphic.onpointerleave = () => {
-            fakeGraphic.style.backgroundColor = ""
+            fakeGraphic.style.backgroundColor = "#f0f0f0"
         }
 
         /* outline colour can be none, so toggle is used for switching between none and the colour */
