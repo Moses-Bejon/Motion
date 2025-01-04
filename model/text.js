@@ -27,8 +27,11 @@ export class text extends shape{
 
         const metrics = context.measureText(this.text)
 
+        this.ascent = metrics.actualBoundingBoxAscent
+        this.descent = metrics.actualBoundingBoxDescent
+
         this.width = metrics.width
-        this.height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+        this.height = this.ascent + this.descent
     }
 
     getNewGeometryGroup(){
@@ -54,8 +57,8 @@ export class text extends shape{
 
         this.geometry = this.getNewGeometryGroup().innerHTML
 
-        this.top = this.bottomLeft[1] - this.height
-        this.bottom = this.bottomLeft[1]
+        this.top = this.bottomLeft[1] - this.ascent
+        this.bottom = this.bottomLeft[1] + this.descent
         this.left = this.bottomLeft[0]
         this.right = this.bottomLeft[0] + this.width
     }

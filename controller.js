@@ -16,18 +16,11 @@ class controllerClass{
     subscribeTo(subscriber,aggregateModel){
         this.aggregateModels[aggregateModel].subscribers.add(subscriber)
 
-        this.updateSubscriber(subscriber,aggregateModel)
+        subscriber.updateAggregateModel(aggregateModel,this.aggregateModels[aggregateModel].content)
     }
 
     unsubscribeTo(subscriber,aggregateModel){
         this.aggregateModels[aggregateModel].subscribers.delete(subscriber)
-    }
-
-    updateSubscriber(subscriber,aggregateModel){
-        subscriber.clearModel(aggregateModel)
-        for (const model of this.aggregateModels[aggregateModel].content){
-            subscriber.addModel(aggregateModel,model)
-        }
     }
 
     addModel(aggregateModel,model){

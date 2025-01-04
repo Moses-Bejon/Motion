@@ -49,7 +49,7 @@ export class ellipseMode{
             this.outlineColour = this.createCanvas.outlineColour.value
             this.ellipse.style.stroke = this.outlineColour
         } else {
-            this.outlineColour = "transparent"
+            this.outlineColour = null
         }
 
         this.thickness = maximumThickness-this.createCanvas.thicknessSlider.value

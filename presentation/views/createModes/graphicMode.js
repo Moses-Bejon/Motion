@@ -12,7 +12,9 @@ export class graphicMode{
         fileLoadPromise.then(() => {
                 controller.newShape(graphicShape)
             }
-        )
+        ).catch((error) => {
+            alert(error)
+        })
     }
 
     static acceptKeyDownOnShape(keyboardEvent,shape){

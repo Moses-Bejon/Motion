@@ -173,16 +173,6 @@ export class canvas extends abstractView{
         controller.unsubscribeTo(this,"displayShapes")
     }
 
-    clearModel(aggregateModel){
-        switch (aggregateModel){
-            case "displayShapes":
-
-                // clears the canvas
-                this.canvas.replaceChildren()
-                break
-        }
-    }
-
     errorCheckAggregateModel(aggregateModel){
         if (aggregateModel !== "displayShapes"){
             throw new Error(
@@ -202,6 +192,16 @@ export class canvas extends abstractView{
         this.shapesToGeometry.set(model,shape)
 
         this.canvas.appendChild(shape)
+    }
+
+    updateAggregateModel(aggregateModel,model){
+        this.errorCheckAggregateModel(aggregateModel)
+
+        this.canvas.replaceChildren()
+        for (const shape of model){
+            console.log(shape)
+            this.addModel(aggregateModel,shape)
+        }
     }
 
     removeModel(aggregateModel,model){

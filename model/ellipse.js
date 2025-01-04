@@ -24,14 +24,18 @@ export class ellipse extends shape{
         ellipse.style.stroke = this.outlineColour
         ellipse.style.strokeWidth = this.thickness
 
+        let extraScale = 0
+
         /* check for edge case where there is not enough space in the user's ellipse for the outline */
-        if ((this.thickness > this.height || this.thickness > this.width) && !(this.outlineColour === "transparent")){
+        if ((this.thickness > this.height || this.thickness > this.width) && (this.outlineColour !== null)){
 
             ellipse.style.stroke = "transparent"
             ellipse.style.fill = this.outlineColour
 
             ellipse.setAttribute("rx",this.width/2 + this.thickness/2)
             ellipse.setAttribute("ry",this.height/2 + this.thickness/2)
+
+            extraScale = this.thickness/2
         } else {
 
             /* otherwise proceed as usual */
@@ -41,6 +45,10 @@ export class ellipse extends shape{
 
             ellipse.setAttribute("rx",this.width/2)
             ellipse.setAttribute("ry",this.height/2)
+
+            if (this.outlineColour !== null){
+                extraScale = this.thickness/2
+                }
         }
 
         ellipse.setAttribute("cx",this.centre[0])
@@ -50,9 +58,9 @@ export class ellipse extends shape{
 
         this.geometry = geometryGroup.innerHTML
 
-        this.left = this.centre[0]-this.width/2
-        this.right = this.centre[1]+this.width/2
-        this.top = this.centre[1]-this.height/2
-        this.bottom = this.centre[1]+this.height/2
+        this.left = this.centre[0]-this.width/2-extraScale
+        this.right = this.centre[0]+this.width/2+extraScale
+        this.top = this.centre[1]-this.height/2-extraScale
+        this.bottom = this.centre[1]+this.height/2+extraScale
     }
 }

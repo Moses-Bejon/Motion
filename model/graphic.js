@@ -1,10 +1,10 @@
 import {shape} from "./shape.js";
 
 export class graphic extends shape{
-    constructor(appearanceTime,disappearanceTime,centre,rotation){
+    constructor(appearanceTime,disappearanceTime,topLeft,rotation){
         super(appearanceTime,disappearanceTime)
 
-        this.centre = centre
+        this.topLeft = topLeft
         this.rotation = rotation
     }
 
@@ -13,17 +13,35 @@ export class graphic extends shape{
         const fileReader = new FileReader()
         fileReader.readAsDataURL(source)
 
-        return new Promise((resolve) => {
+        return new Promise((resolve,reject) => {
             fileReader.onload = () => {
                 this.image = document.createElementNS("http://www.w3.org/2000/svg","image")
                 this.image.setAttribute("href",fileReader.result)
+                console.log(fileReader.result)
 
-                this.width = this.image.width
-                this.height = this.image.height
+                // using a html image in order to get the width and height of the image
+                // it seems to not be trivial to get the width/height of an SVG image before it is appended
+                const htmlImage = document.createElement("img")
+                htmlImage.src = fileReader.result
 
-                this.updateGeometry()
+                htmlImage.onload = () => {
+                    this.width = htmlImage.width
+                    this.height = htmlImage.height
 
-                resolve()
+                    this.updateGeometry()
+
+                    resolve()
+                }
+
+                htmlImage.onerror = () => {
+                    reject(
+                        new Error("Cannot load HTML image (likely because the format is unsupported or isn't an image)")
+                    )
+                }
+            }
+
+            fileReader.onerror = () => {
+                reject(new Error("The file reader could not read your file (likely because the format is unsupported)"))
             }
         })
     }
@@ -35,16 +53,16 @@ export class graphic extends shape{
 
         clonedImage.style.width = this.width
         clonedImage.style.height = this.height
-        clonedImage.setAttribute("x",this.centre[0])
-        clonedImage.setAttribute("y",this.centre[1])
+        clonedImage.setAttribute("x",this.topLeft[0])
+        clonedImage.setAttribute("y",this.topLeft[1])
 
         group.appendChild(clonedImage)
 
         this.geometry = group.innerHTML
 
-        this.top = this.centre[1] - this.height/2
-        this.bottom = this.centre[1] + this.height/2
-        this.left = this.centre[0]-this.width/2
-        this.right = this.centre[0] + this.width/2
+        this.top = this.topLeft[1]
+        this.bottom = this.topLeft[1] + this.height
+        this.left = this.topLeft[0]
+        this.right = this.topLeft[0] + this.width
     }
 }
