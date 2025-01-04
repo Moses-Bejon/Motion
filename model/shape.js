@@ -18,7 +18,7 @@ export class shape{
     }
 
     getPosition(){
-        return midPoint2d([this.getLeft(),this.getTop()],[this.getRight(),this.getBottom()])
+        return midPoint2d([this.left,this.top],[this.right,this.bottom])
     }
 
     updateAttribute(attribute,newValue){

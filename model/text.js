@@ -18,22 +18,6 @@ export class text extends shape{
 
     }
 
-    getTop(){
-        return this.bottomLeft[1]
-    }
-
-    getBottom(){
-        return this.bottomLeft[1] - this.height
-    }
-
-    getLeft(){
-        return this.bottomLeft[0]
-    }
-
-    getRight(){
-        return this.bottomLeft[0] + this.width
-    }
-
     updateWidthAndHeightFromText(){
         // canvas used to measure width and height of text
         const canvas = document.createElement("canvas")
@@ -69,5 +53,10 @@ export class text extends shape{
         this.updateWidthAndHeightFromText()
 
         this.geometry = this.getNewGeometryGroup().innerHTML
+
+        this.top = this.bottomLeft[1] - this.height
+        this.bottom = this.bottomLeft[1]
+        this.left = this.bottomLeft[0]
+        this.right = this.bottomLeft[0] + this.width
     }
 }

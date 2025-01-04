@@ -13,19 +13,6 @@ export class drawing extends shape{
         this.updateGeometry()
     }
 
-    getTop(){
-        return maximumOfArray(this.points,(point)=>{point[1]},isLess) - this.thickness/2
-    }
-    getBottom(){
-        return maximumOfArray(this.points,(point)=>{point[1]}) + this.thickness/2
-    }
-    getLeft(){
-        return maximumOfArray(this.points,(point) => {point[0]},isLess) - this.thickness/2
-    }
-    getRight(){
-        return maximumOfArray(this.points,(point) => {point[0]}) + this.thickness/2
-    }
-
     static lineBetween(x1,y1,x2,y2,thickness,colour){
         const line = document.createElementNS("http://www.w3.org/2000/svg","line")
         line.setAttribute("x1",x1)
@@ -65,5 +52,10 @@ export class drawing extends shape{
 
     updateGeometry(){
         this.geometry = this.getNewGeometryGroup().innerHTML
+
+        this.top = maximumOfArray(this.points,(point)=>{return point[1]},isLess) - this.thickness/2
+        this.left = maximumOfArray(this.points,(point) => {return point[0]},isLess) - this.thickness/2
+        this.bottom = maximumOfArray(this.points,(point)=>{return point[1]}) + this.thickness/2
+        this.right = maximumOfArray(this.points,(point) => {return point[0]}) + this.thickness/2
     }
 }

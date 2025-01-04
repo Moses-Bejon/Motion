@@ -28,22 +28,6 @@ export class graphic extends shape{
         })
     }
 
-    getTop(){
-        return this.centre[1] - this.height/2
-    }
-
-    getBottom(){
-        return this.centre[1] + this.height/2
-    }
-
-    getLeft(){
-        return this.centre[0]-this.width/2
-    }
-
-    getRight(){
-        return this.centre[0] + this.width/2
-    }
-
     updateGeometry(){
         const group = document.createElementNS("http://www.w3.org/2000/svg","g")
 
@@ -57,5 +41,10 @@ export class graphic extends shape{
         group.appendChild(clonedImage)
 
         this.geometry = group.innerHTML
+
+        this.top = this.centre[1] - this.height/2
+        this.bottom = this.centre[1] + this.height/2
+        this.left = this.centre[0]-this.width/2
+        this.right = this.centre[0] + this.width/2
     }
 }

@@ -15,22 +15,6 @@ export class ellipse extends shape{
         this.updateGeometry()
     }
 
-    getTop(){
-        return this.centre[1]-this.height/2
-    }
-
-    getBottom(){
-        return this.centre[1]+this.height/2
-    }
-
-    getLeft(){
-        return this.centre[0]-this.width/2
-    }
-
-    getRight(){
-        return this.centre[1]+this.width/2
-    }
-
     updateGeometry(){
         const geometryGroup = document.createElementNS("http://www.w3.org/2000/svg","g")
 
@@ -65,5 +49,10 @@ export class ellipse extends shape{
         geometryGroup.appendChild(ellipse)
 
         this.geometry = geometryGroup.innerHTML
+
+        this.left = this.centre[0]-this.width/2
+        this.right = this.centre[1]+this.width/2
+        this.top = this.centre[1]-this.height/2
+        this.bottom = this.centre[1]+this.height/2
     }
 }
