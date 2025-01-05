@@ -35,10 +35,25 @@ class controllerClass{
         }
     }
 
+    updateModel(aggregateModel,model){
+
+        // tells views to remove this model, clearing out the old version
+        this.removeModel(aggregateModel,model)
+
+        // tells views to add it again, with its updated properties
+        this.addModel(aggregateModel,model)
+    }
+
     updateAggregateModel(aggregateModel){
         for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
             subscriber.updateAggregateModel(aggregateModel,this.aggregateModels[aggregateModel].content)
         }
+    }
+
+    newAggregateModel(aggregateModel,newModel){
+        console.log("new model",aggregateModel,newModel)
+        this.aggregateModels[aggregateModel].content = newModel
+        this.updateAggregateModel(aggregateModel)
     }
 
     newShape(shape){
@@ -52,10 +67,6 @@ class controllerClass{
             this.aggregateModels.displayShapes.content.add(shape)
             this.addModel("displayShapes",shape)
         }
-
-        // whenever a new shape is added, it is selected by default
-        this.aggregateModels.selectedShapes.content = new Set([shape])
-        this.updateAggregateModel("selectedShapes")
     }
 
     removeShape(shape){
@@ -99,11 +110,6 @@ class controllerClass{
         this.aggregateModels.timelineEvents.content.splice(right-1,0,event)
 
         this.addModel("timelineEvents",event)
-    }
-
-    modelUpdate(model){
-        for (const aggregateModel in this.aggregateModels){
-        }
     }
 
     removeShapeFromTimeline(shape){

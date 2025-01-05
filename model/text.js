@@ -44,8 +44,17 @@ export class text extends shape{
 
         text.style.fontFamily = this.fontFamily
         text.style.fontSize = this.fontSize
+        text.style.whiteSpace = "normal"
 
+        // sanitizing user input
+        // This is for their personal convenience, not for security, as they are, of course, only in their own browser
         text.innerHTML = this.text
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("\"", "&quot;")
+            .replaceAll("'", "&#x27;")
+            .replaceAll(" ","&nbsp;")
 
         newGeometryGroup.appendChild(text)
 

@@ -21,13 +21,15 @@ export class shape{
         return midPoint2d([this.left,this.top],[this.right,this.bottom])
     }
 
-    updateAttribute(attribute,newValue){
-        controller.removeShape(this)
-
+    geometryAttributeUpdate(attribute, newValue){
         this[attribute] = newValue
 
         this.updateGeometry()
 
-        controller.newShape(this)
+        controller.updateModel("displayShapes",this)
+
+        if (controller.aggregateModels.selectedShapes.content.has(this)) {
+            controller.updateModel("selectedShapes", this)
+        }
     }
 }

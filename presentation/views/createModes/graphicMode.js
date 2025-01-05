@@ -11,6 +11,9 @@ export class graphicMode{
 
         fileLoadPromise.then(() => {
                 controller.newShape(graphicShape)
+
+                // select the graphic by default at creation (to allow the user to move it)
+                controller.newAggregateModel("selectedShapes", new Set([graphicShape]))
             }
         ).catch((error) => {
             alert(error)

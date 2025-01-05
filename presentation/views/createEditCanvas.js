@@ -290,10 +290,10 @@ export class createEditCanvas extends canvas{
         this.selectionBox = document.createElementNS("http://www.w3.org/2000/svg","g")
 
         this.selectionOutline = document.createElementNS("http://www.w3.org/2000/svg","rect")
+        this.selectionOutline.setAttribute("stroke-dasharray","4 11")
         this.selectionOutline.style.fill = "transparent"
         this.selectionOutline.style.stroke = "black"
         this.selectionOutline.style.strokeWidth = 1
-        this.selectionOutline.style.outline = "thin solid white"
 
         this.selectionBox.appendChild(this.selectionOutline)
     }
@@ -374,30 +374,33 @@ export class createEditCanvas extends canvas{
         return super.acceptKeyDown(keyboardEvent)
     }
 
+    updateSelectionBox(){
+        this.selectionBox?.remove()
+
+        if (this.selectedShapes.size === 0){
+            return
+        }
+
+        const shapes = Array.from(this.selectedShapes)
+
+        const selectionTop = maximumOfArray(shapes,(shape)=>{return shape.top},isLess)
+        const selectionBottom = maximumOfArray(shapes,(shape) => {return shape.bottom})
+        const selectionLeft = maximumOfArray(shapes,(shape) => {return shape.left},isLess)
+        const selectionRight = maximumOfArray(shapes,(shape => {return shape.right}))
+
+        this.selectionOutline.setAttribute("x",selectionLeft)
+        this.selectionOutline.setAttribute("y",selectionTop)
+        this.selectionOutline.setAttribute("width",selectionRight-selectionLeft)
+        this.selectionOutline.setAttribute("height",selectionBottom-selectionTop)
+
+        this.canvas.appendChild(this.selectionBox)
+
+    }
+
     updateAggregateModel(aggregateModel, model){
         if (aggregateModel === "selectedShapes"){
-
-            this.selectionBox?.remove()
-
             this.selectedShapes = model
-
-            if (this.selectedShapes.size === 0){
-                return
-            }
-
-            const shapes = Array.from(this.selectedShapes)
-
-            const selectionTop = maximumOfArray(shapes,(shape)=>{return shape.top},isLess)
-            const selectionBottom = maximumOfArray(shapes,(shape) => {return shape.bottom})
-            const selectionLeft = maximumOfArray(shapes,(shape) => {return shape.left},isLess)
-            const selectionRight = maximumOfArray(shapes,(shape => {return shape.right}))
-
-            this.selectionOutline.setAttribute("x",selectionLeft)
-            this.selectionOutline.setAttribute("y",selectionTop)
-            this.selectionOutline.setAttribute("width",selectionRight-selectionLeft)
-            this.selectionOutline.setAttribute("height",selectionBottom-selectionTop)
-
-            this.canvas.appendChild(this.selectionBox)
+            this.updateSelectionBox()
 
         } else {
             super.updateAggregateModel(aggregateModel,model)
@@ -407,17 +410,18 @@ export class createEditCanvas extends canvas{
     addModel(aggregateModel, model) {
         if (aggregateModel === "selectedShapes"){
             this.selectedShapes.add(model)
+            this.updateSelectionBox()
         } else {
             super.addModel(aggregateModel, model)
         }
     }
 
     removeModel(aggregateModel, model) {
-        switch (aggregateModel){
-            case "selectedShapes":
-                break
-            default:
-                super.removeModel(aggregateModel,model)
+        if (aggregateModel === "selectedShapes"){
+            this.selectedShapes.delete(model)
+            this.updateSelectionBox()
+        } else {
+            super.removeModel(aggregateModel,model)
         }
     }
 }

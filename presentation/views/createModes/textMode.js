@@ -16,7 +16,7 @@ export class textMode{
         switch (key){
             // removes last letter of text
             case "Backspace":
-                shape.updateAttribute("text",shape.text.slice(0,-1))
+                shape.geometryAttributeUpdate("text",shape.text.slice(0,-1))
                 shape.defaultTextReplaced = true
                 return true
         }
@@ -29,10 +29,10 @@ export class textMode{
         // if the default text has been replaced, add on to text
         // otherwise, replace the default text
         if (shape.defaultTextReplaced){
-            shape.updateAttribute("text",shape.text+key)
+            shape.geometryAttributeUpdate("text",shape.text+key)
         } else {
             shape.defaultTextReplaced = true
-            shape.updateAttribute("text",key)
+            shape.geometryAttributeUpdate("text",key)
         }
         return true
     }
@@ -47,12 +47,17 @@ export class textMode{
 
     createTextBox(pointerEvent){
 
-        controller.newShape(new text(
+        const textShape = new text(
             0,
             animationEndTimeSeconds,
             this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
             0,
             "black"
-        ))
+        )
+
+        controller.newShape(textShape)
+
+        // select the text box by default at creation (to allow the user to type in it)
+        controller.newAggregateModel("selectedShapes",new Set([textShape]))
     }
 }
