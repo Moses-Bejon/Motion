@@ -65,10 +65,24 @@ export class editMode{
     }
 
     beginDraggingSelectionBox(pointerEvent){
-        this.previousSelectionPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+        this.previousSelectionPositionGlobal = [pointerEvent.clientX,pointerEvent.clientY]
+        this.previousSelectionPosition = this.editCanvas.toCanvasCoordinates(...this.previousSelectionPositionGlobal)
     }
 
     dragSelectionBox(pointerEvent){
+        const currentSelectionPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+        const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
+        const transformation = `translate(${translation[0]}px, ${translation[1]}px)`
+
+        for (const shape of this.editCanvas.selectedShapes){
+            const geometry = this.editCanvas.shapesToGeometry.get(shape)
+            geometry.style.transform = transformation
+        }
+
+        this.editCanvas.selectionBox.style.transform = transformation
+    }
+
+    endDraggingSelectionBox(pointerEvent){
         const currentSelectionPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
         const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
@@ -82,8 +96,8 @@ export class editMode{
             controller.updateModel("displayShapes",shape)
             controller.updateModel("selectedShapes",shape)
         }
-    }
 
-    endDraggingSelectionBox(pointerEvent){
+        this.editCanvas.selectionBox.style.transform = null
+
     }
 }
