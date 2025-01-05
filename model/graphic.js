@@ -70,6 +70,8 @@ export class graphic extends shape{
 
     translate(translationVector){
         increment2dVectorBy(this.topLeft,translationVector)
+
+        this.updateGeometry()
     }
 
     copy(){
