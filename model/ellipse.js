@@ -1,4 +1,5 @@
 import {shape} from "./shape.js";
+import {increment2dVectorBy} from "../maths.js";
 
 export class ellipse extends shape{
     constructor(appearanceTime,disappearanceTime,centre,height,width,outlineColour,colour,rotation,thickness){
@@ -62,5 +63,23 @@ export class ellipse extends shape{
         this.right = this.centre[0]+this.width/2+extraScale
         this.top = this.centre[1]-this.height/2-extraScale
         this.bottom = this.centre[1]+this.height/2+extraScale
+    }
+
+    translate(translationVector){
+        increment2dVectorBy(this.centre,translationVector)
+
+        this.updateGeometry()
+    }
+
+    copy(){
+        return new ellipse(
+            this.appearanceTime,
+            this.disappearanceTime,
+            Array.from(this.centre),
+            this.height,this.width,
+            this.outlineColour,
+            this.colour,
+            this.rotation,
+            this.thickness)
     }
 }

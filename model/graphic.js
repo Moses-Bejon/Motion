@@ -1,4 +1,5 @@
 import {shape} from "./shape.js";
+import {increment2dVectorBy} from "../maths.js";
 
 export class graphic extends shape{
     constructor(appearanceTime,disappearanceTime,topLeft,rotation){
@@ -15,13 +16,15 @@ export class graphic extends shape{
 
         return new Promise((resolve,reject) => {
             fileReader.onload = () => {
+                this.source = fileReader.result
+
                 this.image = document.createElementNS("http://www.w3.org/2000/svg","image")
-                this.image.setAttribute("href",fileReader.result)
+                this.image.setAttribute("href",this.source)
 
                 // using a html image in order to get the width and height of the image
                 // it seems to not be trivial to get the width/height of an SVG image before it is appended
                 const htmlImage = document.createElement("img")
-                htmlImage.src = fileReader.result
+                htmlImage.src = this.source
 
                 htmlImage.onload = () => {
                     this.width = htmlImage.width
@@ -63,5 +66,23 @@ export class graphic extends shape{
         this.bottom = this.topLeft[1] + this.height
         this.left = this.topLeft[0]
         this.right = this.topLeft[0] + this.width
+    }
+
+    translate(translationVector){
+        increment2dVectorBy(this.topLeft,translationVector)
+    }
+
+    copy(){
+        const copy = new graphic(this.appearanceTime,this.disappearanceTime,Array.from(this.topLeft),this.rotation)
+
+        // it is too expensive to reload the image's source
+        copy.source = this.source
+        copy.image = this.image
+        copy.width = this.width
+        copy.height = this.height
+
+        copy.updateGeometry()
+
+        return copy
     }
 }

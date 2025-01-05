@@ -17,6 +17,7 @@ import {graphicMode} from "./createModes/graphicMode.js";
 import {isLess,
     maximumOfArray
 } from "../../maths.js";
+import {editMode} from "./createModes/editMode.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -224,15 +225,23 @@ export class createEditCanvas extends canvas{
         this.createEditSwitch.onCallback = () => {
             this.create.style.display = "none"
             this.edit.style.display = "flex"
+
+            this.currentMode.switchMode()
+            this.currentMode = new editMode(this)
         }
         this.createEditSwitch.offCallback = () => {
             this.create.style.display = "flex"
             this.edit.style.display = "none"
+
+            this.currentMode.switchMode()
+            this.currentMode = new drawMode(this)
         }
 
         this.thicknessSlider = this.shadowRoot.getElementById("thicknessSlider")
 
         this.currentMode = new drawMode(this)
+
+        // adding events for all the buttons
         this.shadowRoot.getElementById("draw").onclick = () => {
             this.currentMode.switchMode()
             this.currentMode = new drawMode(this)
@@ -265,6 +274,50 @@ export class createEditCanvas extends canvas{
         }
         graphic.onpointerleave = () => {
             fakeGraphic.style.backgroundColor = "#f0f0f0"
+        }
+
+        this.shadowRoot.getElementById("duplicate").onclick = (pointerEvent) => {
+
+            // the duplicate becomes selected after it is made
+            const newlySelectedShapes = new Set()
+
+            for (const shape of this.selectedShapes) {
+                const duplicate = shape.copy()
+
+                // if the duplicate is right on top of the previous shape users may not realise
+                duplicate.translate([50,50])
+
+                controller.newShape(duplicate)
+                newlySelectedShapes.add(duplicate)
+            }
+            controller.newAggregateModel("selectedShapes",newlySelectedShapes)
+
+            // prevents the click on the canvas from deselecting the selected shapes
+            pointerEvent.stopPropagation()
+        }
+        this.shadowRoot.getElementById("copy").onclick = (pointerEvent) => {
+            this.copiedShapes = []
+
+            for (const shape of this.selectedShapes) {
+                this.copiedShapes.push(shape.copy())
+            }
+            pointerEvent.stopPropagation()
+        }
+        this.shadowRoot.getElementById("paste").onclick = (pointerEvent) => {
+            const newlySelectedShapes = new Set()
+            for (const shape of this.copiedShapes){
+                shape.translate([50,50])
+                const newShape = shape.copy()
+                controller.newShape(newShape)
+                newlySelectedShapes.add(newShape)
+            }
+            controller.newAggregateModel("selectedShapes",newlySelectedShapes)
+            pointerEvent.stopPropagation()
+        }
+        this.shadowRoot.getElementById("delete").onclick = () => {
+            for (const shape of this.selectedShapes) {
+                controller.removeShape(shape)
+            }
         }
 
         /* outline colour can be none, so toggle is used for switching between none and the colour */
@@ -405,6 +458,8 @@ export class createEditCanvas extends canvas{
         } else {
             super.updateAggregateModel(aggregateModel,model)
         }
+
+        this.currentMode.updateAggregateModel?.(aggregateModel, model)
     }
 
     addModel(aggregateModel, model) {
@@ -414,6 +469,8 @@ export class createEditCanvas extends canvas{
         } else {
             super.addModel(aggregateModel, model)
         }
+
+        this.currentMode.addModel?.(aggregateModel, model)
     }
 
     removeModel(aggregateModel, model) {
@@ -423,6 +480,8 @@ export class createEditCanvas extends canvas{
         } else {
             super.removeModel(aggregateModel,model)
         }
+
+        this.currentMode.removeModel?.(aggregateModel, model)
     }
 }
 window.customElements.define("create-edit-canvas",createEditCanvas)

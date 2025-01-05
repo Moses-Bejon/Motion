@@ -1,5 +1,6 @@
 import {shape} from "./shape.js";
 import {fontSize,fontFamily} from "../constants.js";
+import {increment2dVectorBy} from "../maths.js";
 
 export class text extends shape{
     constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size=fontSize,family=fontFamily){
@@ -44,6 +45,7 @@ export class text extends shape{
 
         text.style.fontFamily = this.fontFamily
         text.style.fontSize = this.fontSize
+        text.style.userSelect = "none"
         text.style.whiteSpace = "normal"
 
         // sanitizing user input
@@ -70,5 +72,30 @@ export class text extends shape{
         this.bottom = this.bottomLeft[1] + this.descent
         this.left = this.bottomLeft[0]
         this.right = this.bottomLeft[0] + this.width
+    }
+
+    translate(translationVector){
+        increment2dVectorBy(this.bottomLeft,translationVector)
+
+        this.updateGeometry()
+    }
+
+    copy(){
+        const copy = new text(
+            this.appearanceTime,
+            this.disappearanceTime,
+            this.bottomLeft,
+            this.rotation,
+            this.fontColour,
+            this.fontSize,
+            this.fontFamily
+        )
+
+        copy.text = this.text
+        copy.defaultTextReplaced = this.defaultTextReplaced
+
+        copy.updateGeometry()
+
+        return copy
     }
 }

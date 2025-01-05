@@ -1,5 +1,5 @@
 import {shape} from "./shape.js";
-import {maximumOfArray,isLess} from "../maths.js";
+import {maximumOfArray,isLess,increment2dVectorBy} from "../maths.js";
 
 export class drawing extends shape{
     constructor(appearanceTime,disappearanceTime,colour,thickness,points) {
@@ -57,5 +57,23 @@ export class drawing extends shape{
         this.left = maximumOfArray(this.points,(point) => {return point[0]},isLess) - this.thickness/2
         this.bottom = maximumOfArray(this.points,(point)=>{return point[1]}) + this.thickness/2
         this.right = maximumOfArray(this.points,(point) => {return point[0]}) + this.thickness/2
+    }
+
+    translate(translationVector){
+        for (const point of this.points){
+            increment2dVectorBy(point,translationVector)
+        }
+
+        this.updateGeometry()
+    }
+
+    copy(){
+        return new drawing(
+            this.appearanceTime,
+            this.disappearanceTime,
+            this.colour,
+            this.thickness,
+            structuredClone(this.points)
+        )
     }
 }

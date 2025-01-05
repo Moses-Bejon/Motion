@@ -18,7 +18,7 @@ export class polygonMode extends manyPointsMode{
 
     // called to remove this mode
     switchMode(){
-        this.createCanvas.onclick = null
+        this.createCanvas.canvas.onclick = null
         this.createCanvas.canvas.removeEventListener("pointermove",this.bindedPreviewNextLine)
         this.line?.remove()
         this.currentShape?.remove()
@@ -35,6 +35,7 @@ export class polygonMode extends manyPointsMode{
                 this.pointArray)
             )
 
+            this.currentShape?.remove()
             this.line?.remove()
             this.createCanvas.canvas.removeEventListener("pointermove",this.bindedPreviewNextLine)
             this.createCanvas.canvas.onclick = this.beginPolygon.bind(this)
