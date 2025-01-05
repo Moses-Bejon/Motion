@@ -43,6 +43,9 @@ export class textMode{
 
     switchMode(){
         this.createCanvas.canvas.onclick = null
+
+        // deselects text once done
+        controller.newAggregateModel("selectedShapes",new Set([]))
     }
 
     createTextBox(pointerEvent){

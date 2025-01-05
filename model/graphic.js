@@ -17,7 +17,6 @@ export class graphic extends shape{
             fileReader.onload = () => {
                 this.image = document.createElementNS("http://www.w3.org/2000/svg","image")
                 this.image.setAttribute("href",fileReader.result)
-                console.log(fileReader.result)
 
                 // using a html image in order to get the width and height of the image
                 // it seems to not be trivial to get the width/height of an SVG image before it is appended

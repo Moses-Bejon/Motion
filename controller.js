@@ -51,7 +51,6 @@ class controllerClass{
     }
 
     newAggregateModel(aggregateModel,newModel){
-        console.log("new model",aggregateModel,newModel)
         this.aggregateModels[aggregateModel].content = newModel
         this.updateAggregateModel(aggregateModel)
     }

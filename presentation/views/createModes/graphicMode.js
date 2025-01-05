@@ -28,8 +28,9 @@ export class graphicMode{
         return false
     }
 
-    // for polymorphic reasons:
     switchMode(){
 
+        // deselects shape once done
+        controller.newAggregateModel("selectedShapes", new Set([]))
     }
 }

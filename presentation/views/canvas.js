@@ -199,7 +199,6 @@ export class canvas extends abstractView{
 
         this.canvas.replaceChildren()
         for (const shape of model){
-            console.log(shape)
             this.addModel(aggregateModel,shape)
         }
     }
