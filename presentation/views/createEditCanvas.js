@@ -503,8 +503,7 @@ export class createEditCanvas extends canvas{
     }
 
     beginDraggingSelectionBox(pointerEvent){
-        this.previousSelectionPositionGlobal = [pointerEvent.clientX,pointerEvent.clientY]
-        this.previousSelectionPosition = this.toCanvasCoordinates(...this.previousSelectionPositionGlobal)
+        this.previousSelectionPosition = this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
         pointerEvent.stopPropagation()
     }
@@ -512,6 +511,9 @@ export class createEditCanvas extends canvas{
     dragSelectionBox(pointerEvent){
         const currentSelectionPosition = this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
         const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
+
+        // a css transformation is used in place of actually updating the geometry, as done at the end of the drag
+        // (for performance)
         const transformation = `translate(${translation[0]}px, ${translation[1]}px)`
 
         for (const shape of this.selectedShapes){
