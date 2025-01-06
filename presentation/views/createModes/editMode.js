@@ -1,18 +1,8 @@
 import {controller} from "../../../controller.js";
-import {addDragLogicTo} from "../../../dragLogic.js";
-import {subtract2dVectors} from "../../../maths.js";
 
 export class editMode{
     constructor(editCanvas) {
         this.editCanvas = editCanvas
-
-        // logic for moving the selection box (along with all the shapes in it)
-        addDragLogicTo(
-            this.editCanvas.selectionBox,
-            this.dragSelectionBox.bind(this),
-            this.endDraggingSelectionBox.bind(this),
-            this.beginDraggingSelectionBox.bind(this)
-        )
 
         // when you click on the canvas, but not on any particular shape, deselect all selected shapes
         this.editCanvas.onclick = () => {
@@ -28,8 +18,6 @@ export class editMode{
     }
 
     switchMode(){
-        this.editCanvas.selectionBox.onpointerdown = null
-        this.editCanvas.selectionBox.style.cursor = "auto"
         this.editCanvas.onclick = null
         for (const [shape,geometry] of this.editCanvas.shapesToGeometry){
             geometry.onclick = null
@@ -62,42 +50,5 @@ export class editMode{
         for (const shape of model){
             this.addModel(aggregateModel,shape)
         }
-    }
-
-    beginDraggingSelectionBox(pointerEvent){
-        this.previousSelectionPositionGlobal = [pointerEvent.clientX,pointerEvent.clientY]
-        this.previousSelectionPosition = this.editCanvas.toCanvasCoordinates(...this.previousSelectionPositionGlobal)
-    }
-
-    dragSelectionBox(pointerEvent){
-        const currentSelectionPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
-        const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
-        const transformation = `translate(${translation[0]}px, ${translation[1]}px)`
-
-        for (const shape of this.editCanvas.selectedShapes){
-            const geometry = this.editCanvas.shapesToGeometry.get(shape)
-            geometry.style.transform = transformation
-        }
-
-        this.editCanvas.selectionBox.style.transform = transformation
-    }
-
-    endDraggingSelectionBox(pointerEvent){
-        const currentSelectionPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
-
-        const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
-
-        this.previousSelectionPosition = currentSelectionPosition
-
-        for (const shape of new Set(this.editCanvas.selectedShapes)){
-            shape.translate(translation)
-            shape.updateGeometry()
-
-            controller.updateModel("displayShapes",shape)
-            controller.updateModel("selectedShapes",shape)
-        }
-
-        this.editCanvas.selectionBox.style.transform = null
-
     }
 }
