@@ -505,6 +505,7 @@ export class createEditCanvas extends canvas{
     beginDraggingSelectionBox(pointerEvent){
         this.previousSelectionPosition = this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
+        // avoids other modes interfering, like you wouldn't want to start drawing while moving the box
         pointerEvent.stopPropagation()
     }
 
@@ -531,6 +532,8 @@ export class createEditCanvas extends canvas{
 
         const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
 
+        // a new set is used because, as this loop runs and the geometry is updated, the set is changing
+        // this is because of calls the controller is making
         for (const shape of new Set(this.selectedShapes)){
             shape.translate(translation)
             shape.updateGeometry()

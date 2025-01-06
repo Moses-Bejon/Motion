@@ -38,7 +38,11 @@ export class editMode{
             // stop the canvas from being clicked and deselecting everything
             event.stopPropagation()
 
-            controller.newAggregateModel("selectedShapes",new Set([model]))
+            if (event.shiftKey){
+                controller.selectShape(model)
+            } else {
+                controller.newAggregateModel("selectedShapes",new Set([model]))
+            }
         }
     }
 

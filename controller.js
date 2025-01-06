@@ -59,6 +59,20 @@ class controllerClass{
         this.updateAggregateModel(aggregateModel)
     }
 
+    selectShape(shape){
+
+        if (this.isSelected(shape)){
+            throw new Error("attempt to select an already selected shape")
+        }
+
+        this.aggregateModels.selectedShapes.content.add(shape)
+        this.addModel("selectedShapes",shape)
+    }
+
+    isSelected(shape){
+        return this.aggregateModels.selectedShapes.content.has(shape);
+    }
+
     newShape(shape){
         this.aggregateModels.allShapes.content.add(shape)
         this.addModel("allShapes",shape)
