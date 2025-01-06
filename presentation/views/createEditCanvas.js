@@ -298,16 +298,16 @@ export class createEditCanvas extends canvas{
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("copy").onclick = (pointerEvent) => {
-            this.copiedShapes = []
+            controller.copiedShapes = []
 
             for (const shape of this.selectedShapes) {
-                this.copiedShapes.push(shape.copy())
+                controller.copiedShapes.push(shape.copy())
             }
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("paste").onclick = (pointerEvent) => {
             const newlySelectedShapes = new Set()
-            for (const shape of this.copiedShapes){
+            for (const shape of controller.copiedShapes){
                 shape.translate([50,50])
                 const newShape = shape.copy()
                 controller.newShape(newShape)

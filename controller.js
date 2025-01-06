@@ -3,11 +3,15 @@ import {model} from "./model/model.js";
 class controllerClass{
     constructor() {
 
+        // all the aggregate models are permanent, and should be saved at the end of session
         this.aggregateModels = model
 
         // ordered list of views that hear about keyboard inputs
         // the higher in the hierarchy, the more likely informed (more "in focus")
         this.inputSubscribersHierarchy = []
+
+        // shapes that views want to copy
+        this.copiedShapes = []
 
         document.addEventListener("keydown",this.keyDown.bind(this))
         document.addEventListener("keyup",this.keyUp.bind(this))
