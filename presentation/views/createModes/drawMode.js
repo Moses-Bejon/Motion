@@ -17,11 +17,19 @@ export class drawMode extends manyPointsMode{
             this.begin.bind(this),
             "auto",
             "auto")
+
+        this.ourButton = this.createCanvas.shadowRoot.getElementById("draw")
+
+        // indicate we are now in draw mode to user
+        this.ourButton.style.backgroundColor = "#d0d0d0"
     }
 
     switchMode(){
         this.currentShape?.remove()
         this.createCanvas.canvas.onpointerdown = null
+
+        // remove draw mode indication
+        this.ourButton.style.backgroundColor = null
     }
 
     endDrawing(pointerEvent){

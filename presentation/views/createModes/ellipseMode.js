@@ -15,6 +15,12 @@ export class ellipseMode{
             this.beginEllipse.bind(this),
             "auto",
             "auto")
+
+
+        this.ourButton = this.createCanvas.shadowRoot.getElementById("ellipse")
+
+        // indicate we are now in ellipse mode to user
+        this.ourButton.style.backgroundColor = "#d0d0d0"
     }
 
     static acceptKeyDownOnShape(keyboardEvent,shape){
@@ -28,6 +34,9 @@ export class ellipseMode{
     switchMode(){
         this.ellipse?.remove()
         this.createCanvas.canvas.onpointerdown = null
+
+        // remove ellipse mode indication
+        this.ourButton.style.backgroundColor = null
     }
 
     beginEllipse(pointerEvent){

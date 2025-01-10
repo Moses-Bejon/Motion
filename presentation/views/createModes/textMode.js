@@ -7,6 +7,11 @@ export class textMode{
         this.createCanvas = createCanvas
 
         this.createCanvas.canvas.onclick = this.createTextBox.bind(this)
+
+        this.ourButton = this.createCanvas.shadowRoot.getElementById("text")
+
+        // indicate we are now in text mode to user
+        this.ourButton.style.backgroundColor = "#d0d0d0"
     }
 
     static acceptKeyDownOnShape(keyboardEvent,shape){
@@ -46,6 +51,9 @@ export class textMode{
 
         // deselects text once done
         controller.newAggregateModel("selectedShapes",new Set([]))
+
+        // remove text mode indication
+        this.ourButton.style.backgroundColor = null
     }
 
     createTextBox(pointerEvent){

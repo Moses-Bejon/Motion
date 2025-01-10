@@ -14,6 +14,11 @@ export class polygonMode extends manyPointsMode{
         this.bindedPreviewNextLine = this.previewNextLine.bind(this)
 
         this.createCanvas.canvas.onclick = this.beginPolygon.bind(this)
+
+        this.ourButton = this.createCanvas.shadowRoot.getElementById("polygon")
+
+        // indicate we are now in polygon mode to user
+        this.ourButton.style.backgroundColor = "#d0d0d0"
     }
 
     // called to remove this mode
@@ -22,6 +27,9 @@ export class polygonMode extends manyPointsMode{
         this.createCanvas.canvas.removeEventListener("pointermove",this.bindedPreviewNextLine)
         this.line?.remove()
         this.currentShape?.remove()
+
+        // remove polygon mode indication
+        this.ourButton.style.backgroundColor = null
     }
 
     acceptKeyDown(keyboardEvent) {
