@@ -14,6 +14,11 @@ class controllerClass{
         // shapes that views want to copy
         this.copiedShapes = []
 
+        this.numberOfEachTypeOfShape = {}
+
+        // used to ensure each new shape is placed higher than the last
+        this.ZIndexOfHighestShape = 0
+
         document.addEventListener("keydown",this.keyDown.bind(this))
         document.addEventListener("keyup",this.keyUp.bind(this))
     }
@@ -75,6 +80,19 @@ class controllerClass{
     }
 
     newShape(shape){
+
+        const shapeType = shape.constructor.name
+        if (Object.hasOwn(this.numberOfEachTypeOfShape,shapeType)){
+            this.numberOfEachTypeOfShape[shapeType] ++
+        } else {
+            this.numberOfEachTypeOfShape[shapeType] = 1
+        }
+        const shapeName = shapeType + " " + this.numberOfEachTypeOfShape[shapeType]
+
+        shape.modelConstruct(this.ZIndexOfHighestShape,shapeName)
+
+        this.ZIndexOfHighestShape ++
+
         this.aggregateModels.allShapes.content.add(shape)
         this.addModel("allShapes",shape)
 

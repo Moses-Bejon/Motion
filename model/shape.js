@@ -7,14 +7,14 @@ export class shape{
     constructor(appearanceTime,disappearanceTime) {
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
+    }
 
-        const shapeType = this.constructor.name
-        if (Object.hasOwn(numberOfEachTypeOfShape,shapeType)){
-            numberOfEachTypeOfShape[shapeType] ++
-        } else {
-            numberOfEachTypeOfShape[shapeType] = 1
-        }
-        this.name = shapeType + " " + numberOfEachTypeOfShape[shapeType]
+    // The model needs to also construct shapes to ensure shapes have attributes which
+    // are necessary for their proper functionality, such as setting a unique name or
+    // initializing the z-index. This function assigns these attributes to the shapes.
+    modelConstruct(newZIndex,name){
+        this.ZIndex = newZIndex
+        this.name = name
     }
 
     getPosition(){
