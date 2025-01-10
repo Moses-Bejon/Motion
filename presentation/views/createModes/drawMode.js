@@ -26,9 +26,7 @@ export class drawMode extends manyPointsMode{
 
     endDrawing(pointerEvent){
 
-        console.log(this.pointArray.length)
         this.pointArray = decimateLine(this.pointArray,1)
-        console.log(this.pointArray.length)
 
         /* If the last and first points drawn on the shape are close enough together or there is no fill*/
         if (distanceBetween2dPoints(
