@@ -1,5 +1,6 @@
 import {shape} from "./shape.js";
-import {maximumOfArray,isLess,increment2dVectorBy} from "../maths.js";
+import {isLess,increment2dVectorBy} from "../maths.js";
+import {maximumOfArray} from "../dataStructureOperations.js";
 
 export class drawing extends shape{
     constructor(appearanceTime,disappearanceTime,colour,thickness,points) {

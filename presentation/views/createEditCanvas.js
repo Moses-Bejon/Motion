@@ -16,8 +16,9 @@ import {manyPointsMode} from "./createModes/manyPointsMode.js";
 import {graphicMode} from "./createModes/graphicMode.js";
 import {
     isLess,
-    maximumOfArray, subtract2dVectors
+    subtract2dVectors
 } from "../../maths.js";
+import { maximumOfArray } from "../../dataStructureOperations.js";
 import {editMode} from "./createModes/editMode.js";
 import {addDragLogicTo} from "../../dragLogic.js";
 

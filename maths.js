@@ -45,20 +45,6 @@ export function isLess(a,b){
     return a < b
 }
 
-// may be optimised by reduce function if performance becomes concern:
-export function maximumOfArray(array,key,comparison=isGreater){
-    let maximum = key(array[0])
-
-    for (let i = 1; i < array.length; i++){
-        const value = key(array[i])
-        if (comparison(value,maximum)){
-            maximum = value
-        }
-    }
-
-    return maximum
-}
-
 export function distanceBetween2dPoints(point1,point2){
     return Math.hypot(point1[0]-point2[0],point1[1]-point2[1])
 }
