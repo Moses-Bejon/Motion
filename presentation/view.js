@@ -96,6 +96,20 @@ export class abstractView extends abstractWindow{
             this.fullScreen(this)
         }
 
+        this.functionsToPerformWhenClicked = new Set()
+        this.onclick = (event) => {
+            for (const method of this.functionsToPerformWhenClicked){
+                method(event)
+            }
+        }
+    }
+
+    addFunctionToPerformOnClick(newFunction){
+        this.functionsToPerformWhenClicked.add(newFunction)
+    }
+
+    removeFunctionToPerformOnClick(functionToRemove){
+        this.functionsToPerformWhenClicked.delete(functionToRemove)
     }
 }
 window.customElements.define("abstract-view",abstractView)

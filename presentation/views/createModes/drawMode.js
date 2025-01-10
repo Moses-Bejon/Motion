@@ -1,5 +1,5 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
-import {distanceBetween2dPoints} from "../../../maths.js";
+import {distanceBetween2dPoints,decimateLine} from "../../../maths.js";
 import {manyPointsMode} from "./manyPointsMode.js";
 import {drawing} from "../../../model/drawing.js";
 import {controller} from "../../../controller.js";
@@ -25,6 +25,11 @@ export class drawMode extends manyPointsMode{
     }
 
     endDrawing(pointerEvent){
+
+        console.log(this.pointArray.length)
+        this.pointArray = decimateLine(this.pointArray,1)
+        console.log(this.pointArray.length)
+
         /* If the last and first points drawn on the shape are close enough together or there is no fill*/
         if (distanceBetween2dPoints(
             this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),this.pointArray[0]

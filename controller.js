@@ -166,7 +166,7 @@ class controllerClass{
     subscribeToInputs(subscriber){
 
         // focus should always be set when a user clicks on a window
-        subscriber.onclick = () => {this.setFocus(subscriber)}
+        subscriber.addFunctionToPerformOnClick(() => {this.setFocus(subscriber)})
 
         // keeps track of which window the user is currently hovering over
         subscriber.onmouseenter = () => {this.hoveringOver = subscriber}
