@@ -1,8 +1,6 @@
 import {midPoint2d} from "../maths.js";
 import {controller} from "../controller.js";
 
-const numberOfEachTypeOfShape = {}
-
 export class shape{
     constructor(appearanceTime,disappearanceTime) {
         this.appearanceTime = appearanceTime
