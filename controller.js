@@ -1,4 +1,5 @@
 import {model} from "./model/model.js";
+import {binaryInsertion} from "./dataStructureOperations.js";
 
 class controllerClass{
     constructor() {
@@ -104,27 +105,13 @@ class controllerClass{
     }
 
     addTimeLineEvent(event){
-        const length = this.aggregateModels.timelineEvents.content.length
+        const placeToInsert = binaryInsertion(
+            this.aggregateModels.timelineEvents.content,
+            event.time,
+            (timeLineEvent)=>{return timeLineEvent.time}
+        )
 
-        if (length === 0){
-            this.aggregateModels.timelineEvents.content.push(event)
-            return
-        }
-
-        // binary search to ensure inserted in position to maintain ascending order
-        let left = 0
-        let right = length
-
-        while (left !== right){
-            const middle = Math.trunc((left+right)/2)
-            if (this.aggregateModels.timelineEvents.content[middle].time > event.time){
-                right = middle
-            } else {
-                left = middle + 1
-            }
-        }
-
-        this.aggregateModels.timelineEvents.content.splice(right-1,0,event)
+        this.aggregateModels.timelineEvents.content.splice(placeToInsert,0,event)
 
         this.addModel("timelineEvents",event)
     }
