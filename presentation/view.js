@@ -97,7 +97,7 @@ export class abstractView extends abstractWindow{
         }
 
         this.functionsToPerformWhenClicked = new Set()
-        this.onclick = (event) => {
+        this.onpointerdown = (event) => {
             for (const method of this.functionsToPerformWhenClicked){
                 method(event)
             }

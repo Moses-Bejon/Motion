@@ -1,4 +1,5 @@
 import {controller} from "../../../controller.js";
+import {addDragLogicTo} from "../../../dragLogic.js";
 
 export class editMode{
     constructor(editCanvas) {
@@ -9,8 +10,58 @@ export class editMode{
         // when you click on the canvas, but not on any particular shape, deselect all selected shapes
         this.editCanvas.addFunctionToPerformOnClick(this.bindedDeselectAll)
 
+        addDragLogicTo(this.editCanvas.canvas,
+            this.continueBoxSelection.bind(this),
+            this.finishBoxSelection.bind(this),
+            this.beginBoxSelection.bind(this),
+            "auto",
+            "auto")
+
         // getting up to speed on all the shapes displayed on the canvas
         this.updateAggregateModel("displayShapes",controller.aggregateModels.displayShapes.content)
+    }
+
+    beginBoxSelection(pointerEvent){
+        // ensuring the selection box is on the svg
+        this.editCanvas.selectionBox?.remove()
+        this.editCanvas.canvas.appendChild(this.editCanvas.selectionBox)
+
+        this.beganBoxAt = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+
+        // prevents canvas from being clicked and deselecting everything
+        pointerEvent.stopPropagation()
+    }
+
+    continueBoxSelection(pointerEvent){
+        const currentBoxFinish = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+
+        let top
+        let bottom
+        let left
+        let right
+
+        if (currentBoxFinish[1] > this.beganBoxAt[1]){
+            top = this.beganBoxAt[1]
+            bottom = currentBoxFinish[1]
+        } else {
+            top = currentBoxFinish[1]
+            bottom = this.beganBoxAt[1]
+        }
+
+        if (currentBoxFinish[0] > this.beganBoxAt[0]){
+            left = this.beganBoxAt[0]
+            right = currentBoxFinish[0]
+        } else {
+            left = currentBoxFinish[0]
+            right = this.beganBoxAt[0]
+        }
+
+        this.editCanvas.positionSelectionBox(top,bottom,left,right)
+    }
+
+    finishBoxSelection(pointerEvent){
+        this.editCanvas.selectionBox.remove()
+        this.editCanvas.updateSelectionBox()
     }
 
     acceptKeyDown(keyboardEvent){
@@ -19,8 +70,9 @@ export class editMode{
 
     switchMode(){
         this.editCanvas.removeFunctionToPerformOnClick(this.bindedDeselectAll)
+        this.editCanvas.canvas.onpointerdown = null
         for (const [shape,geometry] of this.editCanvas.shapesToGeometry){
-            geometry.onclick = null
+            geometry.onpointerdown = null
         }
     }
 
@@ -33,8 +85,7 @@ export class editMode{
 
         const geometry = this.editCanvas.shapesToGeometry.get(model)
 
-        geometry.onclick = (event) => {
-
+        geometry.onpointerdown = (event) => {
             // stop the canvas from being clicked and deselecting everything
             event.stopPropagation()
 

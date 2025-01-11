@@ -461,19 +461,8 @@ export class createEditCanvas extends canvas{
         return super.acceptKeyDown(keyboardEvent)
     }
 
-    updateSelectionBox(){
-        this.selectionBox?.remove()
+    positionSelectionBox(selectionTop,selectionBottom,selectionLeft,selectionRight){
 
-        if (this.selectedShapes.size === 0){
-            return
-        }
-
-        const shapes = Array.from(this.selectedShapes)
-
-        const selectionTop = maximumOfArray(shapes,(shape)=>{return shape.top},isLess)
-        const selectionBottom = maximumOfArray(shapes,(shape) => {return shape.bottom})
-        const selectionLeft = maximumOfArray(shapes,(shape) => {return shape.left},isLess)
-        const selectionRight = maximumOfArray(shapes,(shape => {return shape.right}))
         const horizontalCentre = (selectionLeft+selectionRight)/2
         const verticalCentre = (selectionTop+selectionBottom)/2
 
@@ -498,6 +487,24 @@ export class createEditCanvas extends canvas{
         this.leftMiddleScalingNode.setAttribute("cy",verticalCentre)
         this.rightMiddleScalingNode.setAttribute("cx",selectionRight)
         this.rightMiddleScalingNode.setAttribute("cy",verticalCentre)
+
+    }
+
+    updateSelectionBox(){
+        this.selectionBox?.remove()
+
+        if (this.selectedShapes.size === 0){
+            return
+        }
+
+        const shapes = Array.from(this.selectedShapes)
+
+        const selectionTop = maximumOfArray(shapes,(shape)=>{return shape.top},isLess)
+        const selectionBottom = maximumOfArray(shapes,(shape) => {return shape.bottom})
+        const selectionLeft = maximumOfArray(shapes,(shape) => {return shape.left},isLess)
+        const selectionRight = maximumOfArray(shapes,(shape => {return shape.right}))
+
+        this.positionSelectionBox(selectionTop,selectionBottom,selectionLeft,selectionRight)
 
         this.canvas.appendChild(this.selectionBox)
 
