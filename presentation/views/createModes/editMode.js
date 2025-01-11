@@ -57,9 +57,30 @@ export class editMode{
         }
 
         this.editCanvas.positionSelectionBox(top,bottom,left,right)
+
+        return [top,bottom,left,right]
     }
 
     finishBoxSelection(pointerEvent){
+
+        const [top,bottom,left,right] = this.continueBoxSelection(pointerEvent)
+
+        const newlySelectedShapes = new Set()
+
+        for (const shape of controller.aggregateModels.displayShapes.content){
+            if (top < shape.top && bottom > shape.bottom && left < shape.left && right > shape.right){
+                newlySelectedShapes.add(shape)
+            }
+        }
+
+        if (pointerEvent.shiftKey){
+            for (const shape of newlySelectedShapes){
+                controller.selectShape(shape)
+            }
+        } else {
+            controller.newAggregateModel("selectedShapes",newlySelectedShapes)
+        }
+
         this.editCanvas.selectionBox.remove()
         this.editCanvas.updateSelectionBox()
     }
