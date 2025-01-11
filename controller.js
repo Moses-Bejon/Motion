@@ -68,7 +68,7 @@ class controllerClass{
     selectShape(shape){
 
         if (this.isSelected(shape)){
-            throw new Error("attempt to select an already selected shape")
+            return
         }
 
         this.aggregateModels.selectedShapes.content.add(shape)
