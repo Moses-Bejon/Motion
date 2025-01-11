@@ -1,5 +1,6 @@
 import {controller} from "../../controller.js"
 import {increment2dVectorBy, decrement2dVectorBy, multiply2dVectorByScalar, subtract2dVectors} from "../../maths.js";
+import {binarySearch,binaryInsertion} from "../../dataStructureOperations.js";
 import {abstractView} from "../view.js"
 
 import {
@@ -143,6 +144,9 @@ export class canvas extends abstractView{
         // mapping of shape objects to their group elements on the canvas
         this.shapesToGeometry = new Map()
 
+        // used to keep display shapes in the correct stacking order
+        this.shapesInOrderOfZIndex = []
+
         // all keys that the user currently has pressed for this window
         this.keysDown = new Set()
 
@@ -191,13 +195,21 @@ export class canvas extends abstractView{
 
         this.shapesToGeometry.set(model,shape)
 
-        this.canvas.appendChild(shape)
+        const insertAt = binaryInsertion(this.shapesInOrderOfZIndex,model.ZIndex,(shape) => {return shape.ZIndex})
+
+        const geometryAfterNewShape = this.shapesToGeometry.get(this.shapesInOrderOfZIndex[insertAt])
+
+        this.canvas.insertBefore(shape,geometryAfterNewShape)
+
+        this.shapesInOrderOfZIndex.splice(insertAt,0,model)
     }
 
     updateAggregateModel(aggregateModel,model){
         this.errorCheckAggregateModel(aggregateModel)
 
         this.canvas.replaceChildren()
+        this.shapesToGeometry = new Map()
+        this.shapesInOrderOfZIndex = []
         for (const shape of model){
             this.addModel(aggregateModel,shape)
         }
@@ -209,6 +221,9 @@ export class canvas extends abstractView{
         this.canvas.removeChild(this.shapesToGeometry.get(model))
 
         this.shapesToGeometry.delete(model)
+
+        const removeFrom = binarySearch(this.shapesInOrderOfZIndex,model.ZIndex,(shape) => {return shape.ZIndex})
+        this.shapesInOrderOfZIndex.splice(removeFrom,1)
     }
 
     toCanvasCoordinates(x,y){
