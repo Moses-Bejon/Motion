@@ -84,7 +84,7 @@ export class text extends shape{
         const copy = new text(
             this.appearanceTime,
             this.disappearanceTime,
-            this.bottomLeft,
+            Array.from(this.bottomLeft),
             this.rotation,
             this.fontColour,
             this.fontSize,
