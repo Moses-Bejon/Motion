@@ -245,19 +245,19 @@ export class createEditCanvas extends canvas{
         this.currentMode = new drawMode(this)
 
         // adding events for all the buttons
-        this.shadowRoot.getElementById("draw").onclick = () => {
+        this.shadowRoot.getElementById("draw").onpointerdown = () => {
             this.currentMode.switchMode()
             this.currentMode = new drawMode(this)
         }
-        this.shadowRoot.getElementById("polygon").onclick = () => {
+        this.shadowRoot.getElementById("polygon").onpointerdown = () => {
             this.currentMode.switchMode()
             this.currentMode = new polygonMode(this)
         }
-        this.shadowRoot.getElementById("ellipse").onclick = () => {
+        this.shadowRoot.getElementById("ellipse").onpointerdown = () => {
             this.currentMode.switchMode()
             this.currentMode = new ellipseMode(this)
         }
-        this.shadowRoot.getElementById("text").onclick = () => {
+        this.shadowRoot.getElementById("text").onpointerdown = () => {
             this.currentMode.switchMode()
             this.currentMode = new textMode(this)
         }
@@ -279,7 +279,7 @@ export class createEditCanvas extends canvas{
             fakeGraphic.style.backgroundColor = "#f0f0f0"
         }
 
-        this.shadowRoot.getElementById("duplicate").onclick = (pointerEvent) => {
+        this.shadowRoot.getElementById("duplicate").onpointerdown = (pointerEvent) => {
 
             // the duplicate becomes selected after it is made
             const newlySelectedShapes = new Set()
@@ -298,7 +298,7 @@ export class createEditCanvas extends canvas{
             // prevents the click on the canvas from deselecting the selected shapes
             pointerEvent.stopPropagation()
         }
-        this.shadowRoot.getElementById("copy").onclick = (pointerEvent) => {
+        this.shadowRoot.getElementById("copy").onpointerdown = (pointerEvent) => {
             controller.copiedShapes = []
 
             for (const shape of this.selectedShapes) {
@@ -306,7 +306,7 @@ export class createEditCanvas extends canvas{
             }
             pointerEvent.stopPropagation()
         }
-        this.shadowRoot.getElementById("paste").onclick = (pointerEvent) => {
+        this.shadowRoot.getElementById("paste").onpointerdown = (pointerEvent) => {
             const newlySelectedShapes = new Set()
             for (const shape of controller.copiedShapes){
                 shape.translate([50,50])
@@ -317,7 +317,7 @@ export class createEditCanvas extends canvas{
             controller.newAggregateModel("selectedShapes",newlySelectedShapes)
             pointerEvent.stopPropagation()
         }
-        this.shadowRoot.getElementById("delete").onclick = () => {
+        this.shadowRoot.getElementById("delete").onpointerdown = () => {
             for (const shape of this.selectedShapes) {
                 controller.removeShape(shape)
             }
@@ -329,8 +329,8 @@ export class createEditCanvas extends canvas{
         this.outlineColour = this.shadowRoot.getElementById("outlineColour")
         this.noOutlineColour = this.shadowRoot.getElementById("noOutlineColour")
 
-        this.shadowRoot.getElementById("outlineColourLabel").onclick = this.toggleOutlineColour.bind(this)
-        this.noOutlineColour.onclick = this.toggleOutlineColour.bind(this)
+        this.shadowRoot.getElementById("outlineColourLabel").onpointerdown = this.toggleOutlineColour.bind(this)
+        this.noOutlineColour.onpointerdown = this.toggleOutlineColour.bind(this)
         this.noOutlineColour.style.display = "none"
 
         this.fillColourToggled = false
@@ -338,8 +338,8 @@ export class createEditCanvas extends canvas{
         this.fillColour.style.display = "none"
         this.noFillColour = this.shadowRoot.getElementById("noFillColour")
 
-        this.shadowRoot.getElementById("fillColourLabel").onclick = this.toggleFillColour.bind(this)
-        this.noFillColour.onclick = this.toggleFillColour.bind(this)
+        this.shadowRoot.getElementById("fillColourLabel").onpointerdown = this.toggleFillColour.bind(this)
+        this.noFillColour.onpointerdown = this.toggleFillColour.bind(this)
 
         this.selectedShapes = new Set()
 
