@@ -53,6 +53,22 @@ export function midPoint2d(point1,point2){
     return [(point1[0]+point2[0])/2,(point1[1]+point2[1])/2]
 }
 
+export function getDistanceToStraightLineThrough(point1,point2){
+    const x1 = point1[0]
+    const y1 = point1[1]
+    const x2 = point2[0]
+    const y2 = point2[1]
+
+    // getting straight section in form ax + y + c = 0
+    const a = (y1-y2)/(x2-x1)
+
+    const c = -x1*a-y1
+
+    const denominator = (a**2+1)**0.5
+
+    return (point) => {return Math.abs(a*point[0]+point[1]+c)/denominator}
+}
+
 // simplifies a line
 export function decimateLine(line,epsilon){
     return [line[0]].concat(decimateLineRecursivePart(line,epsilon)).concat([line[line.length-1]])
@@ -65,19 +81,12 @@ export function decimateLineRecursivePart(line,epsilon){
     }
 
     // start and end of straight section
-    const x1 = line[0][0]
-    const y1 = line[0][1]
-    const x2 = line[line.length-1][0]
-    const y2 = line[line.length-1][1]
+    const first = line[0]
+    const last = line[line.length-1]
 
-    const lineLength = distanceBetween2dPoints([x1,y1],[x2,y2])
+    const lineLength = distanceBetween2dPoints(first,last)
 
-    // getting straight section in form ax + y + c = 0
-    const a = (y1-y2)/(x2-x1)
-
-    const c = -x1*a-y1
-
-    const denominator = (a**2+1)**0.5
+    const pointToDistance = getDistanceToStraightLineThrough(first,last)
 
     let greatestDistance = -1
     let greatestIndex = null
@@ -85,9 +94,9 @@ export function decimateLineRecursivePart(line,epsilon){
     for (let i = 1; i<line.length-1; i++){
 
         const point = line[i]
-        const perpendicularDistance = Math.abs(a*point[0]+point[1]+c)/denominator
-        const distanceToFirstEndPoint = distanceBetween2dPoints([x1,y1],point)
-        const distanceToSecondEndPoint = distanceBetween2dPoints([x2,y2],point)
+        const perpendicularDistance = pointToDistance(point)
+        const distanceToFirstEndPoint = distanceBetween2dPoints(first,point)
+        const distanceToSecondEndPoint = distanceBetween2dPoints(last,point)
 
         let distanceToClosestEndPoint
         let distanceToFurthestEndPoint
