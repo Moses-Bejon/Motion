@@ -53,16 +53,15 @@ export function midPoint2d(point1,point2){
     return [(point1[0]+point2[0])/2,(point1[1]+point2[1])/2]
 }
 
-export function getDistanceToStraightLineThrough(point1,point2){
-    const x1 = point1[0]
-    const y1 = point1[1]
-    const x2 = point2[0]
-    const y2 = point2[1]
+export function getDistanceToStraightLineThrough(gradientPoint1,gradientPoint2,linePoint){
 
     // getting straight section in form ax + y + c = 0
-    const a = (y1-y2)/(x2-x1)
 
-    const c = -x1*a-y1
+    // gradientPoints are used to compute the gradient
+    const a = (gradientPoint1[1]-gradientPoint2[1])/(gradientPoint2[0]-gradientPoint1[0])
+
+    // and line points to find the position of the line
+    const c = -linePoint[0]*a-linePoint[1]
 
     const denominator = (a**2+1)**0.5
 
@@ -86,7 +85,7 @@ export function decimateLineRecursivePart(line,epsilon){
 
     const lineLength = distanceBetween2dPoints(first,last)
 
-    const pointToDistance = getDistanceToStraightLineThrough(first,last)
+    const pointToDistance = getDistanceToStraightLineThrough(first,last,first)
 
     let greatestDistance = -1
     let greatestIndex = null
