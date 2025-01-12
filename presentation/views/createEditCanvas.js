@@ -14,13 +14,10 @@ import {textMode} from "./createModes/textMode.js";
 import {controller} from "../../controller.js";
 import {manyPointsMode} from "./createModes/manyPointsMode.js";
 import {graphicMode} from "./createModes/graphicMode.js";
-import {
-    isLess,
-    subtract2dVectors
-} from "../../maths.js";
+import {selectionBox} from "./createModes/selectionBox.js";
+import {isLess} from "../../maths.js";
 import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
 import {editMode} from "./createModes/editMode.js";
-import {addDragLogicTo} from "../../dragLogic.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -372,46 +369,7 @@ export class createEditCanvas extends canvas{
 
         this.selectedShapes = new Set()
 
-        this.selectionBox = document.createElementNS("http://www.w3.org/2000/svg","g")
-
-        this.selectionOutline = document.createElementNS("http://www.w3.org/2000/svg","rect")
-        this.selectionOutline.setAttribute("stroke-dasharray","4 11")
-        this.selectionOutline.style.fill = "transparent"
-        this.selectionOutline.style.stroke = "black"
-        this.selectionOutline.style.strokeWidth = 1
-
-        this.selectionBox.appendChild(this.selectionOutline)
-
-        const selectionScalingNode = document.createElementNS("http://www.w3.org/2000/svg","circle")
-        selectionScalingNode.setAttribute("r",5)
-        selectionScalingNode.style.fill = "black"
-        selectionScalingNode.style.stroke = "white"
-        selectionScalingNode.style.strokeWidth = 1
-
-        this.topLeftScalingNode = selectionScalingNode.cloneNode(false)
-        this.selectionBox.appendChild(this.topLeftScalingNode)
-        this.topRightScalingNode = selectionScalingNode.cloneNode(false)
-        this.selectionBox.appendChild(this.topRightScalingNode)
-        this.bottomLeftScalingNode = selectionScalingNode.cloneNode(false)
-        this.selectionBox.appendChild(this.bottomLeftScalingNode)
-        this.bottomRightScalingNode = selectionScalingNode.cloneNode(false)
-        this.selectionBox.appendChild(this.bottomRightScalingNode)
-        this.topMiddleScalingNode = selectionScalingNode.cloneNode(false)
-        this.selectionBox.appendChild(this.topMiddleScalingNode)
-        this.bottomMiddleScalingNode = selectionScalingNode.cloneNode(false)
-        this.selectionBox.appendChild(this.bottomMiddleScalingNode)
-        this.leftMiddleScalingNode = selectionScalingNode.cloneNode(false)
-        this.selectionBox.appendChild(this.leftMiddleScalingNode)
-        this.rightMiddleScalingNode = selectionScalingNode.cloneNode(false)
-        this.selectionBox.appendChild(this.rightMiddleScalingNode)
-
-        // logic for moving the selection box (along with all the shapes in it)
-        addDragLogicTo(
-            this.selectionBox,
-            this.dragSelectionBox.bind(this),
-            this.endDraggingSelectionBox.bind(this),
-            this.beginDraggingSelectionBox.bind(this)
-        )
+        this.selectionBoxInstance = new selectionBox(this)
     }
 
     connectedCallback() {
@@ -490,37 +448,8 @@ export class createEditCanvas extends canvas{
         return super.acceptKeyDown(keyboardEvent)
     }
 
-    positionSelectionBox(selectionTop,selectionBottom,selectionLeft,selectionRight){
-
-        const horizontalCentre = (selectionLeft+selectionRight)/2
-        const verticalCentre = (selectionTop+selectionBottom)/2
-
-        this.selectionOutline.setAttribute("x",selectionLeft)
-        this.selectionOutline.setAttribute("y",selectionTop)
-        this.selectionOutline.setAttribute("width",selectionRight-selectionLeft)
-        this.selectionOutline.setAttribute("height",selectionBottom-selectionTop)
-
-        this.topLeftScalingNode.setAttribute("cx",selectionLeft)
-        this.topLeftScalingNode.setAttribute("cy",selectionTop)
-        this.topRightScalingNode.setAttribute("cx",selectionRight)
-        this.topRightScalingNode.setAttribute("cy",selectionTop)
-        this.bottomLeftScalingNode.setAttribute("cx",selectionLeft)
-        this.bottomLeftScalingNode.setAttribute("cy",selectionBottom)
-        this.bottomRightScalingNode.setAttribute("cx",selectionRight)
-        this.bottomRightScalingNode.setAttribute("cy",selectionBottom)
-        this.topMiddleScalingNode.setAttribute("cx",horizontalCentre)
-        this.topMiddleScalingNode.setAttribute("cy",selectionTop)
-        this.bottomMiddleScalingNode.setAttribute("cx",horizontalCentre)
-        this.bottomMiddleScalingNode.setAttribute("cy",selectionBottom)
-        this.leftMiddleScalingNode.setAttribute("cx",selectionLeft)
-        this.leftMiddleScalingNode.setAttribute("cy",verticalCentre)
-        this.rightMiddleScalingNode.setAttribute("cx",selectionRight)
-        this.rightMiddleScalingNode.setAttribute("cy",verticalCentre)
-
-    }
-
     updateSelectionBox(){
-        this.selectionBox?.remove()
+        this.selectionBoxGeometry?.remove()
 
         if (this.selectedShapes.size === 0){
             return
@@ -533,55 +462,10 @@ export class createEditCanvas extends canvas{
         const selectionLeft = maximumOfArray(shapes,(shape) => {return shape.left},isLess)
         const selectionRight = maximumOfArray(shapes,(shape => {return shape.right}))
 
-        this.positionSelectionBox(selectionTop,selectionBottom,selectionLeft,selectionRight)
+        this.selectionBoxGeometry = this.selectionBoxInstance.positionSelectionBox(
+            selectionTop,selectionBottom,selectionLeft,selectionRight)
 
-        this.canvas.appendChild(this.selectionBox)
-
-    }
-
-    beginDraggingSelectionBox(pointerEvent){
-        this.previousSelectionPosition = this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
-
-        // avoids other modes interfering, like you wouldn't want to start drawing while moving the box
-        pointerEvent.stopPropagation()
-    }
-
-    dragSelectionBox(pointerEvent){
-        const currentSelectionPosition = this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
-        const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
-
-        // a css transformation is used in place of actually updating the geometry, as done at the end of the drag
-        // (for performance)
-        const transformation = `translate(${translation[0]}px, ${translation[1]}px)`
-
-        for (const shape of this.selectedShapes){
-            const geometry = this.shapesToGeometry.get(shape)
-            geometry.style.transform = transformation
-        }
-
-        this.selectionBox.style.transform = transformation
-
-        pointerEvent.stopPropagation()
-    }
-
-    endDraggingSelectionBox(pointerEvent){
-        const currentSelectionPosition = this.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
-
-        const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
-
-        // a new set is used because, as this loop runs and the geometry is updated, the set is changing
-        // this is because of calls the controller is making
-        for (const shape of new Set(this.selectedShapes)){
-            shape.translate(translation)
-            shape.updateGeometry()
-
-            controller.updateModel("displayShapes",shape)
-            controller.updateModel("selectedShapes",shape)
-        }
-
-        this.selectionBox.style.transform = null
-
-        pointerEvent.stopPropagation()
+        this.canvas.appendChild(this.selectionBoxGeometry)
 
     }
 

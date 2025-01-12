@@ -23,8 +23,8 @@ export class editMode{
 
     beginBoxSelection(pointerEvent){
         // ensuring the selection box is on the svg
-        this.editCanvas.selectionBox?.remove()
-        this.editCanvas.canvas.appendChild(this.editCanvas.selectionBox)
+        this.editCanvas.selectionBoxGeometry?.remove()
+        this.editCanvas.canvas.appendChild(this.editCanvas.selectionBoxGeometry)
 
         this.beganBoxAt = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
@@ -56,7 +56,7 @@ export class editMode{
             right = this.beganBoxAt[0]
         }
 
-        this.editCanvas.positionSelectionBox(top,bottom,left,right)
+        this.editCanvas.selectionBoxInstance.positionSelectionBox(top,bottom,left,right)
 
         return [top,bottom,left,right]
     }
@@ -81,7 +81,7 @@ export class editMode{
             controller.newAggregateModel("selectedShapes",newlySelectedShapes)
         }
 
-        this.editCanvas.selectionBox.remove()
+        this.editCanvas.selectionBoxGeometry.remove()
         this.editCanvas.updateSelectionBox()
     }
 
