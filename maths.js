@@ -65,7 +65,7 @@ export function getDistanceToStraightLineThrough(gradientPoint1,gradientPoint2,l
 
     const denominator = (a**2+1)**0.5
 
-    return (point) => {return Math.abs(a*point[0]+point[1]+c)/denominator}
+    return (point) => {return (a*point[0]+point[1]+c)/denominator}
 }
 
 // simplifies a line
@@ -93,7 +93,7 @@ export function decimateLineRecursivePart(line,epsilon){
     for (let i = 1; i<line.length-1; i++){
 
         const point = line[i]
-        const perpendicularDistance = pointToDistance(point)
+        const perpendicularDistance = Math.abs(pointToDistance(point))
         const distanceToFirstEndPoint = distanceBetween2dPoints(first,point)
         const distanceToSecondEndPoint = distanceBetween2dPoints(last,point)
 

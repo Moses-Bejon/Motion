@@ -370,6 +370,10 @@ export class createEditCanvas extends canvas{
         this.selectedShapes = new Set()
 
         this.selectionBoxInstance = new selectionBox(this)
+
+        // ensures we have the geometry in case we need it later
+        this.selectionBoxGeometry = this.selectionBoxInstance.positionSelectionBox(0,0,0,0)
+        this.selectionBoxGeometry.remove()
     }
 
     connectedCallback() {
