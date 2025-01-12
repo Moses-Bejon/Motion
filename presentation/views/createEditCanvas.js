@@ -18,7 +18,7 @@ import {
     isLess,
     subtract2dVectors
 } from "../../maths.js";
-import { maximumOfArray } from "../../dataStructureOperations.js";
+import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
 import {editMode} from "./createModes/editMode.js";
 import {addDragLogicTo} from "../../dragLogic.js";
 
@@ -201,12 +201,16 @@ p{
 </div>
 
 <div id="edit">
-    <button id="duplicate" class="duplicate">Duplicate</button>
+    <button id="duplicate" class="editButton">Duplicate</button>
     <button id="copy" class="editButton">Copy</button>
     <button id="paste" class="editButton">Paste</button>
     <button id="merge" class="editButton">Merge</button>
     <button id="delete" class="editButton">Delete</button>
     <button id="transform" class="editButton">Transform</button>
+    <button id="moveAbove" class="editButton">Move one above</button>
+    <button id="moveBehind" class="editButton">Move one below</button>
+    <button id="moveFront" class="editButton">Move to front</button>
+    <button id="moveBack" class="editButton">Move to back</button>
 </div>
 </div>`
 
@@ -321,6 +325,31 @@ export class createEditCanvas extends canvas{
             for (const shape of this.selectedShapes) {
                 controller.removeShape(shape)
             }
+        }
+        this.shadowRoot.getElementById("moveAbove").onpointerdown = (pointerEvent) => {
+            this.moveSelectedShapesOneAbove()
+            pointerEvent.stopPropagation()
+        }
+        this.shadowRoot.getElementById("moveBehind").onpointerdown = (pointerEvent) => {
+            this.moveSelectedShapesOneBelow()
+            pointerEvent.stopPropagation()
+        }
+        this.shadowRoot.getElementById("moveFront").onpointerdown = (pointerEvent) => {
+
+            // this is just the easiest way to do it, will optimise if becomes an issue
+            for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
+                this.moveSelectedShapesOneAbove()
+            }
+
+            pointerEvent.stopPropagation()
+        }
+        this.shadowRoot.getElementById("moveBack").onpointerdown = (pointerEvent) => {
+
+            for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
+                this.moveSelectedShapesOneBelow()
+            }
+
+            pointerEvent.stopPropagation()
         }
 
         /* outline colour can be none, so toggle is used for switching between none and the colour */
@@ -554,6 +583,63 @@ export class createEditCanvas extends canvas{
 
         pointerEvent.stopPropagation()
 
+    }
+
+    positionsOfShapesInZIndexArray(shapes){
+        const positions = []
+        for (const shape of shapes){
+            const shapePosition = binarySearch(this.shapesInOrderOfZIndex,shape.ZIndex,(model) => {return model.ZIndex})
+
+            // ensures the returned positions are in sorted order
+            positions.splice(binaryInsertion(positions,shapePosition),0,shapePosition)
+        }
+        return positions
+    }
+
+    swapZIndicesOfShapes(shape1,shape2){
+        const tempZIndex = shape2.ZIndex
+
+        shape2.ZIndex = shape1.ZIndex
+        shape1.ZIndex = tempZIndex
+
+        // this ensures controller knows we updated the shapes
+        shape2.geometryAttributeUpdate("ZIndex",shape2.ZIndex)
+        shape1.geometryAttributeUpdate("ZIndex",shape1.ZIndex)
+    }
+
+    moveSelectedShapesOneAbove(){
+        const positions = this.positionsOfShapesInZIndexArray(this.selectedShapes).reverse()
+
+        // remove any shapes already on the top from the shapes we are going to move
+        let top = this.shapesInOrderOfZIndex.length-1
+        while (positions[0] === top){
+            positions.shift()
+            top --
+        }
+
+        for (const position of positions){
+            const shapeAhead = this.shapesInOrderOfZIndex[position+1]
+            const shape = this.shapesInOrderOfZIndex[position]
+
+            this.swapZIndicesOfShapes(shape,shapeAhead)
+        }
+    }
+
+    moveSelectedShapesOneBelow(){
+        const positions = this.positionsOfShapesInZIndexArray(this.selectedShapes)
+
+        let bottom = 0
+        while (positions[0] === bottom){
+            positions.shift()
+            bottom ++
+        }
+
+        for (const position of positions){
+            const shapeBehind = this.shapesInOrderOfZIndex[position-1]
+            const shape = this.shapesInOrderOfZIndex[position]
+
+            this.swapZIndicesOfShapes(shape,shapeBehind)
+        }
     }
 
     updateAggregateModel(aggregateModel, model){

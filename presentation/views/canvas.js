@@ -222,8 +222,14 @@ export class canvas extends abstractView{
 
         this.shapesToGeometry.delete(model)
 
-        const removeFrom = binarySearch(this.shapesInOrderOfZIndex,model.ZIndex,(shape) => {return shape.ZIndex})
-        this.shapesInOrderOfZIndex.splice(removeFrom,1)
+        for (let i = 0; i<this.shapesInOrderOfZIndex.length; i++){
+            if (this.shapesInOrderOfZIndex[i] === model){
+                this.shapesInOrderOfZIndex.splice(i,1)
+
+                // any given display shape should only appear once in the list
+                return
+            }
+        }
     }
 
     toCanvasCoordinates(x,y){
