@@ -80,6 +80,16 @@ export class drawing extends shape{
         this.updateGeometry()
     }
 
+    scaleParallelToDimension(dimension,scaleFactor,aboutCentre){
+        for (const point of this.points){
+            point[dimension] = scaleFactor*(point[dimension]-aboutCentre)+aboutCentre
+        }
+
+        this.thickness = Math.abs(scaleFactor*this.thickness)
+
+        this.updateGeometry()
+    }
+
     copy(){
         return new drawing(
             this.appearanceTime,

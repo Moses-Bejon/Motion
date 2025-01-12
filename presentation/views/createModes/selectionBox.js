@@ -1,7 +1,6 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {
     getDistanceToStraightLineThrough,
-    increment2dVectorBy,
     subtract2dVectors
 } from "../../../maths.js";
 import {controller} from "../../../controller.js";
@@ -104,12 +103,75 @@ export class selectionBox{
 
         this.topMiddleScalingNode = selectionScalingNode.cloneNode(false)
         this.selectionBox.appendChild(this.topMiddleScalingNode)
+
+        addDragLogicTo(
+            this.topMiddleScalingNode,
+            this.dragScalingNodeAlongDimension.bind(this),
+            this.endDraggingScalingNodeAlongDimension.bind(this),
+            (pointerEvent) => {
+                this.beginDraggingScalingNodeAlongDimension(
+                    pointerEvent,
+                    1,
+                    this.bottom
+                )
+            },
+            "ns-resize",
+            "ns-resize"
+        )
+
         this.bottomMiddleScalingNode = selectionScalingNode.cloneNode(false)
         this.selectionBox.appendChild(this.bottomMiddleScalingNode)
+
+        addDragLogicTo(
+            this.bottomMiddleScalingNode,
+            this.dragScalingNodeAlongDimension.bind(this),
+            this.endDraggingScalingNodeAlongDimension.bind(this),
+            (pointerEvent) => {
+                this.beginDraggingScalingNodeAlongDimension(
+                    pointerEvent,
+                    1,
+                    this.top
+                )
+            },
+            "ns-resize",
+            "ns-resize"
+        )
+
         this.leftMiddleScalingNode = selectionScalingNode.cloneNode(false)
         this.selectionBox.appendChild(this.leftMiddleScalingNode)
+
+        addDragLogicTo(
+            this.leftMiddleScalingNode,
+            this.dragScalingNodeAlongDimension.bind(this),
+            this.endDraggingScalingNodeAlongDimension.bind(this),
+            (pointerEvent) => {
+                this.beginDraggingScalingNodeAlongDimension(
+                    pointerEvent,
+                    0,
+                    this.right
+                )
+            },
+            "ew-resize",
+            "ew-resize"
+        )
+
         this.rightMiddleScalingNode = selectionScalingNode.cloneNode(false)
         this.selectionBox.appendChild(this.rightMiddleScalingNode)
+
+        addDragLogicTo(
+            this.rightMiddleScalingNode,
+            this.dragScalingNodeAlongDimension.bind(this),
+            this.endDraggingScalingNodeAlongDimension.bind(this),
+            (pointerEvent) => {
+                this.beginDraggingScalingNodeAlongDimension(
+                    pointerEvent,
+                    0,
+                    this.left
+                )
+            },
+            "ew-resize",
+            "ew-resize"
+        )
 
         // logic for moving the selection box (along with all the shapes in it)
         addDragLogicTo(
@@ -188,7 +250,49 @@ export class selectionBox{
 
         pointerEvent.stopPropagation()
     }
+    
+    beginDraggingScalingNodeAlongDimension(pointerEvent,dimension,valueScalingAround){
+        this.dimensionScalingAlong = dimension
+        this.valueScalingAround = valueScalingAround
 
+        const transformOrigin = [0,0]
+        transformOrigin[dimension] = valueScalingAround
+        this.newTransformOrigin(transformOrigin)
+
+        const currentPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+
+        this.initialDistance = currentPosition[this.dimensionScalingAlong] - this.valueScalingAround
+
+        pointerEvent.stopPropagation()
+    }
+
+    dragScalingNodeAlongDimension(pointerEvent){
+        const currentPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+
+        const scaleFactor = (currentPosition[this.dimensionScalingAlong] - this.valueScalingAround)/this.initialDistance
+
+        const scale = [1,1]
+        scale[this.dimensionScalingAlong] = scaleFactor
+
+        this.transform(`scale(${scale[0]}, ${scale[1]})`)
+
+        return scaleFactor
+    }
+
+    endDraggingScalingNodeAlongDimension(pointerEvent){
+        const scaleFactor = this.dragScalingNodeAlongDimension(pointerEvent)
+
+        this.selectionBox.style.transform = null
+
+        this.globalTransform(
+            (shape) => {
+                shape.scaleParallelToDimension(this.dimensionScalingAlong,scaleFactor,this.valueScalingAround)
+            }
+        )
+
+        pointerEvent.stopPropagation()
+    }
+    
     beginDraggingSelectionBox(pointerEvent){
         this.previousSelectionPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
