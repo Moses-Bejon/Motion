@@ -1,7 +1,8 @@
 // global constants are defined here
 
 export const fontFamily = "Helvetica,sans-serif"
-export const fontSize = "12pt"
+export const fontSizeInt = 12
+export const fontSize = `${fontSizeInt}pt`
 
 export const innerEdgeThicknessInt = 5
 export const innerEdgeThickness = innerEdgeThicknessInt + "px"

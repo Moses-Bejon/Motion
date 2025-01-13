@@ -1,5 +1,5 @@
 import {shape} from "./shape.js";
-import {isLess, increment2dVectorBy, decrement2dVectorBy, scale2dVectorBy} from "../maths.js";
+import {isLess, increment2dVectorBy, scale2dVectorAboutPoint} from "../maths.js";
 import {maximumOfArray} from "../dataStructureOperations.js";
 
 export class drawing extends shape{
@@ -70,19 +70,7 @@ export class drawing extends shape{
 
     scale(scaleFactor,aboutCentre){
         for (const point of this.points){
-            decrement2dVectorBy(point,aboutCentre)
-            scale2dVectorBy(point,scaleFactor)
-            increment2dVectorBy(point,aboutCentre)
-        }
-
-        this.thickness = Math.abs(scaleFactor*this.thickness)
-
-        this.updateGeometry()
-    }
-
-    scaleParallelToDimension(dimension,scaleFactor,aboutCentre){
-        for (const point of this.points){
-            point[dimension] = scaleFactor*(point[dimension]-aboutCentre)+aboutCentre
+            scale2dVectorAboutPoint(point,aboutCentre,scaleFactor)
         }
 
         this.thickness = Math.abs(scaleFactor*this.thickness)

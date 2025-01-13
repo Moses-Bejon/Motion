@@ -1,9 +1,9 @@
 import {shape} from "./shape.js";
-import {fontSize,fontFamily} from "../constants.js";
-import {increment2dVectorBy} from "../maths.js";
+import {fontSizeInt,fontFamily} from "../constants.js";
+import {increment2dVectorBy, scale2dVectorAboutPoint} from "../maths.js";
 
 export class text extends shape{
-    constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size=fontSize,family=fontFamily){
+    constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size=fontSizeInt,family=fontFamily){
         super(appearanceTime,disappearanceTime)
 
         this.text = "Begin typing"
@@ -24,7 +24,7 @@ export class text extends shape{
         const canvas = document.createElement("canvas")
         const context = canvas.getContext("2d")
 
-        context.font = `${this.fontSize} ${this.fontFamily}`
+        context.font = `${this.fontSize}pt ${this.fontFamily}`
 
         const metrics = context.measureText(this.text)
 
@@ -44,7 +44,7 @@ export class text extends shape{
         text.setAttribute("y",this.bottomLeft[1])
 
         text.style.fontFamily = this.fontFamily
-        text.style.fontSize = this.fontSize
+        text.style.fontSize = `${this.fontSize}pt`
         text.style.userSelect = "none"
         text.style.whiteSpace = "normal"
 
@@ -76,6 +76,14 @@ export class text extends shape{
 
     translate(translationVector){
         increment2dVectorBy(this.bottomLeft,translationVector)
+
+        this.updateGeometry()
+    }
+
+    scale(scaleFactor,aboutCentre){
+        scale2dVectorAboutPoint(this.bottomLeft,aboutCentre,scaleFactor)
+
+        this.fontSize *= Math.abs(scaleFactor)
 
         this.updateGeometry()
     }

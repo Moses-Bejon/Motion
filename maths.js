@@ -37,6 +37,12 @@ export function scale2dVectorBy(vector,by){
     vector[1] *= by
 }
 
+export function scale2dVectorAboutPoint(vector,point,scaleFactor){
+    decrement2dVectorBy(vector,point)
+    scale2dVectorBy(vector,scaleFactor)
+    increment2dVectorBy(vector,point)
+}
+
 export function isGreater(a,b){
     return a > b
 }

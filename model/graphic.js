@@ -1,5 +1,5 @@
 import {shape} from "./shape.js";
-import {increment2dVectorBy} from "../maths.js";
+import {increment2dVectorBy, scale2dVectorAboutPoint} from "../maths.js";
 
 export class graphic extends shape{
     constructor(appearanceTime,disappearanceTime,topLeft,rotation){
@@ -70,6 +70,14 @@ export class graphic extends shape{
 
     translate(translationVector){
         increment2dVectorBy(this.topLeft,translationVector)
+
+        this.updateGeometry()
+    }
+
+    scale(scaleFactor,aboutCentre){
+        scale2dVectorAboutPoint(this.topLeft,aboutCentre,scaleFactor)
+        this.width *= Math.abs(scaleFactor)
+        this.height *= Math.abs(scaleFactor)
 
         this.updateGeometry()
     }
