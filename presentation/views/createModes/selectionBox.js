@@ -1,5 +1,6 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {
+    angleBetweenThreePoints,
     getDistanceToStraightLineThrough,
     subtract2dVectors
 } from "../../../maths.js";
@@ -18,6 +19,19 @@ export class selectionBox{
         this.selectionOutline.style.strokeWidth = 1
 
         this.selectionBox.appendChild(this.selectionOutline)
+
+        this.rotateIcon = document.createElementNS("http://www.w3.org/2000/svg","image")
+        this.rotateIcon.setAttribute("href","../../../assets/rotate.svg")
+        this.rotateIcon.style.width = "50px"
+        this.rotateIcon.style.height = "50px"
+        this.selectionBox.appendChild(this.rotateIcon)
+
+        addDragLogicTo(
+            this.rotateIcon,
+            this.dragRotateIcon.bind(this),
+            this.endDraggingRotateIcon.bind(this),
+            this.beginDraggingRotateIcon.bind(this)
+        )
 
         const selectionScalingNode = document.createElementNS("http://www.w3.org/2000/svg","circle")
         selectionScalingNode.setAttribute("r",5)
@@ -111,10 +125,22 @@ export class selectionBox{
     }
 
     positionSelectionBox(selectionTop,selectionBottom,selectionLeft,selectionRight){
+        this.top = selectionTop
+        this.bottom = selectionBottom
+        this.left = selectionLeft
+        this.right = selectionRight
+
+        this.verticalCentre = (selectionTop+selectionBottom)/2
+        this.horizontalCentre = (selectionLeft+selectionRight)/2
+        this.centre = [this.horizontalCentre,this.verticalCentre]
+
         this.selectionOutline.setAttribute("x",selectionLeft)
         this.selectionOutline.setAttribute("y",selectionTop)
         this.selectionOutline.setAttribute("width",selectionRight-selectionLeft)
         this.selectionOutline.setAttribute("height",selectionBottom-selectionTop)
+
+        this.rotateIcon.setAttribute("x",this.horizontalCentre-25)
+        this.rotateIcon.setAttribute("y",selectionTop-50)
 
         this.topLeftScalingNode.setAttribute("cx",selectionLeft)
         this.topLeftScalingNode.setAttribute("cy",selectionTop)
@@ -125,12 +151,40 @@ export class selectionBox{
         this.bottomRightScalingNode.setAttribute("cx",selectionRight)
         this.bottomRightScalingNode.setAttribute("cy",selectionBottom)
 
-        this.top = selectionTop
-        this.bottom = selectionBottom
-        this.left = selectionLeft
-        this.right = selectionRight
-
         return this.selectionBox
+    }
+
+    beginDraggingRotateIcon(pointerEvent){
+        this.newTransformOrigin(this.centre)
+
+        this.initialPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+
+        pointerEvent.stopPropagation()
+    }
+
+    dragRotateIcon(pointerEvent){
+        const currentPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+
+        let angle
+
+        if (currentPosition[0] > this.initialPosition[0]) {
+            angle = angleBetweenThreePoints(currentPosition,this.centre,this.initialPosition)
+        } else{
+            angle = 2*Math.PI - angleBetweenThreePoints(currentPosition,this.centre,this.initialPosition)
+        }
+
+        this.transform(`rotate(${angle}rad)`)
+        return angle
+    }
+
+    endDraggingRotateIcon(pointerEvent){
+        const rotationAngle = this.dragRotateIcon(pointerEvent)
+
+        this.selectionBox.style.transform = null
+
+        this.globalTransform((shape) => {shape.rotate(rotationAngle,this.transformOrigin)})
+
+        pointerEvent.stopPropagation()
     }
 
     beginDraggingScalingNode(pointerEvent, pointScalingAround, gradientPoint1, gradientPoint2){

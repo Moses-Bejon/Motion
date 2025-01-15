@@ -1,5 +1,5 @@
 import {shape} from "./shape.js";
-import {isLess, increment2dVectorBy, scale2dVectorAboutPoint} from "../maths.js";
+import {isLess, increment2dVectorBy, scale2dVectorAboutPoint, getRotateByAngle} from "../maths.js";
 import {maximumOfArray} from "../dataStructureOperations.js";
 
 export class drawing extends shape{
@@ -74,6 +74,15 @@ export class drawing extends shape{
         }
 
         this.thickness = Math.abs(scaleFactor*this.thickness)
+
+        this.updateGeometry()
+    }
+
+    rotate(angle,aboutCentre){
+        const rotationFunction = getRotateByAngle(angle,aboutCentre)
+        for (let i = 0; i<this.points.length;i++){
+            this.points[i] = rotationFunction(this.points[i])
+        }
 
         this.updateGeometry()
     }

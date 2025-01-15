@@ -37,6 +37,13 @@ export function scale2dVectorBy(vector,by){
     vector[1] *= by
 }
 
+export function transformVectorByMatrix(vector,matrix){
+    return [
+        matrix[0][0]*vector[0]+matrix[0][1]*vector[1],
+        matrix[1][0]*vector[0]+matrix[1][1]*vector[1]
+    ]
+}
+
 export function scale2dVectorAboutPoint(vector,point,scaleFactor){
     decrement2dVectorBy(vector,point)
     scale2dVectorBy(vector,scaleFactor)
@@ -72,6 +79,27 @@ export function getDistanceToStraightLineThrough(gradientPoint1,gradientPoint2,l
     const denominator = (a**2+1)**0.5
 
     return (point) => {return (a*point[0]+point[1]+c)/denominator}
+}
+
+export function getRotateByAngle(angle,aboutCentre){
+    const cosine = Math.cos(angle)
+    const sine = Math.sin(angle)
+    const rotationMatrix = [[cosine,-sine],[sine,cosine]]
+
+    return (point) => {
+        return add2dVectors(transformVectorByMatrix(subtract2dVectors(point,aboutCentre),rotationMatrix),aboutCentre)
+    }
+}
+
+export function dotProduct2d(vector1,vector2){
+    return vector1[0]*vector2[0] + vector1[1]*vector2[1]
+}
+
+export function angleBetweenThreePoints(A,B,C){
+    const BA = subtract2dVectors(A,B)
+    const BC = subtract2dVectors(C,B)
+
+    return Math.acos(dotProduct2d(BA,BC)/(Math.hypot(...BA)*Math.hypot(...BC)))
 }
 
 // simplifies a line
