@@ -1,5 +1,6 @@
 import {shape} from "./shape.js";
-import {increment2dVectorBy, scale2dVectorAboutPoint} from "../maths.js";
+import {add2dVectors, getRotateByAngle, increment2dVectorBy, isLess, scale2dVectorAboutPoint} from "../maths.js";
+import {maximumOfArray} from "../dataStructureOperations.js";
 
 export class graphic extends shape{
     constructor(appearanceTime,disappearanceTime,topLeft,rotation){
@@ -49,6 +50,26 @@ export class graphic extends shape{
     }
 
     updateGeometry(){
+
+        const corners = [this.topLeft]
+
+        corners.push(add2dVectors(this.topLeft,[this.width,this.height]))
+        corners.push(add2dVectors(this.topLeft,[0,this.height]))
+        corners.push(add2dVectors(this.topLeft,[this.width,0]))
+
+        const rotation = getRotateByAngle(this.rotation,this.topLeft)
+
+        // rotate each corner
+        for (let i = 0; i < 4; i++){
+            corners[i] = rotation(corners[i])
+        }
+
+        // use corners to find top, bottom, left and right
+        this.top = maximumOfArray(corners,(corner) => {return corner[1]},isLess)
+        this.bottom = maximumOfArray(corners,(corner) => {return corner[1]})
+        this.left = maximumOfArray(corners,(corner) => {return corner[0]},isLess)
+        this.right = maximumOfArray(corners,(corner) => {return corner[0]})
+
         const group = document.createElementNS("http://www.w3.org/2000/svg","g")
 
         const clonedImage = this.image.cloneNode(false)
@@ -58,14 +79,12 @@ export class graphic extends shape{
         clonedImage.setAttribute("x",this.topLeft[0])
         clonedImage.setAttribute("y",this.topLeft[1])
 
+        clonedImage.style.transformOrigin = `${this.topLeft[0]}px ${this.topLeft[1]}px`
+        clonedImage.style.transform = `rotate(${this.rotation}rad)`
+
         group.appendChild(clonedImage)
 
         this.geometry = group.innerHTML
-
-        this.top = this.topLeft[1]
-        this.bottom = this.topLeft[1] + this.height
-        this.left = this.topLeft[0]
-        this.right = this.topLeft[0] + this.width
     }
 
     translate(translationVector){
@@ -79,6 +98,15 @@ export class graphic extends shape{
         this.width *= Math.abs(scaleFactor)
         this.height *= Math.abs(scaleFactor)
 
+        this.updateGeometry()
+    }
+
+    rotate(angle,aboutCentre){
+        const rotation = getRotateByAngle(angle,aboutCentre)
+
+        this.topLeft = rotation(this.topLeft)
+
+        this.rotation += angle
         this.updateGeometry()
     }
 
