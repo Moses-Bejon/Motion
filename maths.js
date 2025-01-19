@@ -186,3 +186,35 @@ export function getEdgesOfBoxAfterRotation(corners,angle,aboutCentre){
 
     return [top,bottom,left,right]
 }
+
+// see appendix D of NEA report for explanation of the maths in this function
+export function getEdgesOfEllipseAfterRotation(width,height,angle,centre){
+    const a = width/2
+    const b = height/2
+    const aSquared = a**2
+    const bSquared = b**2
+
+    const sine = Math.sin(angle)
+    const cosine = Math.cos(angle)
+    const sineSquared = sine**2
+    const cosineSquared = cosine**2
+
+    const A = aSquared*sineSquared + bSquared*cosineSquared
+    const BSquared = (2*(bSquared-aSquared)*sine*cosine)**2
+    const C = aSquared*cosineSquared + bSquared*sineSquared
+    const D = -aSquared*bSquared
+
+    const fraction = 4*D/(BSquared-4*A*C)
+
+    const verticalEdgeToCentre = (A*fraction)**0.5
+    const horizontalEdgeToCentre = (C*fraction)**0.5
+
+    const [centreX,centreY] = centre
+
+    return [
+        centreY-verticalEdgeToCentre,
+        centreY+verticalEdgeToCentre,
+        centreX-horizontalEdgeToCentre,
+        centreX+horizontalEdgeToCentre
+    ]
+}

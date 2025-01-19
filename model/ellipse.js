@@ -1,5 +1,10 @@
 import {shape} from "./shape.js";
-import {increment2dVectorBy, scale2dVectorAboutPoint} from "../maths.js";
+import {
+    getEdgesOfEllipseAfterRotation,
+    getRotateByAngle,
+    increment2dVectorBy,
+    scale2dVectorAboutPoint
+} from "../maths.js";
 
 export class ellipse extends shape{
     constructor(appearanceTime,disappearanceTime,centre,height,width,outlineColour,colour,rotation,thickness){
@@ -25,6 +30,9 @@ export class ellipse extends shape{
         ellipse.style.stroke = this.outlineColour
         ellipse.style.strokeWidth = this.thickness
 
+        ellipse.style.transformOrigin = `${this.centre[0]}px ${this.centre[1]}px`
+        ellipse.style.transform = `rotate(${this.rotation}rad)`
+
         let extraScale = 0
 
         /* check for edge case where there is not enough space in the user's ellipse for the outline */
@@ -36,7 +44,7 @@ export class ellipse extends shape{
             ellipse.setAttribute("rx",this.width/2 + this.thickness/2)
             ellipse.setAttribute("ry",this.height/2 + this.thickness/2)
 
-            extraScale = this.thickness/2
+            extraScale = this.thickness
         } else {
 
             /* otherwise proceed as usual */
@@ -48,7 +56,7 @@ export class ellipse extends shape{
             ellipse.setAttribute("ry",this.height/2)
 
             if (this.outlineColour !== null){
-                extraScale = this.thickness/2
+                extraScale = this.thickness
                 }
         }
 
@@ -59,10 +67,16 @@ export class ellipse extends shape{
 
         this.geometry = geometryGroup.innerHTML
 
-        this.left = this.centre[0]-this.width/2-extraScale
-        this.right = this.centre[0]+this.width/2+extraScale
-        this.top = this.centre[1]-this.height/2-extraScale
-        this.bottom = this.centre[1]+this.height/2+extraScale
+        const edges = getEdgesOfEllipseAfterRotation(
+            this.width+extraScale,
+            this.height+extraScale,
+            this.rotation,this.centre
+        )
+
+        this.top = edges[0]
+        this.bottom = edges[1]
+        this.left = edges[2]
+        this.right = edges[3]
     }
 
     translate(translationVector){
@@ -77,6 +91,15 @@ export class ellipse extends shape{
         this.width *= Math.abs(scaleFactor)
         this.thickness *= Math.abs(scaleFactor)
 
+        this.updateGeometry()
+    }
+
+    rotate(angle,aboutCentre){
+        const rotation = getRotateByAngle(angle,aboutCentre)
+
+        this.centre = rotation(this.centre)
+
+        this.rotation += angle
         this.updateGeometry()
     }
 
