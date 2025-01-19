@@ -4,7 +4,7 @@ import {
     fontSize,
     fontFamily,
     minimumThickness,
-    maximumThickness
+    maximumThickness, animationEndTimeSeconds
 } from "../../constants.js";
 import {canvas} from "./canvas.js";
 import {drawMode} from "./createModes/drawMode.js";
@@ -18,6 +18,7 @@ import {selectionBox} from "./createModes/selectionBox.js";
 import {isLess} from "../../maths.js";
 import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
 import {editMode} from "./createModes/editMode.js";
+import {shapeGroup} from "../../model/shapeGroup.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -202,6 +203,7 @@ p{
     <button id="copy" class="editButton">Copy</button>
     <button id="paste" class="editButton">Paste</button>
     <button id="merge" class="editButton">Merge</button>
+    <button id="split" class="editButton">Split</button>
     <button id="delete" class="editButton">Delete</button>
     <button id="transform" class="editButton">Transform</button>
     <button id="moveAbove" class="editButton">Move one above</button>
@@ -318,6 +320,38 @@ export class createEditCanvas extends canvas{
             controller.newAggregateModel("selectedShapes",newlySelectedShapes)
             pointerEvent.stopPropagation()
         }
+        this.shadowRoot.getElementById("merge").onpointerdown = () => {
+
+            // needs at least 2 shapes to combine them
+            if (this.selectedShapes.size < 2){
+                return
+            }
+
+            controller.newShape(new shapeGroup(
+                0,
+                animationEndTimeSeconds,
+                Array.from(this.selectedShapes)
+            ))
+
+            for (const shape of this.selectedShapes) {
+                controller.removeShape(shape)
+            }
+        }
+        this.shadowRoot.getElementById("split").onpointerdown = () => {
+
+            for (const shape of this.selectedShapes){
+                if (shape.constructor.name !== "shapeGroup"){
+                    continue
+                }
+
+                for (const innerShape of shape.innerShapes){
+                    controller.newShape(innerShape)
+                }
+
+                controller.removeShape(shape)
+            }
+
+        }
         this.shadowRoot.getElementById("delete").onpointerdown = () => {
             for (const shape of this.selectedShapes) {
                 controller.removeShape(shape)
@@ -422,6 +456,10 @@ export class createEditCanvas extends canvas{
             case "drawing":
                 return manyPointsMode
             case "polygon":
+                return manyPointsMode
+            case "shapeGroup":
+                // for the purposes of a mode, a shape group can be considered to be a group of points
+                // each point being a shape
                 return manyPointsMode
             case "ellipse":
                 return ellipseMode
