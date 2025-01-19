@@ -1,6 +1,8 @@
 // mathematical functions are defined here
 
-export function clamp(number,lower,upper){
+import {maximumOfArray} from "./dataStructureOperations.js";
+
+export function clamp(number, lower, upper){
     if (number < lower){
         return lower
     }
@@ -166,4 +168,21 @@ export function decimateLineRecursivePart(line,epsilon){
         [line[greatestIndex]]).concat(decimateLineRecursivePart(line.slice(greatestIndex),epsilon)
     )
 
+}
+
+export function getEdgesOfBoxAfterRotation(corners,angle,aboutCentre){
+    const rotation = getRotateByAngle(angle,aboutCentre)
+
+    // rotate each corner
+    for (let i = 0; i < 4; i++){
+        corners[i] = rotation(corners[i])
+    }
+
+    // use corners to find top, bottom, left and right
+    const top = maximumOfArray(corners,(corner) => {return corner[1]},isLess)
+    const bottom = maximumOfArray(corners,(corner) => {return corner[1]})
+    const left = maximumOfArray(corners,(corner) => {return corner[0]},isLess)
+    const right = maximumOfArray(corners,(corner) => {return corner[0]})
+
+    return [top,bottom,left,right]
 }

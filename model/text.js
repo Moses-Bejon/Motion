@@ -1,6 +1,12 @@
 import {shape} from "./shape.js";
 import {fontSizeInt,fontFamily} from "../constants.js";
-import {increment2dVectorBy, scale2dVectorAboutPoint} from "../maths.js";
+import {
+    add2dVectors,
+    getEdgesOfBoxAfterRotation,
+    getRotateByAngle,
+    increment2dVectorBy,
+    scale2dVectorAboutPoint
+} from "../maths.js";
 
 export class text extends shape{
     constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size=fontSizeInt,family=fontFamily){
@@ -48,6 +54,9 @@ export class text extends shape{
         text.style.userSelect = "none"
         text.style.whiteSpace = "normal"
 
+        text.style.transformOrigin = `${this.bottomLeft[0]}px ${this.bottomLeft[1]}px`
+        text.style.transform = `rotate(${this.rotation}rad)`
+
         // sanitizing user input
         // This is for their personal convenience, not for security, as they are, of course, only in their own browser
         text.innerHTML = this.text
@@ -68,10 +77,22 @@ export class text extends shape{
 
         this.geometry = this.getNewGeometryGroup().innerHTML
 
-        this.top = this.bottomLeft[1] - this.ascent
-        this.bottom = this.bottomLeft[1] + this.descent
-        this.left = this.bottomLeft[0]
-        this.right = this.bottomLeft[0] + this.width
+
+        const edges = getEdgesOfBoxAfterRotation(
+            [
+                add2dVectors(this.bottomLeft,[0,-this.ascent]),
+                add2dVectors(this.bottomLeft,[0,this.descent]),
+                add2dVectors(this.bottomLeft,[this.width,-this.ascent]),
+                add2dVectors(this.bottomLeft,[this.width,this.descent])
+            ],
+            this.rotation,
+            this.bottomLeft
+        )
+
+        this.top = edges[0]
+        this.bottom = edges[1]
+        this.left = edges[2]
+        this.right = edges[3]
     }
 
     translate(translationVector){
@@ -85,6 +106,15 @@ export class text extends shape{
 
         this.fontSize *= Math.abs(scaleFactor)
 
+        this.updateGeometry()
+    }
+
+    rotate(angle,aboutCentre){
+        const rotation = getRotateByAngle(angle,aboutCentre)
+
+        this.bottomLeft = rotation(this.bottomLeft)
+
+        this.rotation += angle
         this.updateGeometry()
     }
 
