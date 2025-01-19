@@ -21,7 +21,7 @@ export class selectionBox{
         this.selectionBox.appendChild(this.selectionOutline)
 
         this.rotateIcon = document.createElementNS("http://www.w3.org/2000/svg","image")
-        this.rotateIcon.setAttribute("href","../../../assets/rotate.svg")
+        this.rotateIcon.setAttribute("href","../../assets/rotate.svg")
         this.rotateIcon.style.width = "50px"
         this.rotateIcon.style.height = "50px"
         this.selectionBox.appendChild(this.rotateIcon)
