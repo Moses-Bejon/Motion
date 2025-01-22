@@ -97,11 +97,22 @@ export function dotProduct2d(vector1,vector2){
     return vector1[0]*vector2[0] + vector1[1]*vector2[1]
 }
 
-export function angleBetweenThreePoints(A,B,C){
+export function acuteAngleBetweenThreePoints(A, B, C){
     const BA = subtract2dVectors(A,B)
     const BC = subtract2dVectors(C,B)
 
     return Math.acos(dotProduct2d(BA,BC)/(Math.hypot(...BA)*Math.hypot(...BC)))
+}
+
+export function angleBetweenThreePoints(A, B, C){
+
+    const determinant = (C[0]-A[0])*(B[1]-A[1])-(C[1]-A[1])*(B[0]-A[0])
+
+    if (determinant >= 0) {
+        return acuteAngleBetweenThreePoints(A,B,C)
+    } else{
+        return 2*Math.PI - acuteAngleBetweenThreePoints(A,B,C)
+    }
 }
 
 // simplifies a line

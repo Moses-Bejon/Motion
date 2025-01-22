@@ -29,3 +29,6 @@ export const animationEndTimeSeconds = 10
 
 // how close points have to be to be considered "connected"
 export const snappingDistance = Math.hypot(canvasWidth,canvasHeight)/100
+
+// how large UI overlays (like rotate icons) on the canvas typically are
+export const canvasOverlayUISize = 50

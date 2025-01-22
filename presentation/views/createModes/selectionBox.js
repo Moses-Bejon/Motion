@@ -1,10 +1,11 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {
-    angleBetweenThreePoints,
+    acuteAngleBetweenThreePoints, angleBetweenThreePoints,
     getDistanceToStraightLineThrough,
     subtract2dVectors
 } from "../../../maths.js";
 import {controller} from "../../../controller.js";
+import {canvasOverlayUISize} from "../../../constants.js";
 
 export class selectionBox{
     constructor(editCanvas) {
@@ -22,8 +23,8 @@ export class selectionBox{
 
         this.rotateIcon = document.createElementNS("http://www.w3.org/2000/svg","image")
         this.rotateIcon.setAttribute("href","assets/rotate.svg")
-        this.rotateIcon.style.width = "50px"
-        this.rotateIcon.style.height = "50px"
+        this.rotateIcon.style.width = `${canvasOverlayUISize}px`
+        this.rotateIcon.style.height = `${canvasOverlayUISize}px`
         this.selectionBox.appendChild(this.rotateIcon)
 
         addDragLogicTo(
@@ -165,13 +166,7 @@ export class selectionBox{
     dragRotateIcon(pointerEvent){
         const currentPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
-        let angle
-
-        if (currentPosition[0] > this.initialPosition[0]) {
-            angle = angleBetweenThreePoints(currentPosition,this.centre,this.initialPosition)
-        } else{
-            angle = 2*Math.PI - angleBetweenThreePoints(currentPosition,this.centre,this.initialPosition)
-        }
+        const angle = angleBetweenThreePoints(this.initialPosition,this.centre,currentPosition)
 
         this.transform(`rotate(${angle}rad)`)
         return angle

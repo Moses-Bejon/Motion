@@ -19,6 +19,7 @@ import {isLess} from "../../maths.js";
 import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
 import {editMode} from "./createModes/editMode.js";
 import {shapeGroup} from "../../model/shapeGroup.js";
+import {transformMode} from "./createModes/transformMode.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -355,6 +356,17 @@ export class createEditCanvas extends canvas{
         this.shadowRoot.getElementById("delete").onpointerdown = () => {
             for (const shape of this.selectedShapes) {
                 controller.removeShape(shape)
+            }
+        }
+        this.shadowRoot.getElementById("transform").onpointerdown = (pointerEvent) => {
+
+            this.currentMode.switchMode()
+
+            // if we are already in transform mode, we go back to edit mode
+            if (this.currentMode.constructor.name === "transformMode"){
+                this.currentMode = new editMode(this)
+            } else {
+                this.currentMode = new transformMode(this)
             }
         }
         this.shadowRoot.getElementById("moveAbove").onpointerdown = (pointerEvent) => {
