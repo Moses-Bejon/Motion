@@ -1,6 +1,6 @@
 import {controller} from "../../../controller.js";
 import {addDragLogicTo} from "../../../dragLogic.js";
-import {angleBetweenThreePoints, distanceBetween2dPoints} from "../../../maths.js";
+import {angleBetweenThreePoints, distanceBetween2dPoints, inverseRotationAngle, inverseScale} from "../../../maths.js";
 import {editMode} from "./editMode.js";
 import {rotatePath} from "../../../assets/rotatePath.js"
 import {canvasOverlayUISize} from "../../../constants.js";
@@ -86,15 +86,8 @@ export class transformMode{
         }
     }
 
-    globalTransform(transformation){
-        // a new set is used because, as this loop runs and the geometry is updated, the set is changing
-        // this is because of calls the controller is making
-        for (const shape of new Set(this.editCanvas.selectedShapes)){
-            transformation(shape)
-
-            controller.updateModel("displayShapes",shape)
-            controller.updateModel("selectedShapes",shape)
-        }
+    globalTransform(transformation,inverseTransformation){
+        this.editCanvas.userTransform(transformation,inverseTransformation)
 
         this.switchMode()
         this.editCanvas.currentMode = new editMode(this.editCanvas)
@@ -122,7 +115,10 @@ export class transformMode{
         this.scaleUI.style.transform = null
         this.editCanvas.selectionBoxGeometry.style.transform = null
 
-        this.globalTransform((shape) => {shape.rotate(rotationAngle,this.transformOrigin)})
+        this.globalTransform(
+            (shape) => {shape.rotate(rotationAngle,this.transformOrigin)},
+            (shape) => {shape.rotate(inverseRotationAngle(rotationAngle),this.transformOrigin)}
+        )
 
         pointerEvent.stopPropagation()
     }
@@ -154,7 +150,10 @@ export class transformMode{
         this.scaleUI.style.transform = null
         this.editCanvas.selectionBoxGeometry.style.transform = null
 
-        this.globalTransform((shape) => {shape.scale(scaleFactor,this.transformOrigin)})
+        this.globalTransform(
+            (shape) => {shape.scale(scaleFactor,this.transformOrigin)},
+            (shape) => {shape.scale(inverseScale(scaleFactor),this.transformOrigin)}
+        )
 
         pointerEvent.stopPropagation()
     }

@@ -285,8 +285,7 @@ export class createEditCanvas extends canvas{
 
         this.shadowRoot.getElementById("duplicate").onpointerdown = (pointerEvent) => {
 
-            // the duplicate becomes selected after it is made
-            const newlySelectedShapes = new Set()
+            const duplicates = new Set()
 
             for (const shape of this.selectedShapes) {
                 const duplicate = shape.copy()
@@ -294,10 +293,24 @@ export class createEditCanvas extends canvas{
                 // if the duplicate is right on top of the previous shape users may not realise
                 duplicate.translate([50,50])
 
-                controller.newShape(duplicate)
-                newlySelectedShapes.add(duplicate)
+                duplicates.add(duplicate)
             }
-            controller.newAggregateModel("selectedShapes",newlySelectedShapes)
+
+            controller.newAction(
+                () => {
+                    for (const duplicate of duplicates) {
+                        controller.newShape(duplicate)
+                    }
+                },
+                () => {
+                    for (const duplicate of duplicates) {
+                        controller.removeShape(duplicate)
+                    }
+                }
+            )
+
+            // the duplicate becomes selected after it is made
+            controller.newAggregateModel("selectedShapes",duplicates)
 
             // prevents the click on the canvas from deselecting the selected shapes
             pointerEvent.stopPropagation()
@@ -311,14 +324,27 @@ export class createEditCanvas extends canvas{
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("paste").onpointerdown = (pointerEvent) => {
-            const newlySelectedShapes = new Set()
+            const copiedShapes = new Set()
+
             for (const shape of controller.copiedShapes){
                 shape.translate([50,50])
-                const newShape = shape.copy()
-                controller.newShape(newShape)
-                newlySelectedShapes.add(newShape)
+                copiedShapes.add(shape.copy())
             }
-            controller.newAggregateModel("selectedShapes",newlySelectedShapes)
+
+            controller.newAction(
+                () => {
+                    for (const shape of copiedShapes){
+                        controller.newShape(shape)
+                    }
+                },
+                () => {
+                    for (const shape of copiedShapes){
+                        controller.removeShape(shape)
+                    }
+                }
+            )
+
+            controller.newAggregateModel("selectedShapes",copiedShapes)
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("merge").onpointerdown = () => {
@@ -328,15 +354,28 @@ export class createEditCanvas extends canvas{
                 return
             }
 
-            controller.newShape(new shapeGroup(
+            const mergedShapes = new Set(this.selectedShapes)
+            const mergedShape = new shapeGroup(
                 0,
                 animationEndTimeSeconds,
-                Array.from(this.selectedShapes)
-            ))
+                Array.from(mergedShapes)
+            )
 
-            for (const shape of this.selectedShapes) {
-                controller.removeShape(shape)
-            }
+            controller.newAction(()=>{
+                    controller.newShape(mergedShape)
+
+                    for (const shape of mergedShapes) {
+                        controller.removeShape(shape)
+                    }
+                },
+                () => {
+                    controller.removeShape(mergedShape)
+
+                    for (const shape of mergedShapes){
+                        controller.newShape(shape)
+                    }
+                })
+
         }
         this.shadowRoot.getElementById("split").onpointerdown = () => {
 
@@ -345,18 +384,42 @@ export class createEditCanvas extends canvas{
                     continue
                 }
 
-                for (const innerShape of shape.innerShapes){
-                    controller.newShape(innerShape)
-                }
+                controller.newAction(
+                    () => {
+                        for (const innerShape of shape.innerShapes){
+                            controller.newShape(innerShape)
+                        }
 
-                controller.removeShape(shape)
+                        controller.removeShape(shape)
+                    },
+                    () => {
+                        controller.newShape(shape)
+
+                        for (const innerShape of shape.innerShapes){
+                            controller.newShape(innerShape)
+                        }
+                    }
+                )
             }
 
         }
         this.shadowRoot.getElementById("delete").onpointerdown = () => {
-            for (const shape of this.selectedShapes) {
-                controller.removeShape(shape)
-            }
+
+            const toRemove = new Set(this.selectedShapes)
+
+            controller.newAction(
+                () => {
+                    for (const shape of toRemove) {
+                        controller.removeShape(shape)
+                    }
+                },
+                () => {
+                    for (const shape of toRemove) {
+                        controller.newShape(shape)
+                    }
+                }
+            )
+
         }
         this.shadowRoot.getElementById("transform").onpointerdown = (pointerEvent) => {
 
@@ -370,27 +433,69 @@ export class createEditCanvas extends canvas{
             }
         }
         this.shadowRoot.getElementById("moveAbove").onpointerdown = (pointerEvent) => {
-            this.moveSelectedShapesOneAbove()
+
+            const shapesToMove = new Set(this.selectedShapes)
+
+            controller.newAction(() => {
+                    this.moveShapesOneAbove(shapesToMove)
+                },
+                () => {
+                    this.moveShapesOneBelow(shapesToMove)
+                })
+
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("moveBehind").onpointerdown = (pointerEvent) => {
-            this.moveSelectedShapesOneBelow()
+
+            const shapesToMove = new Set(this.selectedShapes)
+
+            controller.newAction(() => {
+                    this.moveShapesOneBelow(shapesToMove)
+                },
+                () => {
+                    this.moveShapesOneAbove(shapesToMove)
+                })
+
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("moveFront").onpointerdown = (pointerEvent) => {
 
-            // this is just the easiest way to do it, will optimise if becomes an issue
-            for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
-                this.moveSelectedShapesOneAbove()
-            }
+            const shapesToMove = new Set(this.selectedShapes)
+
+            controller.newAction(
+                () => {
+                    // this is just the easiest way to do it, will optimise if becomes an issue
+                    for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
+                        this.moveShapesOneAbove(shapesToMove)
+                    }
+                },
+                () => {
+                    for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
+                        this.moveShapesOneBelow(shapesToMove)
+                    }
+                }
+            )
+
 
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("moveBack").onpointerdown = (pointerEvent) => {
 
-            for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
-                this.moveSelectedShapesOneBelow()
-            }
+            const shapesToMove = new Set(this.selectedShapes)
+
+            controller.newAction(
+                () => {
+                    for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
+                        this.moveShapesOneBelow(shapesToMove)
+                    }
+                },
+                () => {
+                    for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
+                        this.moveShapesOneAbove(shapesToMove)
+                    }
+                }
+            )
+
 
             pointerEvent.stopPropagation()
         }
@@ -545,8 +650,8 @@ export class createEditCanvas extends canvas{
         shape1.geometryAttributeUpdate("ZIndex",shape1.ZIndex)
     }
 
-    moveSelectedShapesOneAbove(){
-        const positions = this.positionsOfShapesInZIndexArray(this.selectedShapes).reverse()
+    moveShapesOneAbove(shapes){
+        const positions = this.positionsOfShapesInZIndexArray(shapes).reverse()
 
         // remove any shapes already on the top from the shapes we are going to move
         let top = this.shapesInOrderOfZIndex.length-1
@@ -563,8 +668,8 @@ export class createEditCanvas extends canvas{
         }
     }
 
-    moveSelectedShapesOneBelow(){
-        const positions = this.positionsOfShapesInZIndexArray(this.selectedShapes)
+    moveShapesOneBelow(shapes){
+        const positions = this.positionsOfShapesInZIndexArray(shapes)
 
         let bottom = 0
         while (positions[0] === bottom){
@@ -578,6 +683,31 @@ export class createEditCanvas extends canvas{
 
             this.swapZIndicesOfShapes(shape,shapeBehind)
         }
+    }
+
+    userTransform(transformation,inverseTransformation){
+        // a new set is used because, as this loop may run after geometry is updated, the set is changing
+
+        const selectedCopy = new Set(this.selectedShapes)
+
+        controller.newAction(
+            () => {
+                for (const shape of selectedCopy){
+                    transformation(shape)
+
+                    controller.updateModel("displayShapes",shape)
+                    controller.updateModel("selectedShapes",shape)
+                }
+            },
+            () => {
+                for (const shape of selectedCopy){
+                    inverseTransformation(shape)
+
+                    controller.updateModel("displayShapes",shape)
+                    controller.updateModel("selectedShapes",shape)
+                }
+            }
+        )
     }
 
     updateAggregateModel(aggregateModel, model){

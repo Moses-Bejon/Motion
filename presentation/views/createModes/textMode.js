@@ -66,7 +66,13 @@ export class textMode{
             "black"
         )
 
-        controller.newShape(textShape)
+        controller.newAction(() => {
+                controller.newShape(textShape)
+            },
+            () => {
+                controller.removeShape(textShape)
+            }
+        )
 
         // select the text box by default at creation (to allow the user to type in it)
         controller.newAggregateModel("selectedShapes",new Set([textShape]))

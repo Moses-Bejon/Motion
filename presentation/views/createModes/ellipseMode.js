@@ -101,7 +101,8 @@ export class ellipseMode{
 
     endEllipse(pointerEvent){
         const [width,height,centre] = this.continueEllipse(pointerEvent)
-        controller.newShape(new ellipse(0,
+
+        const shape = new ellipse(0,
             animationEndTimeSeconds,
             centre,
             height,
@@ -109,7 +110,15 @@ export class ellipseMode{
             this.outlineColour,
             this.colour,
             0,
-            this.thickness))
+            this.thickness)
+
+        controller.newAction(() => {
+                controller.newShape(shape)
+            },
+            () => {
+                controller.removeShape(shape)
+            }
+        )
 
         this.currentShape.remove()
     }

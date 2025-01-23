@@ -1,7 +1,7 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {
     acuteAngleBetweenThreePoints, angleBetweenThreePoints,
-    getDistanceToStraightLineThrough,
+    getDistanceToStraightLineThrough, inverseRotationAngle, inverseScale, inverseTranslation,
     subtract2dVectors
 } from "../../../maths.js";
 import {controller} from "../../../controller.js";
@@ -177,7 +177,10 @@ export class selectionBox{
 
         this.selectionBox.style.transform = null
 
-        this.globalTransform((shape) => {shape.rotate(rotationAngle,this.transformOrigin)})
+        this.editCanvas.userTransform(
+            (shape) => {shape.rotate(rotationAngle,this.transformOrigin)},
+            (shape) => {shape.rotate(inverseRotationAngle(rotationAngle),this.transformOrigin)}
+        )
 
         pointerEvent.stopPropagation()
     }
@@ -211,7 +214,10 @@ export class selectionBox{
 
         this.selectionBox.style.transform = null
 
-        this.globalTransform((shape) => {shape.scale(scaleFactor,this.transformOrigin)})
+        this.editCanvas.userTransform(
+            (shape) => {shape.scale(scaleFactor,this.transformOrigin)},
+            (shape) => {shape.scale(inverseScale(scaleFactor),this.transformOrigin)}
+        )
 
         pointerEvent.stopPropagation()
     }
@@ -241,7 +247,10 @@ export class selectionBox{
 
         const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
 
-        this.globalTransform((shape) => {shape.translate(translation)})
+        this.editCanvas.userTransform(
+            (shape) => {shape.translate(translation)},
+            (shape) => {shape.translate(inverseTranslation(translation))}
+        )
 
         this.selectionBox.style.transform = null
 
@@ -268,17 +277,6 @@ export class selectionBox{
         for (const shape of this.editCanvas.selectedShapes){
             const geometry = this.editCanvas.shapesToGeometry.get(shape)
             geometry.style.transformOrigin = transformOrigin
-        }
-    }
-
-    globalTransform(transformation){
-        // a new set is used because, as this loop runs and the geometry is updated, the set is changing
-        // this is because of calls the controller is making
-        for (const shape of new Set(this.editCanvas.selectedShapes)){
-            transformation(shape)
-
-            controller.updateModel("displayShapes",shape)
-            controller.updateModel("selectedShapes",shape)
         }
     }
 }

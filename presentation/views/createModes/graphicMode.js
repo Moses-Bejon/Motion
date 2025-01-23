@@ -10,7 +10,14 @@ export class graphicMode{
         const fileLoadPromise = graphicShape.loadImageSource(inputFile)
 
         fileLoadPromise.then(() => {
-                controller.newShape(graphicShape)
+
+            controller.newAction(() => {
+                    controller.newShape(graphicShape)
+                },
+                () => {
+                    controller.removeShape(graphicShape)
+                }
+            )
 
                 // select the graphic by default at creation (to allow the user to move it)
                 controller.newAggregateModel("selectedShapes", new Set([graphicShape]))

@@ -74,12 +74,20 @@ export class manyPointsMode{
 
         this.currentShape.prepend(polygon.fillArea(this.pointArray,fillColour))
 
-        controller.newShape(new polygon(0,
+        const shape = new polygon(0,
             animationEndTimeSeconds,
             this.drawingColour,
             fillColour,
             this.thickness,
-            this.pointArray))
+            this.pointArray)
+
+        controller.newAction(() => {
+                controller.newShape(shape)
+            },
+            () => {
+                controller.removeShape(shape)
+            }
+        )
 
         this.currentShape.remove()
     }

@@ -1,5 +1,10 @@
 // main javascript file for the project
 
+import {controller} from "./controller.js";
+
+document.getElementById("undoButton").onpointerdown = controller.undoAction.bind(controller)
+document.getElementById("redoButton").onpointerdown = controller.redoAction.bind(controller)
+
 const topEdge = document.getElementById("topEdge")
 const leftEdge = document.getElementById("leftEdge")
 const bottomEdge = document.getElementById("bottomEdge")

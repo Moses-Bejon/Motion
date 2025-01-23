@@ -36,11 +36,18 @@ export class polygonMode extends manyPointsMode{
 
         if (keyboardEvent.key === "Enter"){
 
-            controller.newShape(new drawing(0,
+            const shape = new drawing(0,
                 animationEndTimeSeconds,
                 this.drawingColour,
                 this.thickness,
                 this.pointArray)
+
+            controller.newAction(() => {
+                    controller.newShape(shape)
+                },
+                () => {
+                    controller.removeShape(shape)
+                }
             )
 
             this.currentShape?.remove()

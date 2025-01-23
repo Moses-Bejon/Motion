@@ -1,5 +1,7 @@
 import {model} from "./model/model.js";
 import {binaryInsertion} from "./dataStructureOperations.js";
+import {action} from "./model/action.js";
+import {rootAction} from "./model/rootAction.js";
 
 class controllerClass{
     constructor() {
@@ -11,6 +13,8 @@ class controllerClass{
         // the higher in the hierarchy, the more likely informed (more "in focus")
         this.inputSubscribersHierarchy = []
 
+        this.previousAction = new rootAction()
+
         // shapes that views want to copy
         this.copiedShapes = []
 
@@ -21,6 +25,35 @@ class controllerClass{
 
         document.addEventListener("keydown",this.keyDown.bind(this))
         document.addEventListener("keyup",this.keyUp.bind(this))
+    }
+
+    newAction(forwardAction,backwardAction){
+
+        forwardAction()
+
+        const newAction = new action(forwardAction,backwardAction)
+
+        this.previousAction.addActionAfter(newAction)
+        newAction.appendToUndoRedoStack(this.previousAction)
+
+        this.previousAction = newAction
+    }
+
+    undoAction(){
+        this.previousAction.backwardAction()
+
+        this.previousAction = this.previousAction.previousAction
+    }
+
+    redoAction(){
+
+        if (this.previousAction.nextAction === undefined){
+            return
+        }
+
+        this.previousAction = this.previousAction.nextAction
+
+        this.previousAction.forwardAction()
     }
 
     subscribeTo(subscriber,aggregateModel){
@@ -81,17 +114,19 @@ class controllerClass{
 
     newShape(shape){
 
-        const shapeType = shape.constructor.name
-        if (Object.hasOwn(this.numberOfEachTypeOfShape,shapeType)){
-            this.numberOfEachTypeOfShape[shapeType] ++
-        } else {
-            this.numberOfEachTypeOfShape[shapeType] = 1
+        if (!shape.modelConstructed) {
+            const shapeType = shape.constructor.name
+            if (Object.hasOwn(this.numberOfEachTypeOfShape, shapeType)) {
+                this.numberOfEachTypeOfShape[shapeType]++
+            } else {
+                this.numberOfEachTypeOfShape[shapeType] = 1
+            }
+            const shapeName = shapeType + " " + this.numberOfEachTypeOfShape[shapeType]
+
+            shape.modelConstruct(this.ZIndexOfHighestShape, shapeName)
+
+            this.ZIndexOfHighestShape++
         }
-        const shapeName = shapeType + " " + this.numberOfEachTypeOfShape[shapeType]
-
-        shape.modelConstruct(this.ZIndexOfHighestShape,shapeName)
-
-        this.ZIndexOfHighestShape ++
 
         this.aggregateModels.allShapes.content.add(shape)
         this.addModel("allShapes",shape)
