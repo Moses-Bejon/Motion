@@ -16,7 +16,7 @@ template.innerHTML = `
             display: flex;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to right, darkgray 15%, white 15%);
+            background: linear-gradient(to right, darkgray 15%, lightgray 15%);
         }
         #timelineList{
             position: relative;
@@ -49,6 +49,7 @@ template.innerHTML = `
         .timelineEvents{
             border-top: black solid ${borderSize}px;
             border-bottom: black solid ${borderSize}px;
+            background-color: white;
             margin-top: ${margin}px;
             margin-bottom: ${margin}px;
         }
