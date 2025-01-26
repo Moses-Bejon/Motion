@@ -70,6 +70,7 @@ template.innerHTML = `
             font-family: ${fontFamily};
             margin-top: ${margin}px;
             margin-bottom: ${margin}px;
+            overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             min-width: 0;
