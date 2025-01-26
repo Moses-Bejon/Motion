@@ -231,7 +231,8 @@ export class timeline extends abstractView{
     updateModel(aggregateModel,model){
         switch (aggregateModel){
             case "selectedShapes":
-                this.shapeToTimeline[model].firstChild.innerText = model.name
+                // selects the part of the html that displays the model name
+                this.shapeToTimeline[model].firstChild.firstChild.nextSibling.innerText = model.name
                 break
             case "timelineEvents":
                 break
