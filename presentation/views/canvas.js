@@ -215,6 +215,11 @@ export class canvas extends abstractView{
         }
     }
 
+    updateModel(aggregateModel,model){
+        this.removeModel(aggregateModel,model)
+        this.addModel(aggregateModel,model)
+    }
+
     removeModel(aggregateModel,model){
         this.errorCheckAggregateModel(aggregateModel)
 

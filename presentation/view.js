@@ -7,7 +7,8 @@ import {abstractWindow} from "./window.js"
 const typesOfWindow = {
     "horizontally split":"horizontally-split-window",
     "vertically split":"vertically-split-window",
-    "canvas":"create-edit-canvas"
+    "canvas":"create-edit-canvas",
+    "timeline":"time-line"
 }
 
 const template = document.createElement("template")
@@ -60,10 +61,7 @@ template.innerHTML = `
 <div id="fullScreenAndDropDownContainer">
     <div id="fullScreenButton"></div>
     <div id="switchWindowDropDownContainer">
-        <!-- This SVG is a triangle -->
-        <svg id="fakeDropDown" viewBox="0 0 1 1">
-            <polygon points="0, 0, 0.5, 1, 1, 0">
-        </svg>
+        <img src="assets/dropdown.svg" id="fakeDropDown" alt="Image of a triangle for the dropdown">
         <select id="switchWindowDropDown">
         <option disabled selected="selected">Pick a new window</option>
         </select>

@@ -733,6 +733,10 @@ export class createEditCanvas extends canvas{
         this.currentMode.addModel?.(aggregateModel, model)
     }
 
+    updateModel(aggregateModel, model) {
+        super.updateModel(aggregateModel, model)
+    }
+
     removeModel(aggregateModel, model) {
         if (aggregateModel === "selectedShapes"){
             this.selectedShapes.delete(model)

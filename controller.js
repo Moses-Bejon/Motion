@@ -80,11 +80,9 @@ class controllerClass{
 
     updateModel(aggregateModel,model){
 
-        // tells views to remove this model, clearing out the old version
-        this.removeModel(aggregateModel,model)
-
-        // tells views to add it again, with its updated properties
-        this.addModel(aggregateModel,model)
+        for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
+            subscriber.updateModel(aggregateModel,model)
+        }
     }
 
     updateAggregateModel(aggregateModel){
@@ -115,7 +113,7 @@ class controllerClass{
     newShape(shape){
 
         if (!shape.modelConstructed) {
-            const shapeType = shape.constructor.name
+            const shapeType = shape.constructor.name.charAt(0).toUpperCase() + shape.constructor.name.slice(1)
             if (Object.hasOwn(this.numberOfEachTypeOfShape, shapeType)) {
                 this.numberOfEachTypeOfShape[shapeType]++
             } else {
