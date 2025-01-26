@@ -17,6 +17,8 @@ template.innerHTML = `
             width: 100%;
             height: 100%;
             background: linear-gradient(to right, darkgray 15%, lightgray 15%);
+            
+            overflow-y: auto;
         }
         #timelineList{
             position: relative;
@@ -27,7 +29,7 @@ template.innerHTML = `
             display: flex;
             flex-direction: column;
             
-            overflow-y: auto;
+            
         }
         #playButton{
             position: absolute;
