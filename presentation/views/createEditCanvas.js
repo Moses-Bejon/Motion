@@ -710,41 +710,45 @@ export class createEditCanvas extends canvas{
         )
     }
 
-    updateAggregateModel(aggregateModel, model){
-        if (aggregateModel === "selectedShapes"){
-            this.selectedShapes = model
-            this.updateSelectionBox()
+    updateShapeSelection(){
 
-        } else {
+        // the only selected shapes according to the canvas are the ones that are currently being displayed
+        // this is because it would be unintuitive for a user to do something like rotate a shape they can't see
+        this.selectedShapes = controller.selectedShapes().intersection(controller.displayShapes())
+        this.updateSelectionBox()
+    }
+
+    updateAggregateModel(aggregateModel, model){
+
+        // our parent is not subscribed to selected shapes, so would be confused if we sent them this update
+        if (aggregateModel !== "selectedShapes"){
             super.updateAggregateModel(aggregateModel,model)
         }
 
+        this.updateShapeSelection()
         this.currentMode.updateAggregateModel?.(aggregateModel, model)
     }
 
     addModel(aggregateModel, model) {
-        if (aggregateModel === "selectedShapes"){
-            this.selectedShapes.add(model)
-            this.updateSelectionBox()
-        } else {
+        if (aggregateModel !== "selectedShapes"){
             super.addModel(aggregateModel, model)
         }
 
+        this.updateShapeSelection()
         this.currentMode.addModel?.(aggregateModel, model)
     }
 
     updateModel(aggregateModel, model) {
         super.updateModel(aggregateModel, model)
+        this.updateShapeSelection()
     }
 
     removeModel(aggregateModel, model) {
-        if (aggregateModel === "selectedShapes"){
-            this.selectedShapes.delete(model)
-            this.updateSelectionBox()
-        } else {
+        if (aggregateModel !== "selectedShapes"){
             super.removeModel(aggregateModel,model)
         }
 
+        this.updateShapeSelection()
         this.currentMode.removeModel?.(aggregateModel, model)
     }
 }

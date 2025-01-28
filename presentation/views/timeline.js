@@ -1,4 +1,5 @@
 import {abstractView} from "../view.js"
+import {shapeTimeline} from "./shapeTimeline.js";
 import {controller} from "../../controller.js";
 import {animationEndTimeSeconds, fontFamily} from "../../constants.js";
 
@@ -6,7 +7,7 @@ const margin = 5
 const borderSize = 2
 const bumperSize = 9
 
-const bumperTranslation = -borderSize/2-bumperSize/2
+export const bumperTranslation = -borderSize/2-bumperSize/2
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -28,8 +29,6 @@ template.innerHTML = `
             
             display: flex;
             flex-direction: column;
-            
-            
         }
         #playButton{
             position: absolute;
@@ -132,14 +131,11 @@ export class timeline extends abstractView{
             default:
                 console.error("timeline got updates from",aggregateModel)
         }
-
-        console.log("added model")
-        console.log(aggregateModel,model)
     }
 
     newShape(shape){
-        const shapeTimeline = document.createElement("div")
-        shapeTimeline.className = "timeline"
+        const shapeSection = document.createElement("div")
+        shapeSection.className = "timeline"
 
         const labelDropdownContainer = document.createElement("div")
         labelDropdownContainer.className = "labelDropdownContainer"
@@ -153,52 +149,14 @@ export class timeline extends abstractView{
         label.innerText = shape.name
         labelDropdownContainer.appendChild(label)
 
-        shapeTimeline.appendChild(labelDropdownContainer)
+        shapeSection.appendChild(labelDropdownContainer)
 
-        const timeLine = this.createTimeline(shape.appearanceTime,shape.disappearanceTime)
-        shapeTimeline.appendChild(timeLine)
+        const timeLine = new shapeTimeline(this,shape,label)
 
-        this.timelineList.appendChild(shapeTimeline)
-        this.shapeToTimeline[shape] = shapeTimeline
-    }
+        shapeSection.appendChild(timeLine.timeline)
 
-    createTimeline(startTime,endTime){
-        const timeline = document.createElement("div")
-        timeline.style.position = "relative"
-
-        const startProportion = this.timeToTimelinePosition(startTime)
-        const startPosition = 100*startProportion + "%"
-        const width = 100*(this.timeToTimelinePosition(endTime)-startProportion)-15 + "%"
-
-        timeline.style.left = startPosition
-        timeline.style.width = width
-        timeline.className = "timelineEvents"
-
-        const topLeftBumper = document.createElement("div")
-        topLeftBumper.className = "bumper"
-        topLeftBumper.style.left = "0"
-        topLeftBumper.style.top = bumperTranslation + "px"
-        timeline.appendChild(topLeftBumper)
-
-        const topRightBumper = document.createElement("div")
-        topRightBumper.className = "bumper"
-        topRightBumper.style.right = "0"
-        topRightBumper.style.top = bumperTranslation + "px"
-        timeline.appendChild(topRightBumper)
-
-        const bottomRightBumper = document.createElement("div")
-        bottomRightBumper.className = "bumper"
-        bottomRightBumper.style.right = "0"
-        bottomRightBumper.style.bottom = bumperTranslation + "px"
-        timeline.appendChild(bottomRightBumper)
-
-        const bottomLeftBumper = document.createElement("div")
-        bottomLeftBumper.className = "bumper"
-        bottomLeftBumper.style.left = "0"
-        bottomLeftBumper.style.bottom = bumperTranslation + "px"
-        timeline.appendChild(bottomLeftBumper)
-
-        return timeline
+        this.timelineList.appendChild(shapeSection)
+        this.shapeToTimeline.set(shape,timeLine)
     }
 
     timeToTimelinePosition(timeSeconds){
@@ -207,6 +165,25 @@ export class timeline extends abstractView{
         } else {
             return timeSeconds/this.lastEventEndsAt
         }
+    }
+
+    timeLinePositionToTime(position){
+        return position*this.lastEventEndsAt
+    }
+
+    globalWidthToTimelineWidth(width){
+        const boundingRect = this.getBoundingClientRect()
+
+        // this is to account for the fact that the first 15% is dedicated to the left menu
+        return width/(boundingRect.width*0.85)
+    }
+
+    pointerPositionToTimelinePosition(pointerEvent){
+
+        const boundingRect = this.getBoundingClientRect()
+
+        // this is to account for the fact that the first 15% is dedicated to the left menu
+        return ((pointerEvent.clientX-boundingRect.x)/boundingRect.width-0.15)/0.85
     }
 
     newSelectedShapes(newSelectedShapes){
@@ -235,9 +212,10 @@ export class timeline extends abstractView{
         switch (aggregateModel){
             case "selectedShapes":
                 // selects the part of the html that displays the model name
-                this.shapeToTimeline[model].firstChild.firstChild.nextSibling.innerText = model.name
+                this.shapeToTimeline.get(model).label.innerText = model.name
                 break
             case "timelineEvents":
+                this.shapeToTimeline.get(model.shape).updatePosition()
                 break
             default:
                 console.error("timeline got updates from",aggregateModel)
@@ -247,7 +225,7 @@ export class timeline extends abstractView{
     removeModel(aggregateModel,model){
         switch (aggregateModel){
             case "selectedShapes":
-                this.shapeToTimeline[model].remove()
+                this.shapeToTimeline.get(model).timeline.remove()
                 this.shapeToTimeline.delete(model)
                 break
             case "timelineEvents":

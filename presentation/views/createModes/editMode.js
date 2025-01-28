@@ -18,7 +18,7 @@ export class editMode{
             "auto")
 
         // getting up to speed on all the shapes displayed on the canvas
-        this.updateAggregateModel("displayShapes",controller.aggregateModels.displayShapes.content)
+        this.updateAggregateModel("displayShapes",controller.displayShapes())
     }
 
     beginBoxSelection(pointerEvent){
@@ -67,7 +67,7 @@ export class editMode{
 
         const newlySelectedShapes = new Set()
 
-        for (const shape of controller.aggregateModels.displayShapes.content){
+        for (const shape of controller.displayShapes()){
             if (top < shape.top && bottom > shape.bottom && left < shape.left && right > shape.right){
                 newlySelectedShapes.add(shape)
             }

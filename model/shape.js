@@ -33,7 +33,7 @@ export class shape{
 
         controller.updateModel("displayShapes",this)
 
-        if (controller.aggregateModels.selectedShapes.content.has(this)) {
+        if (controller.isSelected(this)) {
             controller.updateModel("selectedShapes", this)
         }
     }
