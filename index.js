@@ -13,6 +13,14 @@ let rootWindow = document.getElementById("rootWindow")
 
 makeWindowFullScreen(rootWindow)
 
+const defaultCanvas = document.createElement("create-edit-canvas")
+const defaultTimeline = document.createElement("time-line")
+const defaultWindow = document.createElement("vertically-split-window")
+
+rootWindow.switchWindowTo(defaultWindow)
+defaultWindow.topWindow.switchWindowTo(defaultCanvas)
+defaultWindow.bottomWindow.switchWindowTo(defaultTimeline)
+
 function setNewRootWindow(newRootWindow){
         rootWindow.removeAttribute("id")
         newRootWindow.id = "rootWindow"
