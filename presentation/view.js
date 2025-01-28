@@ -56,6 +56,8 @@ template.innerHTML = `
     width: 20px;
     height: 20px;
     position: absolute;
+    
+    user-select: none;
 }
 </style>
 <div id="fullScreenAndDropDownContainer">
