@@ -1,4 +1,5 @@
 import {controller} from "../../../controller.js";
+import {clamp} from "../../../maths.js";
 
 export class timeCursor{
     constructor(parentTimeline) {
@@ -19,6 +20,6 @@ export class timeCursor{
     }
 
     updateTimeCursor(){
-        this.cursor.style.left = this.parentTimeline.timeToWindowPosition(controller.clock())*100+"%"
+        this.cursor.style.left = clamp(this.parentTimeline.timeToWindowPosition(controller.clock()),0.15,1)*100+"%"
     }
 }
