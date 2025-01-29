@@ -4,7 +4,9 @@ import {
     fontSize,
     fontFamily,
     minimumThickness,
-    maximumThickness, animationEndTimeSeconds
+    maximumThickness,
+    animationEndTimeSeconds,
+    typicalIconSize
 } from "../../constants.js";
 import {canvas} from "./canvas.js";
 import {drawMode} from "./createModes/drawMode.js";
@@ -47,7 +49,7 @@ template.innerHTML = `
 }
 
 #edit,#create{    
-    height: calc(100% - 30px);
+    height: calc(100% - ${typicalIconSize});
 
     display: flex;
     flex-direction: column;

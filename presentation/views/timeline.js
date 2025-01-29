@@ -10,7 +10,8 @@ import {
     timelineBorderSize,
     timelineBumperSize,
     timelineLeftMenuSize,
-    timelineRightMenuSize
+    timelineRightMenuSize,
+    typicalIconSize
 } from "../../constants.js";
 
 const template = document.createElement("template")
@@ -27,9 +28,9 @@ template.innerHTML = `
         }
         #timelineList{
             position: relative;
-            top: 30px;
+            top: ${typicalIconSize};
             width: 100%;
-            height: calc(100% - 30px);
+            height: calc(100% - ${typicalIconSize});
             
             display: flex;
             flex-direction: column;
@@ -38,8 +39,8 @@ template.innerHTML = `
             position: absolute;
             top: 0;
             right: ${timelineRightMenuSizePercentage}%;
-            width: 30px;
-            height: 30px;
+            width: ${typicalIconSize};
+            height: ${typicalIconSize};
             user-select: none;
         }
         .timeline{

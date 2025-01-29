@@ -1,6 +1,7 @@
 // all views, like canvas, timeline etc. inherit from this class
 
 import {abstractWindow} from "./window.js"
+import {typicalIconSize} from "../constants.js";
 
 // All types of window listed here can be switched to by a user
 // The data is of the form {"name displayed to user":"type of window I should create"}
@@ -21,7 +22,7 @@ template.innerHTML = `
 
     background-color: darkgray;
     width: 60px;
-    height: 30px;
+    height: ${typicalIconSize};
     display: flex;
     align-items: center;
     justify-content: space-evenly;
