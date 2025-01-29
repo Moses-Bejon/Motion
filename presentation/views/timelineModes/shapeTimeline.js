@@ -1,7 +1,7 @@
-import {bumperTranslation} from "./timeline.js";
-import {addDragLogicTo} from "../../dragLogic.js";
-import {clamp} from "../../maths.js";
-import {controller} from "../../controller.js";
+import {addDragLogicTo} from "../../../dragLogic.js";
+import {clamp} from "../../../maths.js";
+import {controller} from "../../../controller.js";
+import {bumperTranslation,timelineRightMenuSizePercentage} from "../../../constants.js";
 
 export class shapeTimeline{
     constructor(parentTimeline,shape,label) {
@@ -79,10 +79,10 @@ export class shapeTimeline{
         this.startProportion = this.parentTimeline.timeToTimelinePosition(this.startTime)
         this.endProportion = this.parentTimeline.timeToTimelinePosition(this.endTime)
 
-        const startPosition = 85*this.startProportion + "%"
+        const startPosition = timelineRightMenuSizePercentage*this.startProportion + "%"
 
         // width of entire timeline is 100% but that includes 15% of left menu, so 85 used
-        const width = 85*(this.endProportion-this.startProportion) + "%"
+        const width = timelineRightMenuSizePercentage*(this.endProportion-this.startProportion) + "%"
 
         this.timeline.style.left = startPosition
         this.timeline.style.width = width
@@ -101,7 +101,7 @@ export class shapeTimeline{
             1
         )
 
-        this.timeline.style.width = 85*(newEndProportion-this.startProportion) + "%"
+        this.timeline.style.width = timelineRightMenuSizePercentage*(newEndProportion-this.startProportion) + "%"
 
         return newEndProportion
     }
@@ -137,8 +137,8 @@ export class shapeTimeline{
             this.endProportion
         )
 
-        this.timeline.style.left = 85*newStartProportion + "%"
-        this.timeline.style.width = 85*(this.endProportion-newStartProportion) + "%"
+        this.timeline.style.left = timelineRightMenuSizePercentage*newStartProportion + "%"
+        this.timeline.style.width = timelineRightMenuSizePercentage*(this.endProportion-newStartProportion) + "%"
 
         return newStartProportion
     }

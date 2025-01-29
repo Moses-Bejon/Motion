@@ -1,13 +1,17 @@
 import {abstractView} from "../view.js"
-import {shapeTimeline} from "./shapeTimeline.js";
+import {shapeTimeline} from "./timelineModes/shapeTimeline.js";
 import {controller} from "../../controller.js";
-import {animationEndTimeSeconds, fontFamily} from "../../constants.js";
-
-const margin = 5
-const borderSize = 2
-const bumperSize = 9
-
-export const bumperTranslation = -borderSize/2-bumperSize/2
+import {
+    animationEndTimeSeconds,
+    fontFamily,
+    timelineLeftMenuSizePercentage,
+    timelineRightMenuSizePercentage,
+    timelineMargin,
+    timelineBorderSize,
+    timelineBumperSize,
+    timelineLeftMenuSize,
+    timelineRightMenuSize
+} from "../../constants.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -17,7 +21,7 @@ template.innerHTML = `
             display: flex;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to right, darkgray 15%, lightgray 15%);
+            background: linear-gradient(to right, darkgray ${timelineLeftMenuSizePercentage}%, lightgray ${timelineLeftMenuSizePercentage}%);
             
             overflow-y: auto;
         }
@@ -33,7 +37,7 @@ template.innerHTML = `
         #playButton{
             position: absolute;
             top: 0;
-            right: 85%;
+            right: ${timelineRightMenuSizePercentage}%;
             width: 30px;
             height: 30px;
             user-select: none;
@@ -44,34 +48,34 @@ template.innerHTML = `
         .dropdown{
             width: 25px;
             height: 25px;
-            margin: 5px;
+            margin: ${timelineMargin}px;
             user-select: none;
         }
         .timelineEvents{
-            border-top: black solid ${borderSize}px;
-            border-bottom: black solid ${borderSize}px;
+            border-top: black solid ${timelineBorderSize}px;
+            border-bottom: black solid ${timelineBorderSize}px;
             background-color: white;
-            margin-top: ${margin}px;
-            margin-bottom: ${margin}px;
+            margin-top: ${timelineMargin}px;
+            margin-bottom: ${timelineMargin}px;
         }
         .bumper{
             border-radius: 50%;
             
-            width: ${bumperSize}px;
-            height: ${bumperSize}px;
+            width: ${timelineBumperSize}px;
+            height: ${timelineBumperSize}px;
             background-color: black;
             position: absolute;
         }
         .labelDropdownContainer{
-            width: 15%;
+            width: ${timelineLeftMenuSizePercentage}%;
             overflow: hidden;
             
             display: flex;
         }
         h2{
             font-family: ${fontFamily};
-            margin-top: ${margin}px;
-            margin-bottom: ${margin}px;
+            margin-top: ${timelineMargin}px;
+            margin-bottom: ${timelineMargin}px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -109,6 +113,7 @@ export class timeline extends abstractView{
         controller.subscribeToInputs(this)
         controller.subscribeTo(this,"selectedShapes")
         controller.subscribeTo(this,"timelineEvents")
+        controller.subscribeTo(this,"clock")
     }
 
     disconnectedCallback(){
@@ -118,19 +123,7 @@ export class timeline extends abstractView{
         controller.unsubscribeFromInputs(this)
         controller.unsubscribeTo(this,"selectedShapes")
         controller.unsubscribeTo(this,"timelineEvents")
-    }
-
-    addModel(aggregateModel,model){
-
-        switch (aggregateModel){
-            case "selectedShapes":
-                this.newShape(model)
-                break
-            case "timelineEvents":
-                break
-            default:
-                console.error("timeline got updates from",aggregateModel)
-        }
+        controller.unsubscribeTo(this,"clock")
     }
 
     newShape(shape){
@@ -175,7 +168,7 @@ export class timeline extends abstractView{
         const boundingRect = this.getBoundingClientRect()
 
         // this is to account for the fact that the first 15% is dedicated to the left menu
-        return width/(boundingRect.width*0.85)
+        return width/(boundingRect.width*timelineRightMenuSize)
     }
 
     pointerPositionToTimelinePosition(pointerEvent){
@@ -183,7 +176,7 @@ export class timeline extends abstractView{
         const boundingRect = this.getBoundingClientRect()
 
         // this is to account for the fact that the first 15% is dedicated to the left menu
-        return ((pointerEvent.clientX-boundingRect.x)/boundingRect.width-0.15)/0.85
+        return ((pointerEvent.clientX-boundingRect.x)/boundingRect.width-timelineLeftMenuSize)/timelineRightMenuSizePercentage
     }
 
     newSelectedShapes(newSelectedShapes){
@@ -192,6 +185,19 @@ export class timeline extends abstractView{
 
         for (const shape of newSelectedShapes){
             this.newShape(shape)
+        }
+    }
+
+    addModel(aggregateModel,model){
+
+        switch (aggregateModel){
+            case "selectedShapes":
+                this.newShape(model)
+                break
+            case "timelineEvents":
+                break
+            default:
+                console.error("timeline got updates from",aggregateModel)
         }
     }
 
