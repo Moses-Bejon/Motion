@@ -98,7 +98,7 @@ export class shapeTimeline{
         const newEndProportion = clamp(
             this.endProportion + this.parentTimeline.globalWidthToTimelineWidth(currentPosition-this.initialPosition),
             this.startProportion,
-            this.parentTimeline.lastEventEndsAt
+            1
         )
 
         this.timeline.style.width = 85*(newEndProportion-this.startProportion) + "%"
