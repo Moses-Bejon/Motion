@@ -1,5 +1,6 @@
 import {abstractView} from "../view.js"
 import {shapeTimeline} from "./timelineModes/shapeTimeline.js";
+import {timeCursor} from "./timelineModes/timeCursor.js";
 import {controller} from "../../controller.js";
 import {
     animationEndTimeSeconds,
@@ -42,6 +43,15 @@ template.innerHTML = `
             width: ${typicalIconSize};
             height: ${typicalIconSize};
             user-select: none;
+        }
+        #timeCursor{
+            height: 100%;
+            position: absolute;
+        }
+        #timeCursorStem{
+            height: calc(100% - ${typicalIconSize});
+            width: 1px;
+            background-color: black;
         }
         .timeline{
             display: flex;
@@ -100,6 +110,14 @@ export class timeline extends abstractView{
         this.timelineList = this.shadowRoot.getElementById("timelineList")
         this.lastEventEndsAt = animationEndTimeSeconds
         this.shapeToTimeline = new Map()
+
+        this.cursor = new timeCursor(this)
+        this.timelineDiv = this.shadowRoot.getElementById("timeline")
+        this.timelineDiv.appendChild(this.cursor.cursor)
+
+        this.timelineDiv.onpointerdown = (pointerEvent) => {
+            controller.newTime(this.pointerPositionToTimelinePosition(pointerEvent)*this.lastEventEndsAt)
+        }
     }
 
     connectedCallback() {
@@ -153,12 +171,18 @@ export class timeline extends abstractView{
         this.shapeToTimeline.set(shape,timeLine)
     }
 
+    // position with respect to the right part of the window, filled by the timeline
     timeToTimelinePosition(timeSeconds){
         if (timeSeconds > this.lastEventEndsAt){
             console.error("Not implemented")
         } else {
             return timeSeconds/this.lastEventEndsAt
         }
+    }
+
+    // position with respect to whole window
+    timeToWindowPosition(timeSeconds){
+        return this.timeToTimelinePosition(timeSeconds)*timelineRightMenuSize+timelineLeftMenuSize
     }
 
     timeLinePositionToTime(position){
@@ -177,7 +201,7 @@ export class timeline extends abstractView{
         const boundingRect = this.getBoundingClientRect()
 
         // this is to account for the fact that the first 15% is dedicated to the left menu
-        return ((pointerEvent.clientX-boundingRect.x)/boundingRect.width-timelineLeftMenuSize)/timelineRightMenuSizePercentage
+        return ((pointerEvent.clientX-boundingRect.x)/boundingRect.width-timelineLeftMenuSize)/timelineRightMenuSize
     }
 
     newSelectedShapes(newSelectedShapes){
@@ -209,6 +233,9 @@ export class timeline extends abstractView{
                 this.newSelectedShapes(model)
                 break
             case "timelineEvents":
+                break
+            case "clock":
+                this.cursor.updateTimeCursor()
                 break
             default:
                 console.error("timeline got updates from",aggregateModel)

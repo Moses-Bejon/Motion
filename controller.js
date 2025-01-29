@@ -265,6 +265,11 @@ class controllerClass{
 
     }
 
+    newTime(time){
+        this.aggregateModels.clock.content = time
+        this.updateAggregateModel("clock")
+    }
+
     newFocus(focus){
 
         // indicating to the previous focus to clean stuff up as they have lost focus

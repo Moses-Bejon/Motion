@@ -90,6 +90,7 @@ export class shapeTimeline{
 
     setInitialPointerPosition(pointerEvent) {
         this.initialPosition = pointerEvent.clientX
+        pointerEvent.stopPropagation()
     }
 
     dragRightBumper(pointerEvent){
