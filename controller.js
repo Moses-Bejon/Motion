@@ -9,19 +9,11 @@ class controllerClass{
         // all the aggregate models are permanent, and should be saved at the end of session
         this.aggregateModels = model
 
-        // how other classes interface with controller
-        // this ensures they cannot edit the content (or shouldn't, JavaScript doesn't have private variables)
-        this.allShapes = () => {return this.aggregateModels.allShapes.content}
-        this.timelineEvents = () => {return this.aggregateModels.timelineEvents.content}
-        this.clock = () => {return this.aggregateModels.clock.content}
-        this.displayShapes = () => {return this.aggregateModels.displayShapes.content}
-        this.selectedShapes = () => {return this.aggregateModels.selectedShapes.content}
-
-
         // ordered list of views that hear about keyboard inputs
         // the higher in the hierarchy, the more likely informed (more "in focus")
         this.inputSubscribersHierarchy = []
 
+        // used as pointer to undo/redo stack, which is implemented as a linked list
         this.previousAction = new rootAction()
 
         // shapes that views want to copy
@@ -34,6 +26,24 @@ class controllerClass{
 
         document.addEventListener("keydown",this.keyDown.bind(this))
         document.addEventListener("keyup",this.keyUp.bind(this))
+    }
+
+    // how other classes interface with controller
+    // this ensures they cannot edit the content (or shouldn't, JavaScript doesn't have private variables)
+    allShapes(){
+        return this.aggregateModels.allShapes.content
+    }
+    timelineEvents(){
+        return this.aggregateModels.timelineEvents.content
+    }
+    clock(){
+        return this.aggregateModels.clock.content
+    }
+    displayShapes(){
+        return this.aggregateModels.displayShapes.content
+    }
+    selectedShapes(){
+        return this.aggregateModels.selectedShapes.content
     }
 
     newAction(forwardAction,backwardAction){
