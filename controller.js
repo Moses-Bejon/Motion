@@ -225,7 +225,7 @@ class controllerClass{
                                 return
                             }
 
-                            this.aggregateModels.displayShapes.content.remove(previousEvent.shape)
+                            this.aggregateModels.displayShapes.content.delete(previousEvent.shape)
                             this.removeModel("displayShapes",previousEvent.shape)
                         }
                         return
