@@ -61,14 +61,3 @@ export function binarySearch(list,value,listToValue=(value)=>{return value}){
         }
     }
 }
-
-// assumptions:
-// both objects have same attributes but possibly different values of these attributes
-export function objectsEqual(object1,object2){
-    for (const attribute in object1){
-        if (object1[attribute] !== object2[attribute]){
-            return false
-        }
-    }
-    return true
-}

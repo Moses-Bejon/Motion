@@ -10,6 +10,14 @@ export class shapeTimeline{
         this.parentTimeline = parentTimeline
         this.shape = shape
 
+        for (const timelineEvent of shape.timelineEvents){
+            if (timelineEvent.type === "appearance"){
+                this.appearanceEvent = timelineEvent
+            } else if (timelineEvent.type === "disappearance"){
+                this.disappearanceEvent = timelineEvent
+            }
+        }
+
         this.timeline = document.createElement("div")
         this.timeline.style.position = "relative"
         this.timeline.className = "timelineEvents"
@@ -109,22 +117,18 @@ export class shapeTimeline{
 
     finishDraggingRightBumper(pointerEvent){
         const newEnd = this.dragRightBumper(pointerEvent)
+
+        const previousTime = this.endTime
         const newTime = this.parentTimeline.timeLinePositionToTime(newEnd)
 
         controller.newAction(
             () => {
                 this.shape.disappearanceTime = newTime
-                controller.updateTimeLineEvent(
-                    {"type":"disappearance","shape":this.shape,"time":this.endTime},
-                    {"type":"disappearance","shape":this.shape,"time":newTime}
-                )
+                controller.changeTimeOfEvent(this.disappearanceEvent,newTime)
             },
             () => {
                 this.shape.disappearanceTime = this.endTime
-                controller.updateTimeLineEvent(
-                    {"type":"disappearance","shape":this.shape,"time":newTime},
-                    {"type":"disappearance","shape":this.shape,"time":this.endTime}
-                )
+                controller.changeTimeOfEvent(this.appearanceEvent,previousTime)
             }
         )
     }
@@ -146,22 +150,18 @@ export class shapeTimeline{
 
     finishDraggingLeftBumper(pointerEvent){
         const newStart = this.dragLeftBumper(pointerEvent)
+
+        const previousTime = this.startTime
         const newTime = this.parentTimeline.timeLinePositionToTime(newStart)
 
         controller.newAction(
             () => {
                 this.shape.appearanceTime = newTime
-                controller.updateTimeLineEvent(
-                    {"type":"appearance","shape":this.shape,"time":this.startTime},
-                    {"type":"appearance","shape":this.shape,"time":newTime}
-                )
+                controller.changeTimeOfEvent(this.appearanceEvent,newTime)
             },
             () => {
                 this.shape.appearanceTime = this.startTime
-                controller.updateTimeLineEvent(
-                    {"type":"appearance","shape":this.shape,"time":newTime},
-                    {"type":"appearance","shape":this.shape,"time":this.startTime}
-                )
+                controller.changeTimeOfEvent(this.disappearanceEvent,previousTime)
             }
         )
     }

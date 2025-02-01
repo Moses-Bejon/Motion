@@ -1,5 +1,5 @@
 import {model} from "./model/model.js";
-import {binaryInsertion, objectsEqual} from "./dataStructureOperations.js";
+import {binaryInsertion} from "./dataStructureOperations.js";
 import {action} from "./model/action.js";
 import {rootAction} from "./model/rootAction.js";
 
@@ -186,67 +186,88 @@ class controllerClass{
 
     addTimeLineEvent(event){
         this.insertIntoTimeline(event)
+        event.shape.addTimelineEvent(event)
 
         this.addModel("timelineEvents",event)
     }
 
+    hideShape(shape){
+        if (!this.displayShapes().has(shape)){
+
+            console.error("attempted to hide already hidden shape",shape)
+
+            return
+        }
+
+        this.aggregateModels.displayShapes.content.delete(shape)
+        this.removeModel("displayShapes",shape)
+    }
+
+    showShape(shape){
+        if (this.displayShapes().has(shape)){
+
+            console.error("attempted to show already shown shape",shape)
+
+            return
+        }
+
+        this.aggregateModels.displayShapes.content.add(shape)
+        this.addModel("displayShapes",shape)
+    }
+
+    updateChangeEventTiming(previousTime,newTime,forward,backward){
+        if (previousTime > this.clock() && newTime <= this.clock()){
+            forward()
+        } else if (previousTime <= this.clock() && newTime > this.clock()){
+            backward()
+        }
+    }
+
     // could be optimised using binary search in the future
     // reason not implemented yet is you need to handle case where multiple events occur at same time
-    updateTimeLineEvent(previousEvent,newEvent){
+    changeTimeOfEvent(event,newTime){
         for (let i = 0; i<this.timelineEvents().length; i++){
-            if (objectsEqual(this.timelineEvents()[i],previousEvent)){
+            if (this.timelineEvents()[i] === event){
 
-                this.updateModel("timelineEvents",newEvent,previousEvent)
-                this.aggregateModels.timelineEvents.content.splice(i,1)
-                this.insertIntoTimeline(newEvent)
+                switch (event.type){
 
-                switch (previousEvent.type){
                     case "appearance":
-                        if (previousEvent.time <= this.clock() && newEvent.time >= this.clock()){
+                        this.updateChangeEventTiming(
+                            event.time,
+                            newTime,
+                            ()=>{this.showShape(event.shape)},
+                            () => {this.hideShape(event.shape)}
+                        )
+                        break
 
-                            if (!this.displayShapes().has(previousEvent.shape)){
-                                return
-                            }
-
-                            this.aggregateModels.displayShapes.content.delete(previousEvent.shape)
-                            this.removeModel("displayShapes",previousEvent.shape)
-                        } else if (previousEvent.time >= this.clock() && newEvent.time <= this.clock()){
-
-                            if (this.displayShapes().has(previousEvent.shape)){
-                                return
-                            }
-
-                            this.aggregateModels.displayShapes.content.add(previousEvent.shape)
-                            this.addModel("displayShapes",previousEvent.shape)
-                        }
-                        return
                     case "disappearance":
-                        if (previousEvent.time <= this.clock() && newEvent.time >= this.clock()){
+                        this.updateChangeEventTiming(
+                            event.time,
+                            newTime,
+                            () => {this.hideShape(event.shape)},
+                            () => {this.showShape(event.shape)}
+                        )
+                        break
 
-                            if (this.displayShapes().has(previousEvent.shape)){
-                                return
-                            }
+                    case "change":
+                        this.updateChangeEventTiming(event.time,newTime,event.forward,event.backward)
+                        break
 
-                            this.aggregateModels.displayShapes.content.add(previousEvent.shape)
-                            this.addModel("displayShapes",previousEvent.shape)
-                        } else if (previousEvent.time >= this.clock() && newEvent.time <= this.clock()){
-
-                            if (!this.displayShapes().has(previousEvent.shape)){
-                                return
-                            }
-
-                            this.aggregateModels.displayShapes.content.delete(previousEvent.shape)
-                            this.removeModel("displayShapes",previousEvent.shape)
-                        }
-                        return
+                    default:
+                        console.error("Unrecognised event type",event.type)
                 }
 
-                console.error("Unrecognised event type",previousEvent.type)
+                event.time = newTime
+
+                this.updateModel("timelineEvents",event)
+                this.aggregateModels.timelineEvents.content.splice(i,1)
+                this.insertIntoTimeline(event)
+
+                return
             }
         }
 
-        console.error("Attempted to update event but previous event was not in event list",this.timelineEvents(),previousEvent,newEvent)
-
+        console.error("Attempted to update event but previous event was not in event list",this.timelineEvents(),event)
     }
 
     removeShapeFromTimeline(shape){
@@ -265,7 +286,7 @@ class controllerClass{
 
     }
 
-    newTime(time){
+    newClockTime(time){
         this.aggregateModels.clock.content = time
         this.updateAggregateModel("clock")
     }

@@ -6,6 +6,9 @@ export class shape{
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
 
+        // a list of all the things that occur to the shape throughout the animation, in no particular order
+        this.timelineEvents = []
+
         this.modelConstructed = false
     }
 
@@ -36,5 +39,9 @@ export class shape{
         if (controller.isSelected(this)) {
             controller.updateModel("selectedShapes", this)
         }
+    }
+
+    addTimelineEvent(event){
+        this.timelineEvents.push(event)
     }
 }

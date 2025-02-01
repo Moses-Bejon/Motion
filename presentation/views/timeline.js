@@ -116,7 +116,7 @@ export class timeline extends abstractView{
         this.timelineDiv.appendChild(this.cursor.cursor)
 
         this.timelineDiv.onpointerdown = (pointerEvent) => {
-            controller.newTime(this.pointerPositionToTimelinePosition(pointerEvent)*this.lastEventEndsAt)
+            controller.newClockTime(this.pointerPositionToTimelinePosition(pointerEvent)*this.lastEventEndsAt)
         }
     }
 
