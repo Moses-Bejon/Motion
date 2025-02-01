@@ -14,6 +14,7 @@ import {
     timelineRightMenuSize,
     typicalIconSize
 } from "../../constants.js";
+import {clamp} from "../../maths.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -201,7 +202,11 @@ export class timeline extends abstractView{
         const boundingRect = this.getBoundingClientRect()
 
         // this is to account for the fact that the first 15% is dedicated to the left menu
-        return ((pointerEvent.clientX-boundingRect.x)/boundingRect.width-timelineLeftMenuSize)/timelineRightMenuSize
+        return clamp(
+            ((pointerEvent.clientX-boundingRect.x)/boundingRect.width-timelineLeftMenuSize)/timelineRightMenuSize,
+            0,
+            1
+        )
     }
 
     newSelectedShapes(newSelectedShapes){

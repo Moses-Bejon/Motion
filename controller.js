@@ -16,6 +16,10 @@ class controllerClass{
         // used as pointer to undo/redo stack, which is implemented as a linked list
         this.previousAction = new rootAction()
 
+        // index of the timeline event in forward state closest to current time i.e. the one that's just been done
+        // -1 if there are no timeline events or none in forward state
+        this.currentTimelineEvent = -1
+
         // shapes that views want to copy
         this.copiedShapes = []
 
@@ -148,8 +152,20 @@ class controllerClass{
         this.aggregateModels.allShapes.content.add(shape)
         this.addModel("allShapes",shape)
 
-        this.addTimeLineEvent({"type": "appearance","shape": shape,"time": shape.appearanceTime})
-        this.addTimeLineEvent({"type": "disappearance","shape": shape,"time": shape.disappearanceTime})
+        this.addTimeLineEvent({
+            "type": "appearance",
+            "shape": shape,
+            "time": shape.appearanceTime,
+            "forward": () => {this.showShape(shape)},
+            "backward": () => {this.hideShape(shape)}
+        })
+        this.addTimeLineEvent({
+            "type": "disappearance",
+            "shape": shape,
+            "time": shape.disappearanceTime,
+            "forward": () => {this.hideShape(shape)},
+            "backward": () => {this.showShape(shape)}
+        })
 
         if (shape.appearanceTime <= this.clock() <= shape.disappearanceTime){
             this.aggregateModels.displayShapes.content.add(shape)
@@ -181,7 +197,19 @@ class controllerClass{
             (timeLineEvent)=>{return timeLineEvent.time}
         )
 
-        this.timelineEvents().splice(placeToInsert,0,event)
+        this.aggregateModels.timelineEvents.content.splice(placeToInsert,0,event)
+
+        if (event.time <= this.clock()){
+            this.currentTimelineEvent ++
+        }
+    }
+
+    removeIndexFromTimeline(index){
+        this.aggregateModels.timelineEvents.content.splice(index,1)
+
+        if (this.currentTimelineEvent >= index){
+            this.currentTimelineEvent --
+        }
     }
 
     addTimeLineEvent(event){
@@ -215,52 +243,22 @@ class controllerClass{
         this.addModel("displayShapes",shape)
     }
 
-    updateChangeEventTiming(previousTime,newTime,forward,backward){
-        if (previousTime > this.clock() && newTime <= this.clock()){
-            forward()
-        } else if (previousTime <= this.clock() && newTime > this.clock()){
-            backward()
-        }
-    }
-
     // could be optimised using binary search in the future
     // reason not implemented yet is you need to handle case where multiple events occur at same time
     changeTimeOfEvent(event,newTime){
         for (let i = 0; i<this.timelineEvents().length; i++){
             if (this.timelineEvents()[i] === event){
 
-                switch (event.type){
-
-                    case "appearance":
-                        this.updateChangeEventTiming(
-                            event.time,
-                            newTime,
-                            ()=>{this.showShape(event.shape)},
-                            () => {this.hideShape(event.shape)}
-                        )
-                        break
-
-                    case "disappearance":
-                        this.updateChangeEventTiming(
-                            event.time,
-                            newTime,
-                            () => {this.hideShape(event.shape)},
-                            () => {this.showShape(event.shape)}
-                        )
-                        break
-
-                    case "change":
-                        this.updateChangeEventTiming(event.time,newTime,event.forward,event.backward)
-                        break
-
-                    default:
-                        console.error("Unrecognised event type",event.type)
+                if (event.time > this.clock() && newTime <= this.clock()){
+                    event.forward()
+                } else if (event.time <= this.clock() && newTime > this.clock()){
+                    event.backward()
                 }
 
                 event.time = newTime
 
                 this.updateModel("timelineEvents",event)
-                this.aggregateModels.timelineEvents.content.splice(i,1)
+                this.removeIndexFromTimeline(i)
                 this.insertIntoTimeline(event)
 
                 return
@@ -277,6 +275,11 @@ class controllerClass{
         for (const timeLineEvent of this.timelineEvents()) {
             if (timeLineEvent.shape === shape) {
                 this.removeModel("timelineEvents",timeLineEvent)
+
+                if (timeLineEvent.time <= this.clock()){
+                    this.currentTimelineEvent --
+                }
+
             } else {
                 remainingEvents.push(timeLineEvent)
             }
@@ -286,7 +289,52 @@ class controllerClass{
 
     }
 
+    goForwardToTime(time){
+
+        // for every event between now and last event
+        for (let i = this.currentTimelineEvent+1;i<this.timelineEvents().length;i++){
+            const nextEvent = this.timelineEvents()[i]
+
+            if (nextEvent.time > time){
+
+                // we are just before the place where the time is greater than us
+                this.currentTimelineEvent = i-1
+                return
+            }
+
+            nextEvent.forward()
+        }
+
+        this.currentTimelineEvent = this.timelineEvents().length-1
+    }
+
+    goBackwardToTime(time){
+
+        // for every event between now and first event
+        for (let i = this.currentTimelineEvent;i>=0;i--){
+
+            const previousEvent = this.timelineEvents()[i]
+
+            if (previousEvent.time <= time){
+
+                this.currentTimelineEvent = i
+                return
+            }
+
+            previousEvent.backward()
+        }
+
+        this.currentTimelineEvent = -1
+    }
+
     newClockTime(time){
+
+        if (time < this.clock()){
+            this.goBackwardToTime(time)
+        } else{
+            this.goForwardToTime(time)
+        }
+
         this.aggregateModels.clock.content = time
         this.updateAggregateModel("clock")
     }
