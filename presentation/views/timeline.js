@@ -119,6 +119,9 @@ export class timeline extends abstractView{
         this.timelineDiv.onpointerdown = (pointerEvent) => {
             controller.newClockTime(this.pointerPositionToTimelinePosition(pointerEvent)*this.lastEventEndsAt)
         }
+
+        this.playButton = this.shadowRoot.getElementById("playButton")
+        this.animationPaused()
     }
 
     connectedCallback() {
@@ -131,6 +134,7 @@ export class timeline extends abstractView{
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
         controller.subscribeToInputs(this)
+        controller.subscribeToAnimationPlaying(this)
         controller.subscribeTo(this,"selectedShapes")
         controller.subscribeTo(this,"timelineEvents")
         controller.subscribeTo(this,"clock")
@@ -141,6 +145,7 @@ export class timeline extends abstractView{
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
         controller.unsubscribeFromInputs(this)
+        controller.unsubscribeToAnimationPlaying(this)
         controller.unsubscribeTo(this,"selectedShapes")
         controller.unsubscribeTo(this,"timelineEvents")
         controller.unsubscribeTo(this,"clock")
@@ -274,6 +279,24 @@ export class timeline extends abstractView{
         }
     }
 
+    animationStarted(){
+        this.playButton.onpointerdown = (pointerEvent) => {
+            controller.pauseAnimation()
+            pointerEvent.stopPropagation()
+        }
+
+        this.playButton.src = "assets/pause.svg"
+    }
+
+    animationPaused(){
+        this.playButton.onpointerdown = (pointerEvent) => {
+            controller.playAnimation()
+            pointerEvent.stopPropagation()
+        }
+
+        this.playButton.src = "assets/play.svg"
+    }
+
     acceptKeyDown(keyboardEvent){
 
         console.log("key down")
@@ -294,8 +317,6 @@ export class timeline extends abstractView{
     loseFocus(){
         console.log("lost focus")
     }
-
-
 }
 
 window.customElements.define("time-line",timeline)

@@ -2,6 +2,7 @@ import {model} from "./model/model.js";
 import {binaryInsertion} from "./dataStructureOperations.js";
 import {action} from "./model/action.js";
 import {rootAction} from "./model/rootAction.js";
+import {animationEndTimeSeconds} from "./constants.js";
 
 class controllerClass{
     constructor() {
@@ -23,6 +24,11 @@ class controllerClass{
         // shapes that views want to copy
         this.copiedShapes = []
 
+        // subscribers to alert when playback stops/starts
+        this.animationPlayingSubscribers = new Set()
+        this.animationPlaying = false
+
+        // used to name shapes
         this.numberOfEachTypeOfShape = {}
 
         // used to ensure each new shape is placed higher than the last
@@ -289,6 +295,48 @@ class controllerClass{
 
     }
 
+    playAnimation(){
+        this.previousTime = performance.now()
+
+        this.animationPlaying = true
+
+        for (const subscriber of this.animationPlayingSubscribers){
+            subscriber.animationStarted()
+        }
+
+        this.nextFrame()
+    }
+
+    nextFrame(){
+        const currentTime = performance.now()
+        const deltaTime = currentTime - this.previousTime
+
+        let time = this.clock()+deltaTime/1000
+
+        if (time > animationEndTimeSeconds){
+            time = 0
+            this.goBackwardToTime(time)
+        } else {
+            this.goForwardToTime(time)
+        }
+
+        this.aggregateModels.clock.content = time
+        this.updateAggregateModel("clock")
+
+        this.previousTime = currentTime
+
+        this.animationFrame = requestAnimationFrame(this.nextFrame.bind(this))
+    }
+
+    pauseAnimation() {
+        this.animationPlaying = false
+        cancelAnimationFrame(this.animationFrame)
+
+        for (const subscriber of this.animationPlayingSubscribers){
+            subscriber.animationPaused()
+        }
+    }
+
     goForwardToTime(time){
 
         // for every event between now and last event
@@ -418,6 +466,14 @@ class controllerClass{
                 return
             }
         }
+    }
+
+    subscribeToAnimationPlaying(subscriber){
+        this.animationPlayingSubscribers.add(subscriber)
+    }
+
+    unsubscribeToAnimationPlaying(subscriber){
+        this.animationPlayingSubscribers.delete(subscriber)
     }
 }
 
