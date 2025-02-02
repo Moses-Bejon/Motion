@@ -127,8 +127,8 @@ export class shapeTimeline{
                 controller.changeTimeOfEvent(this.disappearanceEvent,newTime)
             },
             () => {
-                this.shape.disappearanceTime = this.endTime
-                controller.changeTimeOfEvent(this.appearanceEvent,previousTime)
+                this.shape.disappearanceTime = previousTime
+                controller.changeTimeOfEvent(this.disappearanceEvent,previousTime)
             }
         )
     }
@@ -160,8 +160,8 @@ export class shapeTimeline{
                 controller.changeTimeOfEvent(this.appearanceEvent,newTime)
             },
             () => {
-                this.shape.appearanceTime = this.startTime
-                controller.changeTimeOfEvent(this.disappearanceEvent,previousTime)
+                this.shape.appearanceTime = previousTime
+                controller.changeTimeOfEvent(this.appearanceEvent,previousTime)
             }
         )
     }
