@@ -121,7 +121,12 @@ export class timeline extends abstractView{
         }
 
         this.playButton = this.shadowRoot.getElementById("playButton")
-        this.animationPaused()
+
+        if (controller.animationPlaying){
+            this.animationStarted()
+        } else {
+            this.animationPaused()
+        }
     }
 
     connectedCallback() {
