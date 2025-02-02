@@ -4,8 +4,22 @@ import {controller} from "../../../controller.js";
 import {bumperTranslation,timelineRightMenuSizePercentage} from "../../../constants.js";
 
 export class shapeTimeline{
-    constructor(parentTimeline,shape,label) {
-        this.label = label
+    constructor(parentTimeline,shape) {
+
+        this.shapeSection = document.createElement("div")
+        this.shapeSection.className = "timeline"
+
+        const labelDropdownContainer = document.createElement("div")
+        labelDropdownContainer.className = "labelDropdownContainer"
+
+        const dropDown = document.createElement("img")
+        dropDown.src = "assets/dropdown.svg"
+        dropDown.className = "dropdown"
+        labelDropdownContainer.appendChild(dropDown)
+
+        this.label = document.createElement("h2")
+        this.label.innerText = shape.name
+        labelDropdownContainer.appendChild(this.label)
 
         this.parentTimeline = parentTimeline
         this.shape = shape
@@ -77,6 +91,13 @@ export class shapeTimeline{
             "ew-resize",
             "ew-resize"
         )
+
+        this.shapeSection.appendChild(labelDropdownContainer)
+
+        this.shapeSection.appendChild(this.timeline)
+
+        parentTimeline.timelineList.appendChild(this.shapeSection)
+        parentTimeline.shapeToTimeline.set(shape,this)
     }
 
     updatePosition(){

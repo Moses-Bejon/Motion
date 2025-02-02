@@ -156,32 +156,6 @@ export class timeline extends abstractView{
         controller.unsubscribeTo(this,"clock")
     }
 
-    newShape(shape){
-        const shapeSection = document.createElement("div")
-        shapeSection.className = "timeline"
-
-        const labelDropdownContainer = document.createElement("div")
-        labelDropdownContainer.className = "labelDropdownContainer"
-
-        const dropDown = document.createElement("img")
-        dropDown.src = "assets/dropdown.svg"
-        dropDown.className = "dropdown"
-        labelDropdownContainer.appendChild(dropDown)
-
-        const label = document.createElement("h2")
-        label.innerText = shape.name
-        labelDropdownContainer.appendChild(label)
-
-        shapeSection.appendChild(labelDropdownContainer)
-
-        const timeLine = new shapeTimeline(this,shape,label)
-
-        shapeSection.appendChild(timeLine.timeline)
-
-        this.timelineList.appendChild(shapeSection)
-        this.shapeToTimeline.set(shape,timeLine)
-    }
-
     // position with respect to the right part of the window, filled by the timeline
     timeToTimelinePosition(timeSeconds){
         if (timeSeconds > this.lastEventEndsAt){
@@ -224,7 +198,7 @@ export class timeline extends abstractView{
         this.timelineList.replaceChildren()
 
         for (const shape of newSelectedShapes){
-            this.newShape(shape)
+            new shapeTimeline(this,shape)
         }
     }
 
@@ -232,7 +206,7 @@ export class timeline extends abstractView{
 
         switch (aggregateModel){
             case "selectedShapes":
-                this.newShape(model)
+                new shapeTimeline(this,model)
                 break
             case "timelineEvents":
                 break
@@ -274,7 +248,7 @@ export class timeline extends abstractView{
     removeModel(aggregateModel,model){
         switch (aggregateModel){
             case "selectedShapes":
-                this.shapeToTimeline.get(model).timeline.remove()
+                this.shapeToTimeline.get(model).shapeSection.remove()
                 this.shapeToTimeline.delete(model)
                 break
             case "timelineEvents":
