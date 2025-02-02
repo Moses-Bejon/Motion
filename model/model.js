@@ -5,7 +5,7 @@ export const model = {
     },
     "timelineEvents":{
         // ordered list of timelineEvents, sorted in order of time they occur
-        // timeLineEvent structure - {type: string, shape:shape object, time: float (s)}
+        // timeLineEvent structure - {type: string, shape:shape object, time: float (s), forward: function, backward: function}
         // type could be "appearance", "disappearance", or some other unforeseen event
         "content": [],
         "subscribers": new Set()
