@@ -136,10 +136,21 @@ export class canvas extends abstractView{
         // called whenever the position of the zoom bar changes
         this.zoomBar.oninput = this.updateZoom.bind(this)
 
+        // make sure that pointer event doesn't go on to create shenanigans elsewhere
+        this.zoomBar.onpointerdown = (pointerEvent) => {
+            pointerEvent.stopPropagation()
+        }
+
         this.previousCanvasScale = 1
 
-        this.shadowRoot.getElementById("zoomIn").onclick = this.zoomIn.bind(this)
-        this.shadowRoot.getElementById("zoomOut").onclick = this.zoomOut.bind(this)
+        this.shadowRoot.getElementById("zoomIn").onpointerdown = (pointerEvent) => {
+            this.zoomIn()
+            pointerEvent.stopPropagation()
+        }
+        this.shadowRoot.getElementById("zoomOut").onpointerdown = (pointerEvent) => {
+            this.zoomOut()
+            pointerEvent.stopPropagation()
+        }
 
         // mapping of shape objects to their group elements on the canvas
         this.shapesToGeometry = new Map()
