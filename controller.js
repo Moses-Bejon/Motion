@@ -17,6 +17,8 @@ class controllerClass{
         // used as pointer to undo/redo stack, which is implemented as a linked list
         this.previousAction = new rootAction()
 
+        this.previousActionTimelineEventsSubscribers = new Set()
+
         // index of the timeline event in forward state closest to current time i.e. the one that's just been done
         // -1 if there are no timeline events or none in forward state
         this.currentTimelineEvent = -1
@@ -56,11 +58,19 @@ class controllerClass{
         return this.aggregateModels.selectedShapes.content
     }
 
-    newAction(forwardAction,backwardAction){
+    newAction(forwardAction,backwardAction,timelineEvents){
 
         forwardAction()
 
         const newAction = new action(forwardAction,backwardAction)
+
+        this.previousActionTimelineEvents = timelineEvents
+
+        if (this.previousActionTimelineEvents.length === 0){
+            this.previousActionTimelineEventsGone()
+        } else {
+            this.previousActionTimelineEventsReady()
+        }
 
         this.previousAction.addActionAfter(newAction)
         newAction.appendToUndoRedoStack(this.previousAction)
@@ -249,6 +259,18 @@ class controllerClass{
         this.addModel("displayShapes",shape)
     }
 
+    updateShape(shape){
+        this.updateModel("allShapes",shape)
+
+        if (this.displayShapes().has(shape)){
+            this.updateModel("displayShapes",shape)
+        }
+
+        if (this.selectedShapes().has(shape)){
+            this.updateModel("selectedShapes",shape)
+        }
+    }
+
     // could be optimised using binary search in the future
     // reason not implemented yet is you need to handle case where multiple events occur at same time
     changeTimeOfEvent(event,newTime){
@@ -418,7 +440,7 @@ class controllerClass{
         this.newFocus(subscriber)
     }
 
-    unsubscribeFromInputs(subscriber){
+    unsubscribeToInputs(subscriber){
 
         // removes from list of subscribers
         this.inputSubscribersHierarchy.splice(this.inputSubscribersHierarchy.indexOf(subscriber),1)
@@ -470,10 +492,49 @@ class controllerClass{
 
     subscribeToAnimationPlaying(subscriber){
         this.animationPlayingSubscribers.add(subscriber)
+
+        if (this.animationPlaying){
+            subscriber.animationStarted()
+        } else {
+            subscriber.animationPaused()
+        }
     }
 
     unsubscribeToAnimationPlaying(subscriber){
         this.animationPlayingSubscribers.delete(subscriber)
+    }
+
+    // allows UI for putting the timeline event to appear
+    previousActionTimelineEventsReady(){
+        for (const subscriber of this.previousActionTimelineEventsSubscribers){
+            subscriber.previousActionTimelineEventsReady()
+        }
+    }
+
+    // allows for this UI to disappear
+    previousActionTimelineEventsGone() {
+        for (const subscriber of this.previousActionTimelineEventsSubscribers){
+            subscriber.previousActionTimelineEventsGone()
+        }
+    }
+
+    addPreviousActionTimelineEventToTimeline() {
+        for (const timelineEvent of this.previousActionTimelineEvents){
+            timelineEvent.time = this.clock()
+            this.addTimeLineEvent(timelineEvent)
+        }
+
+        // makes sure the same events can't be added twice, that would be a real disaster
+        this.previousActionTimelineEvents = []
+        this.previousActionTimelineEventsGone()
+    }
+
+    subscribeToPreviousActionTimelineEvents(subscriber){
+        this.previousActionTimelineEventsSubscribers.add(subscriber)
+    }
+
+    unsubscribeToPreviousActionTimelineEvents(subscriber){
+        this.previousActionTimelineEventsSubscribers.delete(subscriber)
     }
 }
 

@@ -12,7 +12,7 @@ import {
     timelineBumperSize,
     timelineLeftMenuSize,
     timelineRightMenuSize,
-    typicalIconSize
+    typicalIconSize, typicalIconSizeInt
 } from "../../constants.js";
 import {clamp} from "../../maths.js";
 
@@ -49,9 +49,45 @@ template.innerHTML = `
             height: 100%;
             position: absolute;
         }
+        #timeCursorHead{
+            height: ${typicalIconSizeInt/2}px;
+            width: ${typicalIconSizeInt/2}px;
+            border-radius: 50%;
+            background-color: black;
+            position: absolute;
+            top: ${typicalIconSize};
+            left: 1px;
+            transform: translate(-50%, -50%);
+        }
+        #currentTimeInput{
+            --text-outline-size: 0.5px;
+            --outline-color: white;
+        
+            width: ${typicalIconSize};
+            height: ${typicalIconSizeInt/2}px;
+            transform: translate(-50%, 0);
+            
+            background-color: transparent;
+            border: none;
+            color: black;
+            
+            /* text outline in white */
+            text-shadow: 
+                calc(-1 * var(--text-outline-size)) calc(-1 * var(--text-outline-size)) 0 var(--outline-color),  
+                var(--text-outline-size) calc(-1 * var(--text-outline-size)) 0 var(--outline-color),  
+                calc(-1 * var(--text-outline-size)) var(--text-outline-size) 0 var(--outline-color),  
+                var(--text-outline-size) var(--text-outline-size) 0 var(--outline-color);
+        }
+        #timeCursorButtons{
+            position: relative;
+            top: -${typicalIconSizeInt/2}px;
+            white-space: nowrap;
+        }
         #timeCursorStem{
             height: calc(100% - ${typicalIconSize});
-            width: 1px;
+            position: absolute;
+            top: ${typicalIconSize};
+            width: 2px;
             background-color: black;
         }
         .timeline{
@@ -121,12 +157,6 @@ export class timeline extends abstractView{
         }
 
         this.playButton = this.shadowRoot.getElementById("playButton")
-
-        if (controller.animationPlaying){
-            this.animationStarted()
-        } else {
-            this.animationPaused()
-        }
     }
 
     connectedCallback() {
@@ -140,6 +170,7 @@ export class timeline extends abstractView{
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
         controller.subscribeToInputs(this)
         controller.subscribeToAnimationPlaying(this)
+        controller.subscribeToPreviousActionTimelineEvents(this)
         controller.subscribeTo(this,"selectedShapes")
         controller.subscribeTo(this,"timelineEvents")
         controller.subscribeTo(this,"clock")
@@ -149,8 +180,9 @@ export class timeline extends abstractView{
 
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
-        controller.unsubscribeFromInputs(this)
+        controller.unsubscribeToInputs(this)
         controller.unsubscribeToAnimationPlaying(this)
+        controller.unsubscribeToPreviousActionTimelineEvents(this)
         controller.unsubscribeTo(this,"selectedShapes")
         controller.unsubscribeTo(this,"timelineEvents")
         controller.unsubscribeTo(this,"clock")
@@ -274,6 +306,14 @@ export class timeline extends abstractView{
         }
 
         this.playButton.src = "assets/play.svg"
+    }
+
+    previousActionTimelineEventsReady(){
+        this.cursor.previousActionTimelineEventsReady()
+    }
+
+    previousActionTimelineEventsGone(){
+        this.cursor.previousActionTimelineEventsGone()
     }
 
     acceptKeyDown(keyboardEvent){

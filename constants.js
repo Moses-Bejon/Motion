@@ -33,7 +33,8 @@ export const snappingDistance = Math.hypot(canvasWidth,canvasHeight)/100
 // how large UI overlays (like rotate icons) on the canvas typically are
 export const canvasOverlayUISize = 50
 
-export const typicalIconSize = "30px"
+export const typicalIconSizeInt = 30
+export const typicalIconSize = `${typicalIconSizeInt}px`
 
 // timeline positioning constants
 export const timelineMargin = 5

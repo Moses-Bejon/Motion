@@ -47,7 +47,8 @@ export class polygonMode extends manyPointsMode{
                 },
                 () => {
                     controller.removeShape(shape)
-                }
+                },
+                []
             )
 
             this.currentShape?.remove()

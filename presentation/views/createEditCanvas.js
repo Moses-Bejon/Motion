@@ -308,7 +308,8 @@ export class createEditCanvas extends canvas{
                     for (const duplicate of duplicates) {
                         controller.removeShape(duplicate)
                     }
-                }
+                },
+                []
             )
 
             // the duplicate becomes selected after it is made
@@ -343,7 +344,8 @@ export class createEditCanvas extends canvas{
                     for (const shape of copiedShapes){
                         controller.removeShape(shape)
                     }
-                }
+                },
+                []
             )
 
             controller.newAggregateModel("selectedShapes",copiedShapes)
@@ -376,7 +378,9 @@ export class createEditCanvas extends canvas{
                     for (const shape of mergedShapes){
                         controller.newShape(shape)
                     }
-                })
+                },
+                []
+            )
 
         }
         this.shadowRoot.getElementById("split").onpointerdown = () => {
@@ -400,7 +404,8 @@ export class createEditCanvas extends canvas{
                         for (const innerShape of shape.innerShapes){
                             controller.newShape(innerShape)
                         }
-                    }
+                    },
+                    []
                 )
             }
 
@@ -419,7 +424,8 @@ export class createEditCanvas extends canvas{
                     for (const shape of toRemove) {
                         controller.newShape(shape)
                     }
-                }
+                },
+                []
             )
 
         }
@@ -443,7 +449,9 @@ export class createEditCanvas extends canvas{
                 },
                 () => {
                     this.moveShapesOneBelow(shapesToMove)
-                })
+                },
+                []
+            )
 
             pointerEvent.stopPropagation()
         }
@@ -456,7 +464,9 @@ export class createEditCanvas extends canvas{
                 },
                 () => {
                     this.moveShapesOneAbove(shapesToMove)
-                })
+                },
+                []
+            )
 
             pointerEvent.stopPropagation()
         }
@@ -475,7 +485,8 @@ export class createEditCanvas extends canvas{
                     for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
                         this.moveShapesOneBelow(shapesToMove)
                     }
-                }
+                },
+                []
             )
 
 
@@ -495,7 +506,8 @@ export class createEditCanvas extends canvas{
                     for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
                         this.moveShapesOneAbove(shapesToMove)
                     }
-                }
+                },
+                []
             )
 
 
@@ -692,23 +704,43 @@ export class createEditCanvas extends canvas{
 
         const selectedCopy = new Set(this.selectedShapes)
 
+        const timelineEvents = []
+
+        for (const shape of selectedCopy){
+            timelineEvents.push(
+                {
+                    "type":"change",
+                    "shape":shape,
+                    "forward":() => {
+                        transformation(shape)
+
+                        controller.updateShape(shape)
+                    },
+                    "backward":() => {
+                        inverseTransformation(shape)
+
+                        controller.updateShape(shape)
+                    }
+                }
+            )
+        }
+
         controller.newAction(
             () => {
                 for (const shape of selectedCopy){
                     transformation(shape)
 
-                    controller.updateModel("displayShapes",shape)
-                    controller.updateModel("selectedShapes",shape)
+                    controller.updateShape(shape)
                 }
             },
             () => {
                 for (const shape of selectedCopy){
                     inverseTransformation(shape)
 
-                    controller.updateModel("displayShapes",shape)
-                    controller.updateModel("selectedShapes",shape)
+                    controller.updateShape(shape)
                 }
-            }
+            },
+            timelineEvents
         )
     }
 

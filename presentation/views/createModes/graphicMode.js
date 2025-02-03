@@ -16,7 +16,8 @@ export class graphicMode{
                 },
                 () => {
                     controller.removeShape(graphicShape)
-                }
+                },
+                []
             )
 
                 // select the graphic by default at creation (to allow the user to move it)

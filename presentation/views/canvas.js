@@ -184,7 +184,7 @@ export class canvas extends abstractView{
 
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
-        controller.unsubscribeFromInputs(this)
+        controller.unsubscribeToInputs(this)
         controller.unsubscribeTo(this,"displayShapes")
     }
 

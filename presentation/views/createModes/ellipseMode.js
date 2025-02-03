@@ -117,7 +117,8 @@ export class ellipseMode{
             },
             () => {
                 controller.removeShape(shape)
-            }
+            },
+            []
         )
 
         this.currentShape.remove()

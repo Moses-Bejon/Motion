@@ -54,7 +54,9 @@ export class drawMode extends manyPointsMode{
             },
                 () => {
                 controller.removeShape(shape)
-            })
+            },
+                []
+            )
         } else {
 
             /* If they are, connect up the shape, make a polygon, and fill the polygon with the fill colour */

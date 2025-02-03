@@ -86,7 +86,8 @@ export class manyPointsMode{
             },
             () => {
                 controller.removeShape(shape)
-            }
+            },
+            []
         )
 
         this.currentShape.remove()

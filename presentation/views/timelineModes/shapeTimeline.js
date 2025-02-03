@@ -150,7 +150,8 @@ export class shapeTimeline{
             () => {
                 this.shape.disappearanceTime = previousTime
                 controller.changeTimeOfEvent(this.disappearanceEvent,previousTime)
-            }
+            },
+            []
         )
     }
 
@@ -183,7 +184,8 @@ export class shapeTimeline{
             () => {
                 this.shape.appearanceTime = previousTime
                 controller.changeTimeOfEvent(this.appearanceEvent,previousTime)
-            }
+            },
+            []
         )
     }
 }

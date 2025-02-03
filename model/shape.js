@@ -34,11 +34,7 @@ export class shape{
 
         this.updateGeometry()
 
-        controller.updateModel("displayShapes",this)
-
-        if (controller.isSelected(this)) {
-            controller.updateModel("selectedShapes", this)
-        }
+        controller.updateShape(this)
     }
 
     addTimelineEvent(event){
