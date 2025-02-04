@@ -235,6 +235,10 @@ class controllerClass{
             event.colour = randomBrightColour()
         }
 
+        if (event.time <= this.clock()){
+            event.forward()
+        }
+
         this.insertIntoTimeline(event)
         event.shape.addTimelineEvent(event)
 
@@ -245,18 +249,20 @@ class controllerClass{
     // could be optimised using binary search in the future
     // reason not implemented yet is you need to handle case where multiple events occur at same time
     removeTimeLineEvent(event){
-
         for (let i = 0; i<this.timelineEvents().length;i++){
             if (this.timelineEvents()[i] === event){
 
+                if (i <= this.currentTimelineEvent){
+                    event.backward()
+                }
+
+                event.shape.removeTimelineEvent(this.timelineEvents()[i])
+                this.removeModel("timelineEvents",this.timelineEvents()[i])
                 this.removeIndexFromTimeline(i)
-                event.shape.removeTimeLineEvent(this.timelineEvents()[i])
-                this.removeModel(this.timelineEvents()[i])
 
                 return
             }
         }
-
     }
 
     hideShape(shape){
@@ -545,7 +551,20 @@ class controllerClass{
     addPreviousActionTimelineEventToTimeline() {
         for (const timelineEvent of this.previousActionTimelineEvents){
             timelineEvent.time = this.clock()
-            this.addTimeLineEvent(timelineEvent)
+
+            // removes the previous action from the undo/redo stack
+            this.undoAction()
+
+            this.newAction(
+                () => {
+                    this.addTimeLineEvent(timelineEvent)
+                },
+                () => {
+                    this.removeTimeLineEvent(timelineEvent)
+                },
+                []
+            )
+
         }
 
         // makes sure the same events can't be added twice, that would be a real disaster
