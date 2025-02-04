@@ -301,7 +301,7 @@ export class timeline extends abstractView{
                 this.shapeToTimeline.delete(model)
                 break
             case "timelineEvents":
-                this.shapeToTimeline.get(model.shape).removeTimelineEvent(model)
+                this.shapeToTimeline.get(model.shape)?.removeTimeLineEvent(model)
                 break
             default:
                 console.error("timeline got updates from",aggregateModel)
