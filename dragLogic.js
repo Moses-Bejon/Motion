@@ -36,7 +36,16 @@ function beginDragging(drag,endDrag,pointerEvent,cursor){
 
     document.addEventListener("pointermove",drag)
     document.addEventListener("pointerup",(pointerEvent) => {
-        endDrag(pointerEvent)
+
+        /* This try catch avoids the catastrophic scenario that an error occurs when the user is finished dragging
+        and they get stuck in an infinite drag, unable to escape, because every time they try to end the code gets
+        stuck here */
+        try {
+            endDrag(pointerEvent)
+        } catch (error){
+            console.error(error)
+        }
+
         overRideElement.remove()
         document.removeEventListener("pointermove",drag)
     },{
