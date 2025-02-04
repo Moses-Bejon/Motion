@@ -183,11 +183,6 @@ class controllerClass{
             "forward": () => {this.hideShape(shape)},
             "backward": () => {this.showShape(shape)}
         })
-
-        if (shape.appearanceTime <= this.clock() <= shape.disappearanceTime){
-            this.aggregateModels.displayShapes.content.add(shape)
-            this.addModel("displayShapes",shape)
-        }
     }
 
     removeShape(shape){
