@@ -1,5 +1,6 @@
 import {model} from "./model/model.js";
 import {binaryInsertion} from "./dataStructureOperations.js";
+import {randomBrightColour} from "./random.js"
 import {action} from "./model/action.js";
 import {rootAction} from "./model/rootAction.js";
 import {animationEndTimeSeconds} from "./constants.js";
@@ -229,10 +230,33 @@ class controllerClass{
     }
 
     addTimeLineEvent(event){
+
+        if (!Object.hasOwn(event,"colour")){
+            event.colour = randomBrightColour()
+        }
+
         this.insertIntoTimeline(event)
         event.shape.addTimelineEvent(event)
 
         this.addModel("timelineEvents",event)
+    }
+
+    // performs a linear search for removed event
+    // could be optimised using binary search in the future
+    // reason not implemented yet is you need to handle case where multiple events occur at same time
+    removeTimeLineEvent(event){
+
+        for (let i = 0; i<this.timelineEvents().length;i++){
+            if (this.timelineEvents()[i] === event){
+
+                this.removeIndexFromTimeline(i)
+                event.shape.removeTimeLineEvent(this.timelineEvents()[i])
+                this.removeModel(this.timelineEvents()[i])
+
+                return
+            }
+        }
+
     }
 
     hideShape(shape){

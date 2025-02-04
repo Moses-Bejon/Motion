@@ -48,6 +48,7 @@ template.innerHTML = `
         #timeCursor{
             height: 100%;
             position: absolute;
+            z-index: 1;
         }
         #timeCursorHead{
             height: ${typicalIconSizeInt/2}px;
@@ -105,6 +106,14 @@ template.innerHTML = `
             background-color: white;
             margin-top: ${timelineMargin}px;
             margin-bottom: ${timelineMargin}px;
+            height: calc(100% - ${2*timelineMargin}px);
+        }
+        .eventToken{
+            height: calc(100% - ${timelineMargin}px);
+            width: 5px;
+            position: absolute;
+            top: ${timelineMargin}px;
+            z-index: 1;
         }
         .bumper{
             border-radius: 50%;
@@ -241,6 +250,7 @@ export class timeline extends abstractView{
                 new shapeTimeline(this,model)
                 break
             case "timelineEvents":
+                this.shapeToTimeline.get(model.shape)?.addTimeLineEvent(model)
                 break
             default:
                 console.error("timeline got updates from",aggregateModel)
@@ -254,6 +264,7 @@ export class timeline extends abstractView{
                 this.newSelectedShapes(model)
                 break
             case "timelineEvents":
+                this.newSelectedShapes(controller.selectedShapes())
                 break
             case "clock":
                 this.cursor.updateTimeCursor()
@@ -270,7 +281,13 @@ export class timeline extends abstractView{
                 this.shapeToTimeline.get(model).label.innerText = model.name
                 break
             case "timelineEvents":
-                this.shapeToTimeline.get(model.shape).updatePosition()
+
+                const shape = this.shapeToTimeline.get(model.shape)
+
+                shape.updatePosition()
+                shape.removeTimeLineEvent(model)
+                shape.addTimeLineEvent(model)
+
                 break
             default:
                 console.error("timeline got updates from",aggregateModel)
@@ -284,6 +301,7 @@ export class timeline extends abstractView{
                 this.shapeToTimeline.delete(model)
                 break
             case "timelineEvents":
+                this.shapeToTimeline.get(model.shape).removeTimelineEvent(model)
                 break
             default:
                 console.error("timeline got updates from",aggregateModel)

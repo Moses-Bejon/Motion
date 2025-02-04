@@ -6,8 +6,8 @@ export class shape{
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
 
-        // a list of all the things that occur to the shape throughout the animation, in no particular order
-        this.timelineEvents = []
+        // all the things that occur to the shape throughout the animation
+        this.timelineEvents = new Set()
 
         this.modelConstructed = false
     }
@@ -38,6 +38,10 @@ export class shape{
     }
 
     addTimelineEvent(event){
-        this.timelineEvents.push(event)
+        this.timelineEvents.add(event)
+    }
+
+    removeTimelineEvent(event){
+        this.timelineEvents.delete(event)
     }
 }

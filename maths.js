@@ -127,7 +127,7 @@ export function inverseScale(scale){
     return 1/scale
 }
 
-// simplifies a line
+// simplifies a line - Ramer-Douglas-Peucker algorithm
 export function decimateLine(line,epsilon){
     return [line[0]].concat(decimateLineRecursivePart(line,epsilon)).concat([line[line.length-1]])
 }

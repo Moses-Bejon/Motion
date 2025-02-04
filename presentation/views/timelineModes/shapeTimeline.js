@@ -1,10 +1,12 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {clamp} from "../../../maths.js";
 import {controller} from "../../../controller.js";
-import {bumperTranslation,timelineRightMenuSizePercentage} from "../../../constants.js";
+import {bumperTranslation, timelineMargin, timelineRightMenuSizePercentage} from "../../../constants.js";
 
 export class shapeTimeline{
     constructor(parentTimeline,shape) {
+
+        this.timelineEventToEventToken = new Map()
 
         this.shapeSection = document.createElement("div")
         this.shapeSection.className = "timeline"
@@ -24,11 +26,18 @@ export class shapeTimeline{
         this.parentTimeline = parentTimeline
         this.shape = shape
 
+        this.timelineContainer = document.createElement("div")
+        this.timelineContainer.style.width = timelineRightMenuSizePercentage+"%"
+        this.timelineContainer.style.height = "100%"
+        this.timelineContainer.style.position = "relative"
+
         for (const timelineEvent of shape.timelineEvents){
             if (timelineEvent.type === "appearance"){
                 this.appearanceEvent = timelineEvent
             } else if (timelineEvent.type === "disappearance"){
                 this.disappearanceEvent = timelineEvent
+            } else {
+                this.addTimeLineEvent(timelineEvent)
             }
         }
 
@@ -94,10 +103,41 @@ export class shapeTimeline{
 
         this.shapeSection.appendChild(labelDropdownContainer)
 
-        this.shapeSection.appendChild(this.timeline)
+        this.timelineContainer.appendChild(this.timeline)
+        this.shapeSection.appendChild(this.timelineContainer)
 
         parentTimeline.timelineList.appendChild(this.shapeSection)
         parentTimeline.shapeToTimeline.set(shape,this)
+    }
+
+    addTimeLineEvent(event){
+
+        // we use the shapes to tell us about these types of events
+        // since they have appearance and disappearance times
+        if (event.type === "appearance" || event.type === "disappearance"){
+            return
+        }
+
+        const eventToken = document.createElement("div")
+
+        eventToken.className = "eventToken"
+        eventToken.style.backgroundColor = event.colour
+
+        eventToken.style.left = `${this.parentTimeline.timeToTimelinePosition(event.time)*100}%`
+
+        this.timelineContainer.appendChild(eventToken)
+
+        this.timelineEventToEventToken.set(event,eventToken)
+    }
+
+    removeTimeLineEvent(event){
+
+        if (!this.timelineEventToEventToken.has(event)){
+            return
+        }
+
+        this.timelineEventToEventToken.get(event).remove()
+        this.timelineEventToEventToken.delete(event)
     }
 
     updatePosition(){
@@ -108,10 +148,9 @@ export class shapeTimeline{
         this.startProportion = this.parentTimeline.timeToTimelinePosition(this.startTime)
         this.endProportion = this.parentTimeline.timeToTimelinePosition(this.endTime)
 
-        const startPosition = timelineRightMenuSizePercentage*this.startProportion + "%"
+        const startPosition = 100*this.startProportion + "%"
 
-        // width of entire timeline is 100% but that includes 15% of left menu, so 85 used
-        const width = timelineRightMenuSizePercentage*(this.endProportion-this.startProportion) + "%"
+        const width = 100*(this.endProportion-this.startProportion) + "%"
 
         this.timeline.style.left = startPosition
         this.timeline.style.width = width
@@ -131,7 +170,7 @@ export class shapeTimeline{
             1
         )
 
-        this.timeline.style.width = timelineRightMenuSizePercentage*(newEndProportion-this.startProportion) + "%"
+        this.timeline.style.width = 100*(newEndProportion-this.startProportion) + "%"
 
         return newEndProportion
     }
@@ -164,8 +203,8 @@ export class shapeTimeline{
             this.endProportion
         )
 
-        this.timeline.style.left = timelineRightMenuSizePercentage*newStartProportion + "%"
-        this.timeline.style.width = timelineRightMenuSizePercentage*(this.endProportion-newStartProportion) + "%"
+        this.timeline.style.left = 100*newStartProportion + "%"
+        this.timeline.style.width = 100*(this.endProportion-newStartProportion) + "%"
 
         return newStartProportion
     }
