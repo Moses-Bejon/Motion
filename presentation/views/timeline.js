@@ -109,7 +109,7 @@ template.innerHTML = `
             height: calc(100% - ${2*timelineMargin}px);
         }
         .eventToken{
-            height: calc(100% - ${timelineMargin}px);
+            height: calc(100% - ${timelineMargin}px - ${timelineBorderSize/2}px);
             width: 5px;
             position: absolute;
             top: ${timelineMargin}px;
