@@ -164,25 +164,29 @@ class controllerClass{
             shape.modelConstruct(this.ZIndexOfHighestShape, shapeName)
 
             this.ZIndexOfHighestShape++
+
+            this.addTimeLineEvent({
+                "type": "appearance",
+                "shape": shape,
+                "time": shape.appearanceTime,
+                "forward": () => {this.showShape(shape)},
+                "backward": () => {this.hideShape(shape)}
+            })
+            this.addTimeLineEvent({
+                "type": "disappearance",
+                "shape": shape,
+                "time": shape.disappearanceTime,
+                "forward": () => {this.hideShape(shape)},
+                "backward": () => {this.showShape(shape)}
+            })
+        } else {
+            for (const timelineEvent of shape.timelineEvents){
+                this.addTimeLineEvent(timelineEvent)
+            }
         }
 
         this.aggregateModels.allShapes.content.add(shape)
         this.addModel("allShapes",shape)
-
-        this.addTimeLineEvent({
-            "type": "appearance",
-            "shape": shape,
-            "time": shape.appearanceTime,
-            "forward": () => {this.showShape(shape)},
-            "backward": () => {this.hideShape(shape)}
-        })
-        this.addTimeLineEvent({
-            "type": "disappearance",
-            "shape": shape,
-            "time": shape.disappearanceTime,
-            "forward": () => {this.hideShape(shape)},
-            "backward": () => {this.showShape(shape)}
-        })
     }
 
     removeShape(shape){
