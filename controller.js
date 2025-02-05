@@ -24,6 +24,9 @@ class controllerClass{
         // -1 if there are no timeline events or none in forward state
         this.currentTimelineEvent = -1
 
+        // all the tweens the controller should think about when updating
+        this.currentTimelineTweens = new Set()
+
         // shapes that views want to copy
         this.copiedShapes = []
 
@@ -60,7 +63,6 @@ class controllerClass{
     }
 
     newAction(forwardAction,backwardAction,timelineEvents){
-
         forwardAction()
 
         const newAction = new action(forwardAction,backwardAction)
@@ -374,6 +376,10 @@ class controllerClass{
         this.aggregateModels.clock.content = time
         this.updateAggregateModel("clock")
 
+        for (const tween of this.currentTimelineTweens){
+            tween.goToTime(time)
+        }
+
         this.previousTime = currentTime
 
         this.animationFrame = requestAnimationFrame(this.nextFrame.bind(this))
@@ -436,6 +442,19 @@ class controllerClass{
 
         this.aggregateModels.clock.content = time
         this.updateAggregateModel("clock")
+
+        for (const tween of this.currentTimelineTweens){
+            tween.goToTime(time)
+        }
+
+    }
+
+    addTween(tween){
+        this.currentTimelineTweens.add(tween)
+    }
+
+    removeTween(tween){
+        this.currentTimelineTweens.delete(tween)
     }
 
     newFocus(focus){
@@ -548,23 +567,30 @@ class controllerClass{
     }
 
     addPreviousActionTimelineEventToTimeline() {
-        for (const timelineEvent of this.previousActionTimelineEvents){
-            timelineEvent.time = this.clock()
 
-            // removes the previous action from the undo/redo stack
-            this.undoAction()
+        const timelineEventsCopy = new Set(this.previousActionTimelineEvents)
 
-            this.newAction(
-                () => {
-                    this.addTimeLineEvent(timelineEvent)
-                },
-                () => {
-                    this.removeTimeLineEvent(timelineEvent)
-                },
-                []
-            )
-
+        // ensures they have the time at which they were added to the timeline
+        for (const timelineEvent of timelineEventsCopy){
+            timelineEvent.time = timelineEvent.timeChange(this.clock())
         }
+
+        // removes the previous action from the undo/redo stack
+        this.undoAction()
+
+        this.newAction(
+            () => {
+                for (const timelineEvent of timelineEventsCopy){
+                    this.addTimeLineEvent(timelineEvent)
+                }
+            },
+            () => {
+                for (const timelineEvent of timelineEventsCopy){
+                    this.removeTimeLineEvent(timelineEvent)
+                }
+            },
+            []
+        )
 
         // makes sure the same events can't be added twice, that would be a real disaster
         this.previousActionTimelineEvents = []

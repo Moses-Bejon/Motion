@@ -17,8 +17,9 @@ import {controller} from "../../controller.js";
 import {manyPointsMode} from "./createModes/manyPointsMode.js";
 import {graphicMode} from "./createModes/graphicMode.js";
 import {selectionBox} from "./createModes/selectionBox.js";
-import {isLess} from "../../maths.js";
+import {isLess, returnInput} from "../../maths.js";
 import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
+import {tween} from "../../model/tween.js"
 import {editMode} from "./createModes/editMode.js";
 import {shapeGroup} from "../../model/shapeGroup.js";
 import {transformMode} from "./createModes/transformMode.js";
@@ -699,31 +700,67 @@ export class createEditCanvas extends canvas{
         }
     }
 
-    userTransform(transformation,inverseTransformation){
+    userTransform(operation,inverseOperation,startState,endState){
         // a new set is used because, as this loop may run after geometry is updated, the set is changing
 
         const selectedCopy = new Set(this.selectedShapes)
 
         const timelineEvents = []
 
+        const transformation = (shape) => {
+            operation(shape,endState)
+        }
+
+        const inverseTransformation = (shape) => {
+            inverseOperation(shape,endState)
+        }
+
         for (const shape of selectedCopy){
+
+            const shapeTween = new tween(
+                controller.clock()-0.5,
+                controller.clock(),
+                startState,
+                endState,
+                operation,
+                inverseOperation,
+                shape
+            )
+
             timelineEvents.push(
                 {
-                    "type":"change",
+                    "type":"tweenStart",
                     "shape":shape,
                     "forward":() => {
-                        transformation(shape)
-
-                        controller.updateShape(shape)
+                        controller.addTween(shapeTween)
                     },
                     "backward":() => {
-                        inverseTransformation(shape)
-
-                        controller.updateShape(shape)
+                        controller.removeTween(shapeTween)
+                        shapeTween.beforeStart()
+                    },
+                    "timeChange":(time) => {
+                        return Math.max(0,time-0.5)
                     }
                 }
             )
+
+            timelineEvents.push(
+                {
+                    "type":"tweenEnd",
+                    "shape":shape,
+                    "forward":() => {
+                        controller.removeTween(shapeTween)
+                        shapeTween.finish()
+                    },
+                    "backward":() => {
+                        controller.addTween(shapeTween)
+                    },
+                    "timeChange":returnInput
+                }
+            )
         }
+
+        console.log(timelineEvents)
 
         controller.newAction(
             () => {

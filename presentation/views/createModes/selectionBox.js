@@ -178,8 +178,12 @@ export class selectionBox{
         this.selectionBox.style.transform = null
 
         this.editCanvas.userTransform(
-            (shape) => {shape.rotate(rotationAngle,this.transformOrigin)},
-            (shape) => {shape.rotate(inverseRotationAngle(rotationAngle),this.transformOrigin)}
+            (shape,angle) => {shape.rotate(angle,this.transformOrigin)},
+            (shape,angle) => {
+                shape.rotate(inverseRotationAngle(angle),this.transformOrigin)
+            },
+            0,
+            rotationAngle
         )
 
         pointerEvent.stopPropagation()
@@ -215,8 +219,10 @@ export class selectionBox{
         this.selectionBox.style.transform = null
 
         this.editCanvas.userTransform(
-            (shape) => {shape.scale(scaleFactor,this.transformOrigin)},
-            (shape) => {shape.scale(inverseScale(scaleFactor),this.transformOrigin)}
+            (shape,scaleFactor) => {shape.scale(scaleFactor,this.transformOrigin)},
+            (shape,scaleFactor) => {shape.scale(inverseScale(scaleFactor),this.transformOrigin)},
+            1,
+            scaleFactor
         )
 
         pointerEvent.stopPropagation()

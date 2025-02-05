@@ -60,6 +60,10 @@ export function isLess(a,b){
     return a < b
 }
 
+export function returnInput(x){
+    return x
+}
+
 export function distanceBetween2dPoints(point1,point2){
     return Math.hypot(point1[0]-point2[0],point1[1]-point2[1])
 }
