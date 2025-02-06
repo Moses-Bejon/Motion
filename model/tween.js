@@ -16,11 +16,6 @@ export class tween{
 
     goToTime(time){
 
-        console.log(this.startTime,this.timeLength)
-        console.log(time)
-        console.log(this.startState)
-        console.log(this.endState)
-
         const value = this.startState+this.stateLength*(time-this.startTime)/this.timeLength
 
         console.log(value)

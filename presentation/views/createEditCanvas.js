@@ -760,8 +760,6 @@ export class createEditCanvas extends canvas{
             )
         }
 
-        console.log(timelineEvents)
-
         controller.newAction(
             () => {
                 for (const shape of selectedCopy){
