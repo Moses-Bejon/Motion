@@ -230,6 +230,23 @@ class controllerClass{
         }
     }
 
+    eventForward(event){
+        const now = this.clock()
+
+        // ensure we are at the correct point in time when we go forward
+        this.newClockTime(event.time)
+        event.forward()
+        this.newClockTime(now)
+    }
+
+    eventBackward(event){
+        const now = this.clock()
+
+        this.newClockTime(event.time)
+        event.backward()
+        this.newClockTime(now)
+    }
+
     addTimeLineEvent(event){
 
         if (!Object.hasOwn(event,"colour")){
@@ -237,7 +254,7 @@ class controllerClass{
         }
 
         if (event.time <= this.clock()){
-            event.forward()
+            this.eventForward(event)
         }
 
         this.insertIntoTimeline(event)
@@ -254,7 +271,7 @@ class controllerClass{
             if (this.timelineEvents()[i] === event){
 
                 if (i <= this.currentTimelineEvent){
-                    event.backward()
+                    this.eventBackward(event)
                 }
 
                 event.shape.removeTimelineEvent(this.timelineEvents()[i])
@@ -309,9 +326,9 @@ class controllerClass{
             if (this.timelineEvents()[i] === event){
 
                 if (event.time > this.clock() && newTime <= this.clock()){
-                    event.forward()
+                    this.eventForward(event)
                 } else if (event.time <= this.clock() && newTime > this.clock()){
-                    event.backward()
+                    this.eventBackward(event)
                 }
 
                 event.time = newTime
