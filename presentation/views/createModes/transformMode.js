@@ -1,6 +1,12 @@
 import {controller} from "../../../controller.js";
 import {addDragLogicTo} from "../../../dragLogic.js";
-import {angleBetweenThreePoints, distanceBetween2dPoints, inverseRotationAngle, inverseScale} from "../../../maths.js";
+import {
+    angleBetweenThreePoints,
+    distanceBetween2dPoints,
+    inverseRotationAngle,
+    inverseScale,
+    multiply2dVectorByScalar
+} from "../../../maths.js";
 import {editMode} from "./editMode.js";
 import {rotatePath} from "../../../assets/rotatePath.js"
 import {canvasOverlayUISize} from "../../../constants.js";
@@ -86,8 +92,13 @@ export class transformMode{
         }
     }
 
-    globalTransform(transformation,inverseTransformation){
-        this.editCanvas.userTransform(transformation,inverseTransformation)
+    globalTransform(transformation,inverseTransformation,startState,endState){
+        this.editCanvas.userTransform(
+            transformation,
+            inverseTransformation,
+            startState,
+            endState
+        )
 
         this.switchMode()
         this.editCanvas.currentMode = new editMode(this.editCanvas)
@@ -116,8 +127,10 @@ export class transformMode{
         this.editCanvas.selectionBoxGeometry.style.transform = null
 
         this.globalTransform(
-            (shape) => {shape.rotate(rotationAngle,this.transformOrigin)},
-            (shape) => {shape.rotate(inverseRotationAngle(rotationAngle),this.transformOrigin)}
+            (shape,angle) => {shape.rotate(angle,this.transformOrigin)},
+            (shape,angle) => {shape.rotate(inverseRotationAngle(angle),this.transformOrigin)},
+            0,
+            rotationAngle
         )
 
         pointerEvent.stopPropagation()
@@ -151,8 +164,10 @@ export class transformMode{
         this.editCanvas.selectionBoxGeometry.style.transform = null
 
         this.globalTransform(
-            (shape) => {shape.scale(scaleFactor,this.transformOrigin)},
-            (shape) => {shape.scale(inverseScale(scaleFactor),this.transformOrigin)}
+            (shape,scaleFactor) => {shape.scale(scaleFactor,this.transformOrigin)},
+            (shape,scaleFactor) => {shape.scale(inverseScale(scaleFactor),this.transformOrigin)},
+            1,
+            scaleFactor
         )
 
         pointerEvent.stopPropagation()
