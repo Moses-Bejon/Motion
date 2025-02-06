@@ -1,6 +1,6 @@
 import {controller} from "../../../controller.js";
 import {clamp} from "../../../maths.js";
-import {typicalIconSize} from "../../../constants.js";
+import {animationEndTimeSeconds, typicalIconSize} from "../../../constants.js";
 
 export class timeCursor{
     constructor(parentTimeline) {
@@ -24,7 +24,7 @@ export class timeCursor{
             }
         }
         this.currentTime.onchange = () => {
-            controller.newClockTime(parseFloat(this.currentTime.value))
+            controller.newClockTime(clamp(parseFloat(this.currentTime.value),0,animationEndTimeSeconds))
         }
         this.currentTime.onpointerdown = (pointerEvent) => {
             pointerEvent.stopPropagation()
