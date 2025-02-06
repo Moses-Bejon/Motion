@@ -1,7 +1,7 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {
     acuteAngleBetweenThreePoints, angleBetweenThreePoints,
-    getDistanceToStraightLineThrough, inverseRotationAngle, inverseScale, inverseTranslation,
+    getDistanceToStraightLineThrough, inverseRotationAngle, inverseScale, inverseTranslation, multiply2dVectorByScalar,
     subtract2dVectors
 } from "../../../maths.js";
 import {controller} from "../../../controller.js";
@@ -254,8 +254,10 @@ export class selectionBox{
         const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
 
         this.editCanvas.userTransform(
-            (shape) => {shape.translate(translation)},
-            (shape) => {shape.translate(inverseTranslation(translation))}
+            (shape,tweenPoint) => {shape.translate(multiply2dVectorByScalar(tweenPoint,translation))},
+            (shape,tweenPoint) => {shape.translate(multiply2dVectorByScalar(-tweenPoint,translation))},
+            0,
+            1
         )
 
         this.selectionBox.style.transform = null
