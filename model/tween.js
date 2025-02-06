@@ -18,8 +18,6 @@ export class tween{
 
         const value = this.startState+this.stateLength*(time-this.startTime)/this.timeLength
 
-        console.log(value)
-
         this.inverseOperation(this.shape,this.previousValue)
         this.operation(this.shape,value)
 
