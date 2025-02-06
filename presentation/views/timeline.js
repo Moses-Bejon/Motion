@@ -154,7 +154,6 @@ export class timeline extends abstractView{
         this.shadowRoot.appendChild(template.content.cloneNode(true))
 
         this.timelineList = this.shadowRoot.getElementById("timelineList")
-        this.lastEventEndsAt = animationEndTimeSeconds
         this.shapeToTimeline = new Map()
 
         this.cursor = new timeCursor(this)
@@ -162,7 +161,7 @@ export class timeline extends abstractView{
         this.timelineDiv.appendChild(this.cursor.cursor)
 
         this.timelineDiv.onpointerdown = (pointerEvent) => {
-            controller.newClockTime(this.pointerPositionToTimelinePosition(pointerEvent)*this.lastEventEndsAt)
+            controller.newClockTime(this.pointerPositionToTimelinePosition(pointerEvent)*animationEndTimeSeconds)
         }
 
         this.playButton = this.shadowRoot.getElementById("playButton")
@@ -199,10 +198,10 @@ export class timeline extends abstractView{
 
     // position with respect to the right part of the window, filled by the timeline
     timeToTimelinePosition(timeSeconds){
-        if (timeSeconds > this.lastEventEndsAt){
+        if (timeSeconds > animationEndTimeSeconds){
             console.error("Not implemented")
         } else {
-            return timeSeconds/this.lastEventEndsAt
+            return timeSeconds/animationEndTimeSeconds
         }
     }
 
@@ -212,7 +211,7 @@ export class timeline extends abstractView{
     }
 
     timeLinePositionToTime(position){
-        return position*this.lastEventEndsAt
+        return position*animationEndTimeSeconds
     }
 
     globalWidthToTimelineWidth(width){
