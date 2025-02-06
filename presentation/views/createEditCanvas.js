@@ -740,7 +740,8 @@ export class createEditCanvas extends canvas{
                     },
                     "timeChange":(time) => {
                         return Math.max(0,time-0.5)
-                    }
+                    },
+                    "tween":shapeTween
                 }
             )
 
@@ -755,7 +756,8 @@ export class createEditCanvas extends canvas{
                     "backward":() => {
                         controller.addTween(shapeTween)
                     },
-                    "timeChange":returnInput
+                    "timeChange":returnInput,
+                    "tween":shapeTween
                 }
             )
         }

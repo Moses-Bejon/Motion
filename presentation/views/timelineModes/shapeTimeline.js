@@ -1,12 +1,17 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {clamp} from "../../../maths.js";
 import {controller} from "../../../controller.js";
-import {bumperTranslation, timelineMargin, timelineRightMenuSizePercentage} from "../../../constants.js";
+import {bumperTranslation, timelineRightMenuSizePercentage} from "../../../constants.js";
+import {timelineTween} from "./timelineTween.js";
 
 export class shapeTimeline{
     constructor(parentTimeline,shape) {
 
+        // timeline event object to event token geometry on timeline
         this.timelineEventToEventToken = new Map()
+
+        // tween model to relevant tween presentation class
+        this.tweenToTimelineTween = new Map()
 
         this.shapeSection = document.createElement("div")
         this.shapeSection.className = "timeline"
@@ -110,24 +115,53 @@ export class shapeTimeline{
         parentTimeline.shapeToTimeline.set(shape,this)
     }
 
+    possibleNewTween(tween){
+        if (!this.tweenToTimelineTween.has(tween)){
+            this.tweenToTimelineTween.set(tween,new timelineTween(this.parentTimeline,this.timelineContainer))
+        }
+    }
+
     addTimeLineEvent(event){
 
-        // we use the shapes to tell us about these types of events
-        // since they have appearance and disappearance times
-        if (event.type === "appearance" || event.type === "disappearance"){
-            return
+        switch (event.type){
+            // we use the shapes to tell us about these types of events
+            // since they have appearance and disappearance times
+            case "appearance" || "disappearance":
+                return
+
+            case "change":
+                const eventToken = document.createElement("div")
+
+                eventToken.className = "eventToken"
+                eventToken.style.backgroundColor = event.colour
+
+                eventToken.style.left = `${this.parentTimeline.timeToTimelinePosition(event.time)*100}%`
+
+                this.timelineContainer.appendChild(eventToken)
+
+                this.timelineEventToEventToken.set(event,eventToken)
+
+                break
+
+            case "tweenStart":
+
+                this.possibleNewTween(event.tween)
+
+                this.tweenToTimelineTween.get(event.tween).receiveStart(event)
+
+                break
+
+            case "tweenEnd":
+
+                this.possibleNewTween(event.tween)
+
+                this.tweenToTimelineTween.get(event.tween).receiveEnd(event)
+
+                break
+
+            default:
+                console.error("unexpected shape type",event.type)
         }
-
-        const eventToken = document.createElement("div")
-
-        eventToken.className = "eventToken"
-        eventToken.style.backgroundColor = event.colour
-
-        eventToken.style.left = `${this.parentTimeline.timeToTimelinePosition(event.time)*100}%`
-
-        this.timelineContainer.appendChild(eventToken)
-
-        this.timelineEventToEventToken.set(event,eventToken)
     }
 
     removeTimeLineEvent(event){

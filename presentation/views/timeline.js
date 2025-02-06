@@ -12,7 +12,9 @@ import {
     timelineBumperSize,
     timelineLeftMenuSize,
     timelineRightMenuSize,
-    typicalIconSize, typicalIconSizeInt
+    typicalIconSize,
+    typicalIconSizeInt,
+    eventTokenWidth
 } from "../../constants.js";
 import {clamp} from "../../maths.js";
 
@@ -110,9 +112,17 @@ template.innerHTML = `
         }
         .eventToken{
             height: calc(100% - ${timelineMargin}px - ${timelineBorderSize/2}px);
-            width: 5px;
+            width: ${eventTokenWidth};
             position: absolute;
             top: ${timelineMargin}px;
+            z-index: 1;
+        }
+        .tweenConnector{
+            height: ${eventTokenWidth};
+            
+            position: absolute;
+            top: calc(50% - ${timelineBorderSize/2}px);
+                        
             z-index: 1;
         }
         .bumper{
