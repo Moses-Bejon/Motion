@@ -119,6 +119,30 @@ export function angleBetweenThreePoints(A, B, C){
     }
 }
 
+// used to ensure the mouse angle takes into account how many full revolutions the user has made
+export class angleTracker{
+    constructor(initialPosition,centre) {
+        this.initialPosition = initialPosition
+        this.centre = centre
+        this.previousAngleModded = 0
+        this.angleDefect = 0
+    }
+
+    getNextAngle(currentPosition){
+        const angleModded = angleBetweenThreePoints(this.initialPosition,this.centre,currentPosition)
+
+        if (angleModded-this.previousAngleModded > Math.PI){
+            this.angleDefect -= 2*Math.PI
+        } else if (this.previousAngleModded-angleModded > Math.PI){
+            this.angleDefect += 2*Math.PI
+        }
+
+        this.previousAngleModded = angleModded
+
+        return this.angleDefect + angleModded
+    }
+}
+
 export function inverseTranslation(translationVector){
     return subtract2dVectors([0,0],translationVector)
 }

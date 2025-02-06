@@ -1,7 +1,7 @@
 import {controller} from "../../../controller.js";
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {
-    angleBetweenThreePoints,
+    angleBetweenThreePoints, angleTracker,
     distanceBetween2dPoints,
     inverseRotationAngle,
     inverseScale,
@@ -105,7 +105,9 @@ export class transformMode{
     }
 
     beginRotating(pointerEvent){
-        this.initialPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+        const initialPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+
+        this.angleTracker = new angleTracker(initialPosition,this.centre)
 
         pointerEvent.stopPropagation()
     }
@@ -113,7 +115,7 @@ export class transformMode{
     continueRotating(pointerEvent){
         const currentPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
-        const angle = angleBetweenThreePoints(this.initialPosition,this.centre,currentPosition)
+        const angle = this.angleTracker.getNextAngle(currentPosition)
 
         this.transform(`rotate(${angle}rad)`)
         return angle

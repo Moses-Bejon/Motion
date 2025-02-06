@@ -1,6 +1,6 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {
-    acuteAngleBetweenThreePoints, angleBetweenThreePoints,
+    acuteAngleBetweenThreePoints, angleBetweenThreePoints, angleTracker,
     getDistanceToStraightLineThrough, inverseRotationAngle, inverseScale, inverseTranslation, multiply2dVectorByScalar,
     subtract2dVectors
 } from "../../../maths.js";
@@ -158,7 +158,9 @@ export class selectionBox{
     beginDraggingRotateIcon(pointerEvent){
         this.newTransformOrigin(this.centre)
 
-        this.initialPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+        const initialPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
+
+        this.angleTracker = new angleTracker(initialPosition,this.centre)
 
         pointerEvent.stopPropagation()
     }
@@ -166,7 +168,7 @@ export class selectionBox{
     dragRotateIcon(pointerEvent){
         const currentPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
-        const angle = angleBetweenThreePoints(this.initialPosition,this.centre,currentPosition)
+        const angle = this.angleTracker.getNextAngle(currentPosition)
 
         this.transform(`rotate(${angle}rad)`)
         return angle
