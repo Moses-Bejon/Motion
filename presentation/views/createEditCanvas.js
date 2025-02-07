@@ -19,10 +19,11 @@ import {graphicMode} from "./createModes/graphicMode.js";
 import {selectionBox} from "./createModes/selectionBox.js";
 import {isLess, returnInput} from "../../maths.js";
 import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
-import {tween} from "../../model/tween.js"
 import {editMode} from "./createModes/editMode.js";
 import {shapeGroup} from "../../model/shapeGroup.js";
 import {transformMode} from "./createModes/transformMode.js";
+import {rotationTween} from "../../model/tweens/rotationTween.js";
+import {interpolateTween} from "../../model/tweens/interpolateTween.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -700,6 +701,39 @@ export class createEditCanvas extends canvas{
         }
     }
 
+    userRotate(angle,aboutCentre){
+        // a new set is used because, as this loop may run after geometry is updated, the set is changing
+
+        const selectedCopy = new Set(this.selectedShapes)
+
+        const timelineEvents = []
+
+        for (const shape of selectedCopy){
+
+            const shapeTween = new rotationTween(angle, aboutCentre, shape)
+
+            timelineEvents.push(...shapeTween.getTimelineEvents())
+        }
+
+        controller.newAction(
+            () => {
+                for (const shape of selectedCopy){
+                    shape.rotate(angle,aboutCentre)
+
+                    controller.updateShape(shape)
+                }
+            },
+            () => {
+                for (const shape of selectedCopy){
+                    shape.rotate(-angle,aboutCentre)
+
+                    controller.updateShape(shape)
+                }
+            },
+            timelineEvents
+        )
+    }
+
     userTransform(operation,inverseOperation,startState,endState){
         // a new set is used because, as this loop may run after geometry is updated, the set is changing
 
@@ -717,49 +751,9 @@ export class createEditCanvas extends canvas{
 
         for (const shape of selectedCopy){
 
-            const shapeTween = new tween(
-                controller.clock()-0.5,
-                controller.clock(),
-                startState,
-                endState,
-                operation,
-                inverseOperation,
-                shape
-            )
+            const shapeTween = new interpolateTween(startState, endState, operation, inverseOperation, shape)
 
-            timelineEvents.push(
-                {
-                    "type":"tweenStart",
-                    "shape":shape,
-                    "forward":() => {
-                        controller.addTween(shapeTween)
-                    },
-                    "backward":() => {
-                        controller.removeTween(shapeTween)
-                        shapeTween.beforeStart()
-                    },
-                    "timeChange":(time) => {
-                        return Math.max(0,time-0.5)
-                    },
-                    "tween":shapeTween
-                }
-            )
-
-            timelineEvents.push(
-                {
-                    "type":"tweenEnd",
-                    "shape":shape,
-                    "forward":() => {
-                        controller.removeTween(shapeTween)
-                        shapeTween.finish()
-                    },
-                    "backward":() => {
-                        controller.addTween(shapeTween)
-                    },
-                    "timeChange":returnInput,
-                    "tween":shapeTween
-                }
-            )
+            timelineEvents.push(...shapeTween.getTimelineEvents())
         }
 
         controller.newAction(

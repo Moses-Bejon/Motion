@@ -179,14 +179,7 @@ export class selectionBox{
 
         this.selectionBox.style.transform = null
 
-        this.editCanvas.userTransform(
-            (shape,angle) => {shape.rotate(angle,this.transformOrigin)},
-            (shape,angle) => {
-                shape.rotate(inverseRotationAngle(angle),this.transformOrigin)
-            },
-            0,
-            rotationAngle
-        )
+        this.editCanvas.userRotate(rotationAngle,this.transformOrigin)
 
         pointerEvent.stopPropagation()
     }

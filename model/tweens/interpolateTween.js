@@ -1,15 +1,16 @@
-import {controller} from "../controller.js";
+import {controller} from "../../controller.js";
+import {tween} from "./tween.js";
 
-export class tween{
-    constructor(startTime,endTime,startState,endState,operation,inverseOperation,shape) {
-        this.startTime = startTime
-        this.timeLength = endTime - this.startTime
+export class interpolateTween extends tween{
+    constructor(startState,endState,operation,inverseOperation,shape) {
+
+        super(shape)
+
         this.startState = startState
         this.endState = endState
         this.stateLength = this.endState - this.startState
         this.operation = operation
         this.inverseOperation = inverseOperation
-        this.shape = shape
 
         this.previousValue = this.startState
     }

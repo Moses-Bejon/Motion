@@ -253,6 +253,10 @@ class controllerClass{
             event.colour = randomBrightColour()
         }
 
+        if (Object.hasOwn(event,"tween") && !event.tween.modelConstructed){
+            event.tween.modelConstruct(this.clock())
+        }
+
         if (event.time <= this.clock()){
             this.eventForward(event)
         }
