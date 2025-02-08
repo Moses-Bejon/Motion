@@ -1,5 +1,6 @@
 import {text} from "../../../model/text.js";
 import {controller} from "../../../controller.js";
+import {buttonSelectedColour} from "../../../constants.js";
 
 export class textMode{
     constructor(createCanvas) {
@@ -10,7 +11,7 @@ export class textMode{
         this.ourButton = this.createCanvas.shadowRoot.getElementById("text")
 
         // indicate we are now in text mode to user
-        this.ourButton.style.backgroundColor = "#d0d0d0"
+        this.ourButton.style.backgroundColor = buttonSelectedColour
     }
 
     static acceptKeyDownOnShape(keyboardEvent,shape){

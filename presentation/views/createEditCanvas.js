@@ -8,7 +8,8 @@ import {
     animationEndTimeSeconds,
     typicalIconSize,
     thicknessLevel,
-    timelineSnapLength
+    timelineSnapLength,
+    buttonSelectedColour
 } from "../../constants.js";
 import {canvas} from "./canvas.js";
 import {drawMode} from "./createModes/drawMode.js";
@@ -92,17 +93,17 @@ button,#graphic,.realFakeButtonContainer{
 /* defined here for consistency across browsers, which I'm generally not super concerned with */
 /* however, in this case javascript is changing these colours so I need a standard */
 button{
-    background-color: #f0f0f0;
-    border: 1px solid #555;
-    border-radius: 2px;
+    background-color: #e0e0e0;
+    border: none;
+    border-radius: 0;
 }
 
 button:hover{
-    background-color: #e5e5e5;
+    background-color: #d5d5d5;
 }
 
 button:active{
-    background-color: #d0d0d0;
+    background-color: ${buttonSelectedColour};
 }
 
 /* ensures the fake graphic appears behind the real graphic */
@@ -300,10 +301,10 @@ export class createEditCanvas extends canvas{
 
         /* Simulating hover over button effect */
         graphic.onpointerenter = () => {
-            fakeGraphic.style.backgroundColor = "#e5e5e5"
+            fakeGraphic.style.backgroundColor = "#d5d5d5"
         }
         graphic.onpointerleave = () => {
-            fakeGraphic.style.backgroundColor = "#f0f0f0"
+            fakeGraphic.style.backgroundColor = "#e0e0e0"
         }
 
         this.shadowRoot.getElementById("duplicate").onpointerdown = (pointerEvent) => {

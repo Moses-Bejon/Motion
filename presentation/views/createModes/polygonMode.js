@@ -1,6 +1,6 @@
 import {manyPointsMode} from "./manyPointsMode.js";
 import {distanceBetween2dPoints} from "../../../maths.js";
-import {snappingDistance} from "../../../constants.js";
+import {buttonSelectedColour, snappingDistance} from "../../../constants.js";
 import {controller} from "../../../controller.js";
 import {drawing} from "../../../model/drawing.js";
 
@@ -18,7 +18,7 @@ export class polygonMode extends manyPointsMode{
         this.ourButton = this.createCanvas.shadowRoot.getElementById("polygon")
 
         // indicate we are now in polygon mode to user
-        this.ourButton.style.backgroundColor = "#d0d0d0"
+        this.ourButton.style.backgroundColor = buttonSelectedColour
     }
 
     // called to remove this mode

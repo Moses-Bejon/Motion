@@ -3,7 +3,7 @@ import {distanceBetween2dPoints,decimateLine} from "../../../maths.js";
 import {manyPointsMode} from "./manyPointsMode.js";
 import {drawing} from "../../../model/drawing.js";
 import {controller} from "../../../controller.js";
-import {snappingDistance} from "../../../constants.js";
+import {buttonSelectedColour, snappingDistance} from "../../../constants.js";
 
 export class drawMode extends manyPointsMode{
     constructor(createCanvas) {
@@ -21,7 +21,7 @@ export class drawMode extends manyPointsMode{
         this.ourButton = this.createCanvas.shadowRoot.getElementById("draw")
 
         // indicate we are now in draw mode to user
-        this.ourButton.style.backgroundColor = "#d0d0d0"
+        this.ourButton.style.backgroundColor = buttonSelectedColour
     }
 
     switchMode(){

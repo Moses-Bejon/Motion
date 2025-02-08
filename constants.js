@@ -42,6 +42,8 @@ export const canvasOverlayUISize = 50
 export const typicalIconSizeInt = 30
 export const typicalIconSize = `${typicalIconSizeInt}px`
 
+export const buttonSelectedColour = "#b0b0b0"
+
 // timeline positioning constants
 export const timelineMargin = 5
 export const timelineBorderSize = 2

@@ -1,5 +1,5 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
-import {maximumThickness} from "../../../constants.js";
+import {buttonSelectedColour, maximumThickness} from "../../../constants.js";
 import {midPoint2d} from "../../../maths.js";
 import {controller} from "../../../controller.js";
 import {ellipse} from "../../../model/ellipse.js";
@@ -20,7 +20,7 @@ export class ellipseMode{
         this.ourButton = this.createCanvas.shadowRoot.getElementById("ellipse")
 
         // indicate we are now in ellipse mode to user
-        this.ourButton.style.backgroundColor = "#d0d0d0"
+        this.ourButton.style.backgroundColor = buttonSelectedColour
     }
 
     static acceptKeyDownOnShape(keyboardEvent,shape){
