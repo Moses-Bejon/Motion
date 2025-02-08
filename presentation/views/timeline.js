@@ -14,7 +14,7 @@ import {
     timelineRightMenuSize,
     typicalIconSize,
     typicalIconSizeInt,
-    eventTokenWidth
+    eventTokenWidth, timelineSnapLength
 } from "../../constants.js";
 import {clamp} from "../../maths.js";
 
@@ -50,6 +50,10 @@ template.innerHTML = `
         #timeCursor{
             height: 100%;
             position: absolute;
+            
+            /*ensures elements underneath it are still selectable*/
+            pointer-events: none;
+            
             z-index: 1;
         }
         #timeCursorHead{
@@ -172,6 +176,7 @@ export class timeline extends abstractView{
 
         this.timelineDiv.onpointerdown = (pointerEvent) => {
             controller.newClockTime(this.pointerPositionToTimelinePosition(pointerEvent)*animationEndTimeSeconds)
+            this.snapToCell()
         }
 
         this.playButton = this.shadowRoot.getElementById("playButton")
@@ -320,6 +325,7 @@ export class timeline extends abstractView{
     animationStarted(){
         this.playButton.onpointerdown = (pointerEvent) => {
             controller.pauseAnimation()
+            this.snapToCell()
             pointerEvent.stopPropagation()
         }
 
@@ -343,10 +349,35 @@ export class timeline extends abstractView{
         this.cursor.previousActionTimelineEventsGone()
     }
 
+    snapToCell(){
+        const gridValue = Math.round((controller.clock() - timelineSnapLength/2)/timelineSnapLength)
+
+        controller.newClockTime(gridValue*timelineSnapLength + timelineSnapLength/2)
+
+    }
+
     acceptKeyDown(keyboardEvent){
 
-        console.log("key down")
-        console.log(keyboardEvent)
+        switch (keyboardEvent.key){
+            case " ":
+                if (controller.animationPlaying){
+                    controller.pauseAnimation()
+                    this.snapToCell()
+                } else {
+                    controller.playAnimation()
+                }
+                return true
+
+            case "ArrowRight":
+                controller.newClockTime(controller.clock()+timelineSnapLength)
+                this.snapToCell()
+                return true
+
+            case "ArrowLeft":
+                controller.newClockTime(controller.clock()-timelineSnapLength)
+                this.snapToCell()
+                return true
+        }
 
         return false
     }

@@ -28,7 +28,7 @@ export const thicknessLevel = 0.1
 // the number of seconds the animation lasts
 export const animationEndTimeSeconds = 10
 
-export const defaultTweenLength = 0.5
+export const defaultTweenLength = 0.2
 
 // snaps to grid where cells of this size
 export const timelineSnapLength = 0.2
