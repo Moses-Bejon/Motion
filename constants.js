@@ -28,6 +28,8 @@ export const thicknessLevel = 0.1
 // the number of seconds the animation lasts
 export const animationEndTimeSeconds = 10
 
+export const defaultTweenLength = 0.5
+
 // how close points have to be to be considered "connected"
 export const snappingDistance = Math.hypot(canvasWidth,canvasHeight)/100
 

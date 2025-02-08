@@ -1,5 +1,6 @@
 import {controller} from "../../controller.js";
 import {returnInput} from "../../maths.js";
+import {defaultTweenLength} from "../../constants.js";
 
 export class tween{
     constructor(shape) {
@@ -9,7 +10,7 @@ export class tween{
     }
 
     modelConstruct(timeOfConstruction){
-        this.startTime = Math.max(0,timeOfConstruction-0.5)
+        this.startTime = Math.max(0,timeOfConstruction-defaultTweenLength)
         this.timeLength = timeOfConstruction - this.startTime
 
         this.modelConstructed = true
@@ -29,7 +30,7 @@ export class tween{
                     this.beforeStart()
                 },
                 "timeChange":(time) => {
-                    return Math.max(0,time-0.5)
+                    return Math.max(0,time-defaultTweenLength)
                 },
                 "tween":this
             },
