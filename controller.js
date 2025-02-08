@@ -197,7 +197,7 @@ class controllerClass{
 
         this.removeShapeFromTimeline(shape)
 
-        if (shape.appearanceTime <= this.clock() <= shape.disappearanceTime){
+        if (shape.appearanceTime <= this.clock() && this.clock() <= shape.disappearanceTime){
             this.aggregateModels.displayShapes.content.delete(shape)
             this.removeModel("displayShapes",shape)
         }
