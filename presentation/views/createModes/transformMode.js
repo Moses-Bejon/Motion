@@ -1,12 +1,5 @@
-import {controller} from "../../../controller.js";
 import {addDragLogicTo} from "../../../dragLogic.js";
-import {
-    angleBetweenThreePoints, angleTracker,
-    distanceBetween2dPoints,
-    inverseRotationAngle,
-    inverseScale,
-    multiply2dVectorByScalar
-} from "../../../maths.js";
+import {angleTracker, distanceBetween2dPoints,} from "../../../maths.js";
 import {editMode} from "./editMode.js";
 import {rotatePath} from "../../../assets/rotatePath.js"
 import {canvasOverlayUISize} from "../../../constants.js";
@@ -92,18 +85,6 @@ export class transformMode{
         }
     }
 
-    globalTransform(transformation,inverseTransformation,startState,endState){
-        this.editCanvas.userTransform(
-            transformation,
-            inverseTransformation,
-            startState,
-            endState
-        )
-
-        this.switchMode()
-        this.editCanvas.currentMode = new editMode(this.editCanvas)
-    }
-
     beginRotating(pointerEvent){
         const initialPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
@@ -128,12 +109,10 @@ export class transformMode{
         this.scaleUI.style.transform = null
         this.editCanvas.selectionBoxGeometry.style.transform = null
 
-        this.globalTransform(
-            (shape,angle) => {shape.rotate(angle,this.transformOrigin)},
-            (shape,angle) => {shape.rotate(inverseRotationAngle(angle),this.transformOrigin)},
-            0,
-            rotationAngle
-        )
+        this.editCanvas.userRotate(rotationAngle,this.transformOrigin)
+
+        this.switchMode()
+        this.editCanvas.currentMode = new editMode(this.editCanvas)
 
         pointerEvent.stopPropagation()
     }
@@ -165,12 +144,10 @@ export class transformMode{
         this.scaleUI.style.transform = null
         this.editCanvas.selectionBoxGeometry.style.transform = null
 
-        this.globalTransform(
-            (shape,scaleFactor) => {shape.scale(scaleFactor,this.transformOrigin)},
-            (shape,scaleFactor) => {shape.scale(inverseScale(scaleFactor),this.transformOrigin)},
-            1,
-            scaleFactor
-        )
+        this.editCanvas.userScale(scaleFactor,this.transformOrigin)
+
+        this.switchMode()
+        this.editCanvas.currentMode = new editMode(this.editCanvas)
 
         pointerEvent.stopPropagation()
     }
