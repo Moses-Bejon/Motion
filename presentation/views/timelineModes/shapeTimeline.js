@@ -126,7 +126,8 @@ export class shapeTimeline{
         switch (event.type){
             // we use the shapes to tell us about these types of events
             // since they have appearance and disappearance times
-            case "appearance" || "disappearance":
+            case "appearance":
+            case "disappearance":
                 return
 
             case "change":
