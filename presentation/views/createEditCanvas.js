@@ -17,13 +17,14 @@ import {controller} from "../../controller.js";
 import {manyPointsMode} from "./createModes/manyPointsMode.js";
 import {graphicMode} from "./createModes/graphicMode.js";
 import {selectionBox} from "./createModes/selectionBox.js";
-import {isLess, returnInput} from "../../maths.js";
+import {isLess} from "../../maths.js";
 import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
 import {editMode} from "./createModes/editMode.js";
 import {shapeGroup} from "../../model/shapeGroup.js";
 import {transformMode} from "./createModes/transformMode.js";
 import {rotationTween} from "../../model/tweens/rotationTween.js";
 import {interpolateTween} from "../../model/tweens/interpolateTween.js";
+import {scaleTween} from "../../model/tweens/scaleTween.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -726,6 +727,39 @@ export class createEditCanvas extends canvas{
             () => {
                 for (const shape of selectedCopy){
                     shape.rotate(-angle,aboutCentre)
+
+                    controller.updateShape(shape)
+                }
+            },
+            timelineEvents
+        )
+    }
+
+    userScale(scaleFactor,aboutCentre){
+        // a new set is used because, as this loop may run after geometry is updated, the set is changing
+
+        const selectedCopy = new Set(this.selectedShapes)
+
+        const timelineEvents = []
+
+        for (const shape of selectedCopy){
+
+            const shapeTween = new scaleTween(scaleFactor, aboutCentre, shape)
+
+            timelineEvents.push(...shapeTween.getTimelineEvents())
+        }
+
+        controller.newAction(
+            () => {
+                for (const shape of selectedCopy){
+                    shape.scale(scaleFactor,aboutCentre)
+
+                    controller.updateShape(shape)
+                }
+            },
+            () => {
+                for (const shape of selectedCopy){
+                    shape.scale(1/scaleFactor,aboutCentre)
 
                     controller.updateShape(shape)
                 }

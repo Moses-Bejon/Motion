@@ -1,10 +1,10 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {
-    acuteAngleBetweenThreePoints, angleBetweenThreePoints, angleTracker,
-    getDistanceToStraightLineThrough, inverseRotationAngle, inverseScale, inverseTranslation, multiply2dVectorByScalar,
+    angleTracker,
+    getDistanceToStraightLineThrough,
+    multiply2dVectorByScalar,
     subtract2dVectors
 } from "../../../maths.js";
-import {controller} from "../../../controller.js";
 import {canvasOverlayUISize} from "../../../constants.js";
 
 export class selectionBox{
@@ -213,12 +213,7 @@ export class selectionBox{
 
         this.selectionBox.style.transform = null
 
-        this.editCanvas.userTransform(
-            (shape,scaleFactor) => {shape.scale(scaleFactor,this.transformOrigin)},
-            (shape,scaleFactor) => {shape.scale(inverseScale(scaleFactor),this.transformOrigin)},
-            1,
-            scaleFactor
-        )
+        this.editCanvas.userScale(scaleFactor,this.transformOrigin)
 
         pointerEvent.stopPropagation()
     }
