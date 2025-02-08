@@ -6,7 +6,7 @@ import {
     minimumThickness,
     maximumThickness,
     animationEndTimeSeconds,
-    typicalIconSize
+    typicalIconSize, thicknessLevel
 } from "../../constants.js";
 import {canvas} from "./canvas.js";
 import {drawMode} from "./createModes/drawMode.js";
@@ -177,6 +177,7 @@ p{
     <input id="thicknessSlider" 
     class="sliderVertical slider" type="range" 
     min="${minimumThickness}" max="${maximumThickness}" 
+    value="${minimumThickness+(maximumThickness-minimumThickness)*(1-thicknessLevel)}"
     step="any">
     <div id="buttonContainer">
     
