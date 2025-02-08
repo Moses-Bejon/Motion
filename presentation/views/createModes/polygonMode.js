@@ -1,6 +1,6 @@
 import {manyPointsMode} from "./manyPointsMode.js";
 import {distanceBetween2dPoints} from "../../../maths.js";
-import {animationEndTimeSeconds, snappingDistance} from "../../../constants.js";
+import {snappingDistance} from "../../../constants.js";
 import {controller} from "../../../controller.js";
 import {drawing} from "../../../model/drawing.js";
 
@@ -36,8 +36,10 @@ export class polygonMode extends manyPointsMode{
 
         if (keyboardEvent.key === "Enter"){
 
-            const shape = new drawing(0,
-                animationEndTimeSeconds,
+            const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
+
+            const shape = new drawing(start,
+                end,
                 this.drawingColour,
                 this.thickness,
                 this.pointArray)

@@ -1,5 +1,4 @@
 import {text} from "../../../model/text.js";
-import {animationEndTimeSeconds} from "../../../constants.js";
 import {controller} from "../../../controller.js";
 
 export class textMode{
@@ -58,9 +57,11 @@ export class textMode{
 
     createTextBox(pointerEvent){
 
+        const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
+
         const textShape = new text(
-            0,
-            animationEndTimeSeconds,
+            start,
+            end,
             this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
             0,
             "black"
@@ -71,7 +72,8 @@ export class textMode{
             },
             () => {
                 controller.removeShape(textShape)
-            }
+            },
+            []
         )
 
         // select the text box by default at creation (to allow the user to type in it)

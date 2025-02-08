@@ -3,7 +3,7 @@ import {distanceBetween2dPoints,decimateLine} from "../../../maths.js";
 import {manyPointsMode} from "./manyPointsMode.js";
 import {drawing} from "../../../model/drawing.js";
 import {controller} from "../../../controller.js";
-import {snappingDistance,animationEndTimeSeconds} from "../../../constants.js";
+import {snappingDistance} from "../../../constants.js";
 
 export class drawMode extends manyPointsMode{
     constructor(createCanvas) {
@@ -43,8 +43,11 @@ export class drawMode extends manyPointsMode{
 
             /* If they're not close together or there is no fill make a drawing*/
 
-            const shape = new drawing(0,
-                animationEndTimeSeconds,
+            const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
+
+            const shape = new drawing(
+                start,
+                end,
                 this.drawingColour,
                 this.thickness,
                 this.pointArray)

@@ -1,5 +1,5 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
-import {animationEndTimeSeconds, maximumThickness} from "../../../constants.js";
+import {maximumThickness} from "../../../constants.js";
 import {midPoint2d} from "../../../maths.js";
 import {controller} from "../../../controller.js";
 import {ellipse} from "../../../model/ellipse.js";
@@ -102,8 +102,11 @@ export class ellipseMode{
     endEllipse(pointerEvent){
         const [width,height,centre] = this.continueEllipse(pointerEvent)
 
-        const shape = new ellipse(0,
-            animationEndTimeSeconds,
+        const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
+
+        const shape = new ellipse(
+            start,
+            end,
             centre,
             height,
             width,

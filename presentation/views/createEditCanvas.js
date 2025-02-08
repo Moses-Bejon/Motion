@@ -6,7 +6,9 @@ import {
     minimumThickness,
     maximumThickness,
     animationEndTimeSeconds,
-    typicalIconSize, thicknessLevel
+    typicalIconSize,
+    thicknessLevel,
+    timelineSnapLength
 } from "../../constants.js";
 import {canvas} from "./canvas.js";
 import {drawMode} from "./createModes/drawMode.js";
@@ -250,6 +252,21 @@ export class createEditCanvas extends canvas{
             this.currentMode = new drawMode(this)
         }
 
+        this.persistentTemporarySwitch = this.shadowRoot.getElementById("persistentTemporarySwitch")
+
+        this.persistentTemporarySwitch.onCallback = () => {
+            this.timeToShapeAppearanceDisappearanceTime = (time) => {
+                return [time-timelineSnapLength/2,time+timelineSnapLength/2]
+            }
+        }
+
+        this.persistentTemporarySwitch.offCallback = () => {
+            this.timeToShapeAppearanceDisappearanceTime = (time) => {
+                return [0,animationEndTimeSeconds]
+            }
+        }
+
+
         this.thicknessSlider = this.shadowRoot.getElementById("thicknessSlider")
 
         this.currentMode = new drawMode(this)
@@ -363,9 +380,12 @@ export class createEditCanvas extends canvas{
             }
 
             const mergedShapes = new Set(this.selectedShapes)
+
+            const [start,end] = this.timeToShapeAppearanceDisappearanceTime(controller.clock())
+
             const mergedShape = new shapeGroup(
-                0,
-                animationEndTimeSeconds,
+                start,
+                end,
                 Array.from(mergedShapes)
             )
 

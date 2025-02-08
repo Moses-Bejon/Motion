@@ -1,4 +1,4 @@
-import {animationEndTimeSeconds, maximumThickness} from "../../../constants.js";
+import {maximumThickness} from "../../../constants.js";
 import {controller} from "../../../controller.js";
 import {polygon} from "../../../model/polygon.js";
 import {drawing} from "../../../model/drawing.js";
@@ -74,8 +74,11 @@ export class manyPointsMode{
 
         this.currentShape.prepend(polygon.fillArea(this.pointArray,fillColour))
 
-        const shape = new polygon(0,
-            animationEndTimeSeconds,
+        const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
+
+        const shape = new polygon(
+            start,
+            end,
             this.drawingColour,
             fillColour,
             this.thickness,

@@ -30,6 +30,9 @@ export const animationEndTimeSeconds = 10
 
 export const defaultTweenLength = 0.5
 
+// snaps to grid where cells of this size
+export const timelineSnapLength = 0.2
+
 // how close points have to be to be considered "connected"
 export const snappingDistance = Math.hypot(canvasWidth,canvasHeight)/100
 

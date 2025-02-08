@@ -1,3 +1,5 @@
+import {timelineSnapLength} from "../constants.js";
+
 export const model = {
     "allShapes":{
         "content": new Set(), // of shape objects
@@ -11,7 +13,7 @@ export const model = {
         "subscribers": new Set()
     },
     "clock":{
-        "content": 0, // current time in animation
+        "content": timelineSnapLength/2, // current time in animation
         "subscribers": new Set()
     },
     "displayShapes": {

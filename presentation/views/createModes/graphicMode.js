@@ -5,6 +5,10 @@ import {graphic} from "../../../model/graphic.js";
 export class graphicMode{
 
     constructor(inputFile) {
+
+        // a graphic is always a persistent shape. (persistent/temporary slider has no effect)
+        // using a different graphic for every frame of your animation would grind things to a halt
+        // as such, they are not intended to be temporary shapes
         const graphicShape = new graphic(0,animationEndTimeSeconds,[0,0],0)
 
         const fileLoadPromise = graphicShape.loadImageSource(inputFile)
