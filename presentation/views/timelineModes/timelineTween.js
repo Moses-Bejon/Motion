@@ -70,9 +70,43 @@ export class timelineTween{
         this.connector.style.right = (100-this.endPositionPercent) + "%"
         this.connector.style.backgroundColor = this.start.colour
 
+        this.connector.style.cursor = "pointer"
+        this.connector.onpointerdown = (pointerEvent) => {
+            this.select()
+            pointerEvent.stopPropagation()
+        }
+
+        this.timelineContainer.appendChild(this.connector)
         this.timelineContainer.appendChild(this.startNode)
         this.timelineContainer.appendChild(this.endNode)
-        this.timelineContainer.appendChild(this.connector)
+
+        this.select()
+    }
+
+    select(){
+
+        // only one thing can be selected at a time for timeline events
+        this.parentTimeline.deselectAll()
+
+        this.startNode.style.outline = "1px solid"
+        this.endNode.style.outline = "1px solid"
+        this.connector.style.outline = "1px solid"
+
+        this.parentTimeline.cursor.removeEventReady(
+            () => {
+                controller.removeTween(this.tween)
+            },
+            () => {
+                controller.addTimeLineEvent(this.tween.tweenStartEvent)
+                controller.addTimeLineEvent(this.tween.tweenEndEvent)
+            }
+        )
+    }
+
+    deselect(){
+        this.startNode.style.outline = "none"
+        this.endNode.style.outline = "none"
+        this.connector.style.outline = "none"
     }
 
     remove(){
@@ -145,6 +179,8 @@ export class timelineTween{
             },
             []
         )
+
+        this.select()
     }
 
     dragLeftBumper(pointerEvent){
@@ -184,5 +220,7 @@ export class timelineTween{
             },
             []
         )
+
+        this.select()
     }
 }

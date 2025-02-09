@@ -269,4 +269,14 @@ export class shapeTimeline{
             []
         )
     }
+
+    deselectAll(){
+        for (const [event,token] of this.timelineEventToEventToken){
+            token.deselect()
+        }
+
+        for (const [tween,token] of this.tweenToTimelineTween){
+            token.deselect()
+        }
+    }
 }

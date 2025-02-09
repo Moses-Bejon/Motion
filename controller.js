@@ -354,12 +354,11 @@ class controllerClass{
         console.error("Attempted to update event but previous event was not in event list",this.timelineEvents(),event)
     }
 
-    removeShapeFromTimeline(shape){
-
+    filterTimelineEvents(conditionToRemove){
         const remainingEvents = []
 
         for (const timeLineEvent of this.timelineEvents()) {
-            if (timeLineEvent.shape === shape) {
+            if (conditionToRemove(timeLineEvent)) {
                 this.removeModel("timelineEvents",timeLineEvent)
 
                 if (timeLineEvent.time <= this.clock()){
@@ -372,7 +371,20 @@ class controllerClass{
         }
 
         this.aggregateModels.timelineEvents.content = remainingEvents
+    }
 
+    removeShapeFromTimeline(shape){
+        this.filterTimelineEvents((timelineEvent) => {
+            return timelineEvent.shape === shape
+        })
+    }
+
+    removeTween(tween){
+        this.filterTimelineEvents((timelineEvent) => {
+            return timelineEvent.tween === tween
+        })
+
+        this.currentTimelineTweens.delete(tween)
     }
 
     playAnimation(){
@@ -515,11 +527,11 @@ class controllerClass{
 
     }
 
-    addTween(tween){
+    addTweenToCurrentTweens(tween){
         this.currentTimelineTweens.add(tween)
     }
 
-    removeTween(tween){
+    removeTweenFromCurrentTweens(tween){
         this.currentTimelineTweens.delete(tween)
     }
 

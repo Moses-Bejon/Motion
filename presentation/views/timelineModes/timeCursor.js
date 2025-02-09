@@ -46,6 +46,9 @@ export class timeCursor{
             pointerEvent.stopPropagation()
         }
 
+        this.removeButton = document.createElement("button")
+        this.removeButton.innerText = "Remove from timeline"
+
         const stem = document.createElement("div")
         stem.id = "timeCursorStem"
         this.cursor.appendChild(stem)
@@ -81,4 +84,18 @@ export class timeCursor{
     previousActionTimelineEventsGone(){
         this.addToTimelineButton.remove()
     }
+
+    removeEventReady(removeEvent,addEvent){
+        this.removeButton.onpointerdown = (pointerEvent) => {
+            controller.newAction(removeEvent,addEvent,[])
+            pointerEvent.stopPropagation()
+            this.removeEventGone()
+        }
+        this.buttonContainer.appendChild(this.removeButton)
+    }
+
+    removeEventGone(){
+        this.removeButton.remove()
+    }
+
 }

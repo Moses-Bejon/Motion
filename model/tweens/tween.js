@@ -22,25 +22,25 @@ export class tween{
 
     // used to handle situations where the length of the tween is zero
     startForwardNonZeroLength(){
-        controller.addTween(this)
+        controller.addTweenToCurrentTweens(this)
     }
     startForwardZeroLength(){}
     startBackwardNonZeroLength(){
-        controller.removeTween(this)
+        controller.removeTweenFromCurrentTweens(this)
         this.beforeStart()
     }
     startBackwardZeroLength(){
         this.beforeStart()
     }
     endForwardNonZeroLength(){
-        controller.removeTween(this)
+        controller.removeTweenFromCurrentTweens(this)
         this.finish()
     }
     endForwardZeroLength(){
         this.finish()
     }
     endBackwardNonZeroLength(){
-        controller.addTween(this)
+        controller.addTweenToCurrentTweens(this)
     }
     endBackwardZeroLength(){}
 

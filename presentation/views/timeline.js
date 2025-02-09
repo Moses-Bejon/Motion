@@ -371,6 +371,12 @@ export class timeline extends abstractView{
 
     }
 
+    deselectAll(){
+        for (const [shape,shapeTimeline] of this.shapeToTimeline){
+            shapeTimeline.deselectAll()
+        }
+    }
+
     acceptKeyDown(keyboardEvent){
 
         switch (keyboardEvent.key){
