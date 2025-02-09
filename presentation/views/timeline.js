@@ -176,7 +176,7 @@ export class timeline extends abstractView{
 
         this.timelineDiv.onpointerdown = (pointerEvent) => {
             controller.newClockTime(this.pointerPositionToTimelinePosition(pointerEvent)*animationEndTimeSeconds)
-            this.snapToCell()
+            this.snapTimeToCell()
         }
 
         this.playButton = this.shadowRoot.getElementById("playButton")
@@ -325,7 +325,7 @@ export class timeline extends abstractView{
     animationStarted(){
         this.playButton.onpointerdown = (pointerEvent) => {
             controller.pauseAnimation()
-            this.snapToCell()
+            this.snapTimeToCell()
             pointerEvent.stopPropagation()
         }
 
@@ -349,10 +349,18 @@ export class timeline extends abstractView{
         this.cursor.previousActionTimelineEventsGone()
     }
 
-    snapToCell(){
-        const gridValue = Math.round((controller.clock() - timelineSnapLength/2)/timelineSnapLength)
+    snapValueToCellBorder(value){
+        return Math.round(value/timelineSnapLength)*timelineSnapLength
+    }
 
-        controller.newClockTime(gridValue*timelineSnapLength + timelineSnapLength/2)
+    snapValueToCell(value){
+        return Math.round((value - timelineSnapLength/2)/timelineSnapLength)*timelineSnapLength + timelineSnapLength/2
+    }
+
+    snapTimeToCell(){
+        const gridValue = this.snapValueToCell(controller.clock())
+
+        controller.newClockTime(gridValue)
 
     }
 
@@ -362,7 +370,7 @@ export class timeline extends abstractView{
             case " ":
                 if (controller.animationPlaying){
                     controller.pauseAnimation()
-                    this.snapToCell()
+                    this.snapTimeToCell()
                 } else {
                     controller.playAnimation()
                 }
@@ -370,12 +378,12 @@ export class timeline extends abstractView{
 
             case "ArrowRight":
                 controller.newClockTime(controller.clock()+timelineSnapLength)
-                this.snapToCell()
+                this.snapTimeToCell()
                 return true
 
             case "ArrowLeft":
                 controller.newClockTime(controller.clock()-timelineSnapLength)
-                this.snapToCell()
+                this.snapTimeToCell()
                 return true
         }
 

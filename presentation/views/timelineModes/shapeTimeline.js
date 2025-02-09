@@ -1,7 +1,12 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {clamp} from "../../../maths.js";
 import {controller} from "../../../controller.js";
-import {bumperTranslation, timelineRightMenuSizePercentage} from "../../../constants.js";
+import {
+    animationEndTimeSeconds,
+    bumperTranslation,
+    timelineRightMenuSizePercentage,
+    timelineSnapLength
+} from "../../../constants.js";
 import {timelineTween} from "./timelineTween.js";
 
 export class shapeTimeline{
@@ -201,7 +206,7 @@ export class shapeTimeline{
 
         const newEndProportion = clamp(
             this.endProportion + this.parentTimeline.globalWidthToTimelineWidth(currentPosition-this.initialPosition),
-            this.startProportion,
+            this.startProportion+timelineSnapLength/animationEndTimeSeconds,
             1
         )
 
@@ -214,7 +219,7 @@ export class shapeTimeline{
         const newEnd = this.dragRightBumper(pointerEvent)
 
         const previousTime = this.endTime
-        const newTime = this.parentTimeline.timeLinePositionToTime(newEnd)
+        const newTime = this.parentTimeline.snapValueToCellBorder(this.parentTimeline.timeLinePositionToTime(newEnd))
 
         controller.newAction(
             () => {
@@ -235,7 +240,7 @@ export class shapeTimeline{
         const newStartProportion = clamp(
             this.startProportion + this.parentTimeline.globalWidthToTimelineWidth(currentPosition-this.initialPosition),
             0,
-            this.endProportion
+            this.endProportion-timelineSnapLength/animationEndTimeSeconds
         )
 
         this.timeline.style.left = 100*newStartProportion + "%"
@@ -248,7 +253,7 @@ export class shapeTimeline{
         const newStart = this.dragLeftBumper(pointerEvent)
 
         const previousTime = this.startTime
-        const newTime = this.parentTimeline.timeLinePositionToTime(newStart)
+        const newTime = this.parentTimeline.snapValueToCellBorder(this.parentTimeline.timeLinePositionToTime(newStart))
 
         controller.newAction(
             () => {
