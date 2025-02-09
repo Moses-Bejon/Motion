@@ -282,6 +282,8 @@ class controllerClass{
                     this.eventBackward(event)
                 }
 
+                this.currentTimelineTweens.delete(event.tween)
+
                 this.removeModel("timelineEvents",this.timelineEvents()[i])
 
                 return
