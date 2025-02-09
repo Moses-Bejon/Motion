@@ -92,6 +92,9 @@ export class timelineTween{
         this.endNode.style.outline = "1px solid"
         this.connector.style.outline = "1px solid"
 
+        // after it is selected, it is no longer clickable
+        this.connector.style.cursor = "auto"
+
         this.parentTimeline.cursor.removeEventReady(
             () => {
                 controller.removeTween(this.tween)
@@ -107,6 +110,9 @@ export class timelineTween{
         this.startNode.style.outline = "none"
         this.endNode.style.outline = "none"
         this.connector.style.outline = "none"
+
+        // when it is deselected, it is clickable to select it again
+        this.connector.style.cursor = "pointer"
     }
 
     remove(){
