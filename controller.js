@@ -234,17 +234,17 @@ class controllerClass{
         const now = this.clock()
 
         // ensure we are at the correct point in time when we go forward
-        this.newClockTime(event.time)
+        this.goBackwardToEvent(event)
         event.forward()
-        this.newClockTime(now)
+        this.goForwardToTime(now)
     }
 
     eventBackward(event){
         const now = this.clock()
 
-        this.newClockTime(event.time)
+        this.goForwardToEvent(event)
         event.backward()
-        this.newClockTime(now)
+        this.goBackwardToTime(now)
     }
 
     addTimeLineEvent(event){
@@ -257,12 +257,12 @@ class controllerClass{
             event.tween.modelConstruct(this.clock())
         }
 
+        this.insertIntoTimeline(event)
+        event.shape.addTimelineEvent(event)
+
         if (event.time <= this.clock()){
             this.eventForward(event)
         }
-
-        this.insertIntoTimeline(event)
-        event.shape.addTimelineEvent(event)
 
         this.addModel("timelineEvents",event)
     }
@@ -274,13 +274,14 @@ class controllerClass{
         for (let i = 0; i<this.timelineEvents().length;i++){
             if (this.timelineEvents()[i] === event){
 
+                this.removeIndexFromTimeline(i)
+                event.shape.removeTimelineEvent(this.timelineEvents()[i])
+
                 if (i <= this.currentTimelineEvent){
                     this.eventBackward(event)
                 }
 
-                event.shape.removeTimelineEvent(this.timelineEvents()[i])
                 this.removeModel("timelineEvents",this.timelineEvents()[i])
-                this.removeIndexFromTimeline(i)
 
                 return
             }
@@ -329,17 +330,19 @@ class controllerClass{
         for (let i = 0; i<this.timelineEvents().length; i++){
             if (this.timelineEvents()[i] === event){
 
-                if (event.time > this.clock() && newTime <= this.clock()){
+                const previousTime = event.time
+                event.time = newTime
+
+                this.removeIndexFromTimeline(i)
+                this.insertIntoTimeline(event)
+
+                if (previousTime > this.clock() && newTime <= this.clock()){
                     this.eventForward(event)
-                } else if (event.time <= this.clock() && newTime > this.clock()){
+                } else if (previousTime <= this.clock() && newTime > this.clock()){
                     this.eventBackward(event)
                 }
 
-                event.time = newTime
-
                 this.updateModel("timelineEvents",event)
-                this.removeIndexFromTimeline(i)
-                this.insertIntoTimeline(event)
 
                 return
             }
@@ -413,6 +416,43 @@ class controllerClass{
         for (const subscriber of this.animationPlayingSubscribers){
             subscriber.animationPaused()
         }
+    }
+
+    goForwardToEvent(event){
+        // for every event between now and last event
+        for (let i = this.currentTimelineEvent+1;i<this.timelineEvents().length;i++){
+            const nextEvent = this.timelineEvents()[i]
+
+            if (nextEvent === event){
+
+                // we are just before the place where the time is greater than us
+                this.currentTimelineEvent = i-1
+                return
+            }
+
+            nextEvent.forward()
+        }
+
+        this.currentTimelineEvent = this.timelineEvents().length-1
+    }
+
+    goBackwardToEvent(event){
+
+        // for every event between now and first event
+        for (let i = this.currentTimelineEvent;i>=0;i--){
+
+            const previousEvent = this.timelineEvents()[i]
+
+            if (previousEvent === event){
+
+                this.currentTimelineEvent = i
+                return
+            }
+
+            previousEvent.backward()
+        }
+
+        this.currentTimelineEvent = -1
     }
 
     goForwardToTime(time){
