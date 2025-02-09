@@ -89,6 +89,8 @@ template.innerHTML = `
             position: relative;
             top: -${typicalIconSizeInt/2}px;
             white-space: nowrap;
+            
+            pointer-events: auto;
         }
         #timeCursorStem{
             height: calc(100% - ${typicalIconSize});
@@ -354,6 +356,11 @@ export class timeline extends abstractView{
     }
 
     snapValueToCell(value){
+
+        if (value === animationEndTimeSeconds){
+            return timelineSnapLength*Math.floor(animationEndTimeSeconds/timelineSnapLength) - timelineSnapLength/2
+        }
+
         return Math.round((value - timelineSnapLength/2)/timelineSnapLength)*timelineSnapLength + timelineSnapLength/2
     }
 

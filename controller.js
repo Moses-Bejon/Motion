@@ -4,6 +4,7 @@ import {randomBrightColour} from "./random.js"
 import {action} from "./model/action.js";
 import {rootAction} from "./model/rootAction.js";
 import {animationEndTimeSeconds} from "./constants.js";
+import {clamp} from "./maths.js";
 
 class controllerClass{
     constructor() {
@@ -494,6 +495,8 @@ class controllerClass{
     }
 
     newClockTime(time){
+
+        time = clamp(time,0,animationEndTimeSeconds)
 
         if (time < this.clock()){
             this.goBackwardToTime(time)
