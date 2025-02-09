@@ -398,16 +398,11 @@ export class timeline extends abstractView{
     }
 
     acceptKeyUp(keyboardEvent){
-
-        console.log("key up")
-        console.log(keyboardEvent)
-
         return false
     }
 
-    // clean up animations when we lose focus
+    // here for polymorphic reasons
     loseFocus(){
-        console.log("lost focus")
     }
 }
 
