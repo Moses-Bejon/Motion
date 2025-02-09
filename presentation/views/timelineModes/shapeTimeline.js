@@ -122,7 +122,7 @@ export class shapeTimeline{
 
     possibleNewTween(tween){
         if (!this.tweenToTimelineTween.has(tween)){
-            this.tweenToTimelineTween.set(tween,new timelineTween(this.parentTimeline,this.timelineContainer))
+            this.tweenToTimelineTween.set(tween,new timelineTween(this.parentTimeline,this.timelineContainer,tween))
         }
     }
 
@@ -172,12 +172,14 @@ export class shapeTimeline{
 
     removeTimeLineEvent(event){
 
-        if (!this.timelineEventToEventToken.has(event)){
-            return
+        if (event.type === "change"){
+            this.timelineEventToEventToken.get(event).remove()
+            this.timelineEventToEventToken.delete(event)
+        } else if (event.type === "tweenStart"){
+            this.tweenToTimelineTween.get(event.tween).removeStart()
+        } else if (event.type === "tweenEnd"){
+            this.tweenToTimelineTween.get(event.tween).removeEnd()
         }
-
-        this.timelineEventToEventToken.get(event).remove()
-        this.timelineEventToEventToken.delete(event)
     }
 
     updatePosition(){

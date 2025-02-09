@@ -16,6 +16,14 @@ export class tween{
         this.modelConstructed = true
     }
 
+    newStartTime(startTime){
+        this.timeLength += this.startTime-startTime
+        this.startTime = startTime
+    }
+
+    newEndTime(endTime){
+        this.timeLength = endTime-this.startTime
+    }
 
     getTimelineEvents(){
         return [
