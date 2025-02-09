@@ -46,6 +46,7 @@ template.innerHTML = `
             width: ${typicalIconSize};
             height: ${typicalIconSize};
             user-select: none;
+            cursor: pointer;
         }
         #timeCursor{
             height: 100%;
