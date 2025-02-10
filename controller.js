@@ -359,6 +359,9 @@ class controllerClass{
 
         for (const timeLineEvent of this.timelineEvents()) {
             if (conditionToRemove(timeLineEvent)) {
+
+                timeLineEvent.shape.removeTimelineEvent(timeLineEvent)
+
                 this.removeModel("timelineEvents",timeLineEvent)
 
                 if (timeLineEvent.time <= this.clock()){
