@@ -21,17 +21,12 @@ export class shapeTimeline{
         this.shapeSection = document.createElement("div")
         this.shapeSection.className = "timeline"
 
-        const labelDropdownContainer = document.createElement("div")
-        labelDropdownContainer.className = "labelDropdownContainer"
-
-        const dropDown = document.createElement("img")
-        dropDown.src = "assets/dropdown.svg"
-        dropDown.className = "dropdown"
-        labelDropdownContainer.appendChild(dropDown)
+        const labelContainer = document.createElement("div")
+        labelContainer.className = "labelContainer"
 
         this.label = document.createElement("h2")
         this.label.innerText = shape.name
-        labelDropdownContainer.appendChild(this.label)
+        labelContainer.appendChild(this.label)
 
         this.parentTimeline = parentTimeline
         this.shape = shape
@@ -111,7 +106,7 @@ export class shapeTimeline{
             "ew-resize"
         )
 
-        this.shapeSection.appendChild(labelDropdownContainer)
+        this.shapeSection.appendChild(labelContainer)
 
         this.timelineContainer.appendChild(this.timeline)
         this.shapeSection.appendChild(this.timelineContainer)

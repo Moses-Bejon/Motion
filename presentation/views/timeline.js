@@ -140,7 +140,7 @@ template.innerHTML = `
             background-color: black;
             position: absolute;
         }
-        .labelDropdownContainer{
+        .labelContainer{
             width: ${timelineLeftMenuSizePercentage}%;
             overflow: hidden;
             
