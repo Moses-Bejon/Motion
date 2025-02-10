@@ -143,18 +143,6 @@ export class angleTracker{
     }
 }
 
-export function inverseTranslation(translationVector){
-    return subtract2dVectors([0,0],translationVector)
-}
-
-export function inverseRotationAngle(angle){
-    return 2*Math.PI-angle
-}
-
-export function inverseScale(scale){
-    return 1/scale
-}
-
 // simplifies a line - Ramer-Douglas-Peucker algorithm
 export function decimateLine(line,epsilon){
     return [line[0]].concat(decimateLineRecursivePart(line,epsilon)).concat([line[line.length-1]])
