@@ -216,23 +216,6 @@ class controllerClass{
         }
     }
 
-    eventForward(event){
-        const now = this.clock()
-
-        // ensure we are at the correct point in time when we go forward
-        this.goBackwardToEvent(event)
-        event.forward()
-        this.goForwardToTime(now)
-    }
-
-    eventBackward(event){
-        const now = this.clock()
-
-        this.goForwardToEvent(event)
-        event.backward()
-        this.goBackwardToTime(now)
-    }
-
     addTimeLineEvent(event){
 
         if (!Object.hasOwn(event,"colour")){
@@ -247,7 +230,7 @@ class controllerClass{
         event.shape.addTimelineEvent(event)
 
         if (event.time <= this.clock()){
-            this.eventForward(event)
+            event.forward()
         }
 
         this.addModel("timelineEvents",event)
@@ -264,7 +247,7 @@ class controllerClass{
                 event.shape.removeTimelineEvent(this.timelineEvents()[i])
 
                 if (i <= this.currentTimelineEvent){
-                    this.eventBackward(event)
+                    event.backward()
                 }
 
                 this.currentTimelineTweens.delete(event.tween)
@@ -325,9 +308,9 @@ class controllerClass{
                 this.insertIntoTimeline(event)
 
                 if (previousTime > this.clock() && newTime <= this.clock()){
-                    this.eventForward(event)
+                    event.forward()
                 } else if (previousTime <= this.clock() && newTime > this.clock()){
-                    this.eventBackward(event)
+                    event.backward()
                 }
 
                 this.updateModel("timelineEvents",event)
@@ -419,43 +402,6 @@ class controllerClass{
         for (const subscriber of this.animationPlayingSubscribers){
             subscriber.animationPaused()
         }
-    }
-
-    goForwardToEvent(event){
-        // for every event between now and last event
-        for (let i = this.currentTimelineEvent+1;i<this.timelineEvents().length;i++){
-            const nextEvent = this.timelineEvents()[i]
-
-            if (nextEvent === event){
-
-                // we are just before the place where the time is greater than us
-                this.currentTimelineEvent = i-1
-                return
-            }
-
-            nextEvent.forward()
-        }
-
-        this.currentTimelineEvent = this.timelineEvents().length-1
-    }
-
-    goBackwardToEvent(event){
-
-        // for every event between now and first event
-        for (let i = this.currentTimelineEvent;i>=0;i--){
-
-            const previousEvent = this.timelineEvents()[i]
-
-            if (previousEvent === event){
-
-                this.currentTimelineEvent = i
-                return
-            }
-
-            previousEvent.backward()
-        }
-
-        this.currentTimelineEvent = -1
     }
 
     goForwardToTime(time){
