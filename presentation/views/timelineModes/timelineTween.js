@@ -86,7 +86,7 @@ export class timelineTween{
 
     updateTweenLength(){
         // ensures, the longer the tween, the closer to the back
-        const zIndex = Math.floor(1000/(this.tween.timeLength+1))
+        const zIndex = Math.floor(1000000/(this.tween.timeLength+1))
 
         this.startNode.style.zIndex = zIndex
         this.connector.style.zIndex = zIndex
