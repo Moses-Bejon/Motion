@@ -78,6 +78,8 @@ template.innerHTML = `
             background-color: transparent;
             border: none;
             color: black;
+
+            pointer-events: auto;
             
             /* text outline in white */
             text-shadow: 
