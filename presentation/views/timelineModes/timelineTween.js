@@ -80,7 +80,17 @@ export class timelineTween{
         this.timelineContainer.appendChild(this.startNode)
         this.timelineContainer.appendChild(this.endNode)
 
+        this.updateTweenLength()
         this.select()
+    }
+
+    updateTweenLength(){
+        // ensures, the longer the tween, the closer to the back
+        const zIndex = Math.floor(1000/(this.tween.timeLength+1))
+
+        this.startNode.style.zIndex = zIndex
+        this.connector.style.zIndex = zIndex
+        this.endNode.style.zIndex = zIndex
     }
 
     select(){
@@ -186,6 +196,7 @@ export class timelineTween{
             []
         )
 
+        this.updateTweenLength()
         this.select()
     }
 
@@ -227,6 +238,7 @@ export class timelineTween{
             []
         )
 
+        this.updateTweenLength()
         this.select()
     }
 }

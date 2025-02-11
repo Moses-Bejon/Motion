@@ -36,6 +36,10 @@ export class shapeTimeline{
         this.timelineContainer.style.height = "100%"
         this.timelineContainer.style.position = "relative"
 
+        // setting up a local stacking context, so the super high z indices in this window don't leak
+        // (I need them to be high to ensure that thinner tweens are above thicker tweens)
+        this.timelineContainer.style.zIndex = 0
+
         for (const timelineEvent of shape.timelineEvents){
             if (timelineEvent.type === "appearance"){
                 this.appearanceEvent = timelineEvent
