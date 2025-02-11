@@ -22,7 +22,36 @@ export class shape{
         this.ZIndex = newZIndex
         this.name = name
 
+        // once the controller knows about us we create our appearance and disappearance events
+        this.appearanceEvent = {
+            "type": "appearance",
+            "shape": this,
+            "time": this.appearanceTime,
+            "forward": () => {controller.showShape(this)},
+            "backward": () => {controller.hideShape(this)}
+        }
+        this.disappearanceEvent = {
+            "type": "disappearance",
+            "shape": this,
+            "time": this.disappearanceTime,
+            "forward": () => {controller.hideShape(this)},
+            "backward": () => {controller.showShape(this)}
+        }
+
+        controller.addTimeLineEvent(this.appearanceEvent)
+        controller.addTimeLineEvent(this.disappearanceEvent)
+
         this.modelConstructed = true
+    }
+
+    newAppearanceTime(newTime){
+        this.appearanceTime = newTime
+        controller.changeTimeOfEvent(this.appearanceEvent,newTime)
+    }
+
+    newDisappearanceTime(newTime){
+        this.disappearanceTime = newTime
+        controller.changeTimeOfEvent(this.disappearanceEvent,newTime)
     }
 
     getPosition(){
