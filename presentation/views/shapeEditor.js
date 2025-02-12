@@ -21,6 +21,21 @@ floatInput.type = "number"
 const colourInput = document.createElement("input")
 colourInput.type = "color"
 
+const fonts = ["Helvetica", "Arial", "Verdana", "Tahoma", "Trebuchet MS", "Times New Roman",
+    "Georgia","Garamond", "Courier New", "Brush Script MT"]
+
+const fontSelector = document.createElement("select")
+
+for (const font of fonts){
+    const fontOption = document.createElement("option")
+
+    fontOption.value = font
+    fontOption.innerText = font
+    fontOption.style.fontFamily = font
+
+    fontSelector.appendChild(fontOption)
+}
+
 const shapePropertyToInput = {
     "Appearance time": floatInput,
     "Disappearance time": floatInput
@@ -51,7 +66,8 @@ const shapeToShapeProperties = {
     "text":{
         "Text":stringInput,
         "Font colour":colourInput,
-        "Font size (pt)":floatInput
+        "Font size (pt)":floatInput,
+        "Font":fontSelector
     }
 }
 
@@ -115,6 +131,9 @@ const nameToChangeFunction = {
         value = Math.max(0,value)
 
         shape.geometryAttributeUpdate("fontSize",value)
+    },
+    "Font": (shape,value) => {
+        shape.geometryAttributeUpdate("fontFamily",value)
     }
 }
 
@@ -150,7 +169,10 @@ const nameToGetFunction = {
         return shape.fontColour
     },
     "Font size (pt)":(shape) => {
-        return shape.fontSize
+        return parseFloat(shape.fontSize.toPrecision(5))
+    },
+    "Font":(shape) => {
+        return shape.fontFamily
     }
 }
 
@@ -167,10 +189,11 @@ const nameToValidation =   {
     // all values from html inputs are guaranteed to be strings
     // validation for stuff like possible code insertion is done in text.js
     // (not for security, but for client convenience and to prevent unexpected behaviour, as is client side anyway)
-    "Text":returnInput,
+    "Text":()=>{return true},
 
     "Font colour":validateColour,
-    "Font size (pt)":validateReal
+    "Font size (pt)":validateReal,
+    "Font":()=>{return true}
 }
 
 const template = document.createElement("template")

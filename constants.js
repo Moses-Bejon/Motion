@@ -1,6 +1,6 @@
 // global constants are defined here
 
-export const fontFamily = "Helvetica,sans-serif"
+export const fontFamily = "Helvetica"
 export const fontSizeInt = 12
 export const fontSize = `${fontSizeInt}pt`
 
