@@ -51,6 +51,7 @@ export class text extends shape{
 
         text.style.fontFamily = this.fontFamily
         text.style.fontSize = `${this.fontSize}pt`
+        text.style.fill = this.fontColour
         text.style.userSelect = "none"
         text.style.whiteSpace = "normal"
 

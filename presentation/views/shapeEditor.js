@@ -9,8 +9,11 @@ import {
     typicalIconSize,
     typicalIconSizeInt
 } from "../../constants.js";
-import {clamp} from "../../maths.js";
+import {clamp, returnInput} from "../../maths.js";
 import {validateColour,validateReal} from "../../dataStructureOperations.js";
+
+const stringInput = document.createElement("input")
+stringInput.type = "text"
 
 const floatInput = document.createElement("input")
 floatInput.type = "number"
@@ -27,6 +30,28 @@ const shapeToShapeProperties = {
     "drawing":{
         "Colour":colourInput,
         "Thickness":floatInput
+    },
+    "polygon":{
+        "Colour":colourInput,
+        "Thickness":floatInput,
+        "Polygon fill":colourInput
+    },
+    "ellipse":{
+        "Outline colour":colourInput,
+        "Width":floatInput,
+        "Height":floatInput,
+        "Colour":colourInput,
+        "Thickness":floatInput
+    },
+    "graphic":{
+        "Width":floatInput,
+        "Height":floatInput
+    },
+    "shapeGroup":{},
+    "text":{
+        "Text":stringInput,
+        "Font colour":colourInput,
+        "Font size (pt)":floatInput
     }
 }
 
@@ -57,6 +82,39 @@ const nameToChangeFunction = {
         value = Math.max(minimumThickness,value)
 
         shape.geometryAttributeUpdate("thickness",value)
+    },
+    "Polygon fill": (shape,value) => {
+        shape.geometryAttributeUpdate("fillColour",value)
+    },
+    "Outline colour": (shape,value) => {
+        shape.geometryAttributeUpdate("outlineColour",value)
+    },
+    "Width": (shape,value) => {
+        // validation
+        value = parseFloat(value)
+        value = Math.max(0,value)
+
+        shape.geometryAttributeUpdate("width",value)
+    },
+    "Height": (shape,value) => {
+        // validation
+        value = parseFloat(value)
+        value = Math.max(0,value)
+
+        shape.geometryAttributeUpdate("height",value)
+    },
+    "Text": (shape,value) => {
+        shape.geometryAttributeUpdate("text",value)
+    },
+    "Font colour": (shape,value) => {
+        shape.geometryAttributeUpdate("fontColour",value)
+    },
+    "Font size (pt)": (shape,value) => {
+        // validation
+        value = parseFloat(value)
+        value = Math.max(0,value)
+
+        shape.geometryAttributeUpdate("fontSize",value)
     }
 }
 
@@ -72,6 +130,27 @@ const nameToGetFunction = {
     },
     "Thickness": (shape) => {
         return parseFloat(shape.thickness.toPrecision(5))
+    },
+    "Polygon fill": (shape) => {
+        return shape.fillColour
+    },
+    "Outline colour": (shape) => {
+        return shape.outlineColour
+    },
+    "Width":(shape) => {
+        return parseFloat(shape.width.toPrecision(5))
+    },
+    "Height":(shape) => {
+        return parseFloat(shape.height.toPrecision(5))
+    },
+    "Text":(shape) => {
+        return shape.text
+    },
+    "Font colour":(shape) => {
+        return shape.fontColour
+    },
+    "Font size (pt)":(shape) => {
+        return shape.fontSize
     }
 }
 
@@ -79,7 +158,19 @@ const nameToValidation =   {
     "Appearance time": validateReal,
     "Disappearance time": validateReal,
     "Colour":validateColour,
-    "Thickness":validateReal
+    "Thickness":validateReal,
+    "Polygon fill":validateColour,
+    "Outline colour":validateColour,
+    "Width":validateReal,
+    "Height":validateReal,
+
+    // all values from html inputs are guaranteed to be strings
+    // validation for stuff like possible code insertion is done in text.js
+    // (not for security, but for client convenience and to prevent unexpected behaviour, as is client side anyway)
+    "Text":returnInput,
+
+    "Font colour":validateColour,
+    "Font size (pt)":validateReal
 }
 
 const template = document.createElement("template")
@@ -118,7 +209,7 @@ template.innerHTML = `
         }
         .input{
             min-width: 50px;
-            width: 10%;
+            width: 20%;
         }
     </style>
     <h1 id="shapeName"></h1>

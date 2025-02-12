@@ -4,10 +4,8 @@ import {
     getEdgesOfBoxAfterRotation,
     getRotateByAngle,
     increment2dVectorBy,
-    isLess,
     scale2dVectorAboutPoint
 } from "../maths.js";
-import {maximumOfArray} from "../dataStructureOperations.js";
 
 export class graphic extends shape{
     constructor(appearanceTime,disappearanceTime,topLeft,rotation){
@@ -75,6 +73,7 @@ export class graphic extends shape{
 
         clonedImage.style.width = this.width
         clonedImage.style.height = this.height
+        clonedImage.setAttribute("preserveAspectRatio","none")
         clonedImage.setAttribute("x",this.topLeft[0])
         clonedImage.setAttribute("y",this.topLeft[1])
 
