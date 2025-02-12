@@ -508,6 +508,17 @@ class controllerClass{
 
     keyDown(event){
 
+        // find active element
+        let activeElement = document.activeElement
+        while (activeElement.shadowRoot) {
+            activeElement = activeElement.shadowRoot.activeElement
+        }
+
+        // if the active element is an input it gets priority
+        if (activeElement.tagName === "INPUT"){
+            return
+        }
+
         // item that is being hovered over is the top priority for inputs
         if (this.hoveringOver?.acceptKeyDown(event)){
             event.preventDefault()
