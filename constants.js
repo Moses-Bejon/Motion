@@ -42,6 +42,9 @@ export const canvasOverlayUISize = 50
 export const typicalIconSizeInt = 30
 export const typicalIconSize = `${typicalIconSizeInt}px`
 
+export const fullScreenAndDropdownContainerWidthInt = 2*typicalIconSizeInt
+export const fullScreenAndDropdownContainerWidth = fullScreenAndDropdownContainerWidthInt + "px"
+
 export const buttonSelectedColour = "#b0b0b0"
 
 // timeline positioning constants
