@@ -21,8 +21,9 @@ floatInput.type = "number"
 const colourInput = document.createElement("input")
 colourInput.type = "color"
 
-const fonts = ["Helvetica", "Arial", "Verdana", "Tahoma", "Trebuchet MS", "Times New Roman",
-    "Georgia","Garamond", "Courier New", "Brush Script MT"]
+const fonts = ["Arial","Roboto", "Sofia", "Coming Soon", "Pangolin", "Comic Neue", "Balsamiq Sans",
+    "EB Garamond","Old Standard TT", "Playwrite NG Modern", "Modern Antiqua","Doto","Tiny5","Jolly Lodger",
+    "Yellowtail","Zilla Slab"]
 
 const fontSelector = document.createElement("select")
 
@@ -121,6 +122,7 @@ const nameToChangeFunction = {
     },
     "Text": (shape,value) => {
         shape.geometryAttributeUpdate("text",value)
+        this.defaultTextReplaced = true
     },
     "Font colour": (shape,value) => {
         shape.geometryAttributeUpdate("fontColour",value)
