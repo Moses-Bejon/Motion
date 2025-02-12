@@ -10,6 +10,7 @@ import {
     typicalIconSizeInt
 } from "../../constants.js";
 import {clamp} from "../../maths.js";
+import {validateColour,validateReal} from "../../dataStructureOperations.js";
 
 const floatInput = document.createElement("input")
 floatInput.type = "number"
@@ -72,6 +73,13 @@ const nameToGetFunction = {
     "Thickness": (shape) => {
         return parseFloat(shape.thickness.toPrecision(5))
     }
+}
+
+const nameToValidation =   {
+    "Appearance time": validateReal,
+    "Disappearance time": validateReal,
+    "Colour":validateColour,
+    "Thickness":validateReal
 }
 
 const template = document.createElement("template")
@@ -224,6 +232,14 @@ export class shapeEditor extends abstractView{
     }
 
     updateProperty(propertyName,newValue){
+
+        // validated to false
+        if (!nameToValidation[propertyName](newValue)){
+            // don't touch the controller and just rebuild everything from scratch
+            this.updateAggregateModel("selectedShapes",controller.selectedShapes())
+            return
+        }
+
         const shapesAffected = []
 
         for (const shape of this.selectedShapesOrdered) {

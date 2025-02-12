@@ -61,3 +61,14 @@ export function binarySearch(list,value,listToValue=(value)=>{return value}){
         }
     }
 }
+
+export function validateReal(possibleNumber){
+    possibleNumber = parseFloat(possibleNumber)
+
+    return !isNaN(possibleNumber)
+}
+
+export function validateColour(colour){
+    const regularExpression = /^#([0-9]|[A-F]|[a-f]){6}$/
+    return regularExpression.test(colour)
+}
