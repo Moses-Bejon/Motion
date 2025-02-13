@@ -389,16 +389,22 @@ export class shapeEditor extends abstractView{
 
         const timelineEvents = []
 
-        for (let i = 0; i<shapesAffected.length;i++){
-            timelineEvents.push(
-                {
-                    "type":"change",
-                    "shape":shapesAffected[i],
-                    "forward":() => {changeFunction(shapesAffected[i],newValue)},
-                    "backward":() => {changeFunction(shapesAffected[i],previousValues[i])},
-                    "timeChange":returnInput
-                }
-            )
+        if (nameToTimelineEvents[propertyName]) {
+            for (let i = 0; i < shapesAffected.length; i++) {
+                timelineEvents.push(
+                    {
+                        "type": "change",
+                        "shape": shapesAffected[i],
+                        "forward": () => {
+                            changeFunction(shapesAffected[i], newValue)
+                        },
+                        "backward": () => {
+                            changeFunction(shapesAffected[i], previousValues[i])
+                        },
+                        "timeChange": returnInput
+                    }
+                )
+            }
         }
 
         controller.newAction(
