@@ -89,7 +89,6 @@ class controllerClass{
     }
 
     redoAction(){
-
         if (this.previousAction.nextAction === undefined){
             return
         }
@@ -345,9 +344,22 @@ class controllerClass{
     }
 
     removeShapeFromTimeline(shape){
-        this.filterTimelineEvents((timelineEvent) => {
-            return timelineEvent.shape === shape
-        })
+        const remainingEvents = []
+
+        for (const timeLineEvent of this.timelineEvents()) {
+            if (timeLineEvent.shape === shape) {
+                this.removeModel("timelineEvents",timeLineEvent)
+
+                if (timeLineEvent.time <= this.clock()){
+                    this.currentTimelineEvent --
+                }
+
+            } else {
+                remainingEvents.push(timeLineEvent)
+            }
+        }
+
+        this.aggregateModels.timelineEvents.content = remainingEvents
     }
 
     removeTween(tween){

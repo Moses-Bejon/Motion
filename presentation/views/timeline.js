@@ -304,8 +304,7 @@ export class timeline extends abstractView{
                 const shape = this.shapeToTimeline.get(model.shape)
 
                 shape.updatePosition()
-                shape.removeTimeLineEvent(model)
-                shape.addTimeLineEvent(model)
+                shape.updateTimeLineEvent(model)
 
                 break
             default:

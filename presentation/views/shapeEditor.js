@@ -122,7 +122,7 @@ const nameToChangeFunction = {
     },
     "Text": (shape,value) => {
         shape.geometryAttributeUpdate("text",value)
-        this.defaultTextReplaced = true
+        shape.defaultTextReplaced = true
     },
     "Font colour": (shape,value) => {
         shape.geometryAttributeUpdate("fontColour",value)
@@ -196,6 +196,21 @@ const nameToValidation =   {
     "Font colour":validateColour,
     "Font size (pt)":validateReal,
     "Font":()=>{return true}
+}
+
+const nameToTimelineEvents = {
+    "Appearance time": false,
+    "Disappearance time": false,
+    "Colour": true,
+    "Thickness": true,
+    "Polygon fill": true,
+    "Outline colour": true,
+    "Width": true,
+    "Height": true,
+    "Text": true,
+    "Font colour":true,
+    "Font size (pt)": true,
+    "Font": true
 }
 
 const template = document.createElement("template")
@@ -372,6 +387,20 @@ export class shapeEditor extends abstractView{
 
         const changeFunction = nameToChangeFunction[propertyName]
 
+        const timelineEvents = []
+
+        for (let i = 0; i<shapesAffected.length;i++){
+            timelineEvents.push(
+                {
+                    "type":"change",
+                    "shape":shapesAffected[i],
+                    "forward":() => {changeFunction(shapesAffected[i],newValue)},
+                    "backward":() => {changeFunction(shapesAffected[i],previousValues[i])},
+                    "timeChange":returnInput
+                }
+            )
+        }
+
         controller.newAction(
             () => {
                 for (const shape of shapesAffected){
@@ -383,7 +412,7 @@ export class shapeEditor extends abstractView{
                     changeFunction(shapesAffected[i],previousValues[i])
                 }
             },
-            []
+            timelineEvents
         )
     }
 

@@ -8,6 +8,7 @@ import {
     timelineSnapLength
 } from "../../../constants.js";
 import {timelineTween} from "./timelineTween.js";
+import {timelineChange} from "./timelineChange.js";
 
 export class shapeTimeline{
     constructor(parentTimeline,shape) {
@@ -135,16 +136,7 @@ export class shapeTimeline{
                 return
 
             case "change":
-                const eventToken = document.createElement("div")
-
-                eventToken.className = "eventToken"
-                eventToken.style.backgroundColor = event.colour
-
-                eventToken.style.left = `${this.parentTimeline.timeToTimelinePosition(event.time)*100}%`
-
-                this.timelineContainer.appendChild(eventToken)
-
-                this.timelineEventToEventToken.set(event,eventToken)
+                this.timelineEventToEventToken.set(event,new timelineChange(this.parentTimeline,this.timelineContainer,event))
 
                 break
 
@@ -178,6 +170,18 @@ export class shapeTimeline{
             this.tweenToTimelineTween.get(event.tween).removeStart()
         } else if (event.type === "tweenEnd"){
             this.tweenToTimelineTween.get(event.tween).removeEnd()
+        }
+    }
+
+    updateTimeLineEvent(event){
+        if (event.type === "change"){
+            this.timelineEventToEventToken.get(event).update()
+        } else if (event.type === "tweenStart"){
+            this.tweenToTimelineTween.get(event.tween).removeStart()
+            this.tweenToTimelineTween.get(event.tween).receiveStart(event)
+        } else if (event.type === "tweenEnd"){
+            this.tweenToTimelineTween.get(event.tween).removeEnd()
+            this.tweenToTimelineTween.get(event.tween).receiveEnd(event)
         }
     }
 
