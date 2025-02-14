@@ -10,7 +10,8 @@ const typesOfWindow = {
     "vertically split":"vertically-split-window",
     "canvas":"create-edit-canvas",
     "timeline":"time-line",
-    "shape editor":"shape-editor"
+    "shape editor":"shape-editor",
+    "overview":"over-view"
 }
 
 const template = document.createElement("template")
