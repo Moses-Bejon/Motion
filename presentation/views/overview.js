@@ -18,6 +18,9 @@ template.innerHTML = `
         }
         .shapeListing,.selectedShapeListing{
             border: 1px solid lightgray;
+            height: ${typicalIconSize};
+            display: flex;
+            justify-content: space-between;
         }
         .selectedShapeListing{
             background-color: darkgray;
@@ -32,6 +35,12 @@ template.innerHTML = `
             background-color: transparent;
             border: none;
             color: black;
+            flex-grow: 1;
+            flex-shrink: 1;
+            min-width: 0;
+        }
+        .overviewButton{
+            cursor: pointer;
         }
     </style>
     <button id="newDirectoryButton">New Directory</button>
@@ -113,6 +122,20 @@ export class overview extends abstractView{
             }
 
             shapeListing.appendChild(shapeName)
+
+            const deleteButton = document.createElement("img")
+            deleteButton.className = "overviewButton"
+            deleteButton.src = "assets/trash.svg"
+            deleteButton.alt = "Delete shape button"
+
+            deleteButton.onpointerdown = (pointerEvent) => {
+                controller.removeShape(model)
+
+                // prevents the shape from then being selected after being removed
+                pointerEvent.stopPropagation()
+            }
+
+            shapeListing.appendChild(deleteButton)
 
             this.shapesList.appendChild(shapeListing)
 
