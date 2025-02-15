@@ -56,6 +56,7 @@ export class overview extends abstractView{
         this.shapesList = this.shadowRoot.getElementById("shapesList")
 
         this.shapeToShapeListing = new Map()
+        this.shapeListingToShape = new Map()
     }
 
     connectedCallback() {
@@ -85,6 +86,15 @@ export class overview extends abstractView{
         }
     }
 
+    selectBetween(element1,element2){
+        while (element1.nextSibling !== element2){
+            element1 = element1.nextSibling
+            if (element1.className === "shapeListing"){
+                controller.selectShape(this.shapeListingToShape.get(element1))
+            }
+        }
+    }
+
     addModel(aggregateModel,model){
         this.errorCheckAggregateModel(aggregateModel)
 
@@ -93,8 +103,40 @@ export class overview extends abstractView{
             shapeListing.className = "shapeListing"
 
             shapeListing.onpointerdown = (pointerEvent) => {
-                if (pointerEvent.shiftKey){
+                if (pointerEvent.ctrlKey){
                     controller.selectShape(model)
+                } else if (pointerEvent.shiftKey){
+
+                    // select elements between selected shape and clicked shape, including clicked shape
+
+                    // if it's not selected, select it. This means we now only have to select the shapes between it
+                    // and a selected shape
+                    if (!controller.isSelected(model)){
+                        controller.selectShape(model)
+                    }
+
+                    let listing = shapeListing
+
+                    // search backward until selected shape found. We prioritise going down.
+                    while (listing.previousSibling !== null){
+                        listing = listing.previousSibling
+                        if (listing.className === "selectedShapeListing"){
+                            this.selectBetween(listing,shapeListing)
+                            return
+                        }
+                    }
+
+                    listing = shapeListing
+
+                    // otherwise go forward
+                    while (listing.nextSibling !== null){
+                        listing = listing.nextSibling
+                        if (listing.className === "selectedShapeListing"){
+                            this.selectBetween(shapeListing,listing)
+                            return
+                        }
+                    }
+
                 } else {
                     controller.newAggregateModel("selectedShapes",new Set([model]))
                 }
@@ -111,7 +153,7 @@ export class overview extends abstractView{
 
                 for (const shape of controller.allShapes()){
                     if (shape.name === shapeName.value){
-                        alert("You cannot give a shape the name another shape has used")
+                        alert("You cannot give a shape the same name as another shape")
                         shapeName.value = model.name
                         return
                     }
@@ -140,6 +182,7 @@ export class overview extends abstractView{
             this.shapesList.appendChild(shapeListing)
 
             this.shapeToShapeListing.set(model,shapeListing)
+            this.shapeListingToShape.set(shapeListing,model)
 
             return
         }
