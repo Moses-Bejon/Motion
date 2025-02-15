@@ -41,6 +41,10 @@ class controllerClass{
         // used to ensure each new shape is placed higher than the last
         this.ZIndexOfHighestShape = 0
 
+        // to know which directory we should add shapes to, null indicates to not add it to a directory
+        this.selectedDirectorySubscribers = new Set()
+        this.selectedDirectory = null
+
         document.addEventListener("keydown",this.keyDown.bind(this))
         document.addEventListener("keyup",this.keyUp.bind(this))
     }
@@ -172,7 +176,7 @@ class controllerClass{
             }
             const shapeName = shapeType + " " + this.numberOfEachTypeOfShape[shapeType]
 
-            shape.modelConstruct(this.ZIndexOfHighestShape, shapeName)
+            shape.modelConstruct(this.ZIndexOfHighestShape, shapeName,this.selectedDirectory)
 
             this.ZIndexOfHighestShape++
         } else {
@@ -488,6 +492,64 @@ class controllerClass{
 
     removeTweenFromCurrentTweens(tween){
         this.currentTimelineTweens.delete(tween)
+    }
+
+    newSelectedDirectory(directory){
+        for (const subscriber of this.selectedDirectorySubscribers){
+            subscriber.newSelectedDirectory(directory,this.selectedDirectory)
+        }
+        this.selectedDirectory = directory
+    }
+
+    deselectSelectedDirectory(){
+        for (const subscriber of this.selectedDirectorySubscribers){
+            subscriber.deselectSelectedDirectory(this.selectedDirectory)
+        }
+        this.selectedDirectory = null
+    }
+
+    deselectDirectory(directory){
+        if (this.selectedDirectory === directory){
+            this.deselectSelectedDirectory()
+        }
+    }
+
+    deleteDirectory(directory){
+
+        // new set required as this.allShapes() is actively modified while we remove shapes
+        const allShapesCopy = new Set(this.allShapes())
+
+        for (const shape of allShapesCopy){
+            if (shape.directory === directory){
+                this.removeShape(shape)
+            }
+        }
+
+        this.deselectDirectory(directory)
+    }
+
+    changeDirectoryName(oldName,newName){
+
+        if (this.selectedDirectory === oldName){
+            this.selectedDirectory = newName
+        }
+
+        for (const shape of this.allShapes()){
+            if (shape.directory === oldName){
+                shape.directory = newName
+            }
+
+            this.updateShape(shape)
+        }
+    }
+
+    subscribeToSelectedDirectory(subscriber){
+        this.selectedDirectorySubscribers.add(subscriber)
+        subscriber.newSelectedDirectory(this.selectedDirectory)
+    }
+
+    unsubscribeFromSelectedDirectory(subscriber){
+        this.selectedDirectorySubscribers.delete(subscriber)
     }
 
     newFocus(focus){

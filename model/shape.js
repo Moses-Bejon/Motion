@@ -18,9 +18,12 @@ export class shape{
 
     // the function should only be called once
     // the modelConstructed boolean is used to ensure the controller doesn't do this twice
-    modelConstruct(newZIndex,name){
+    modelConstruct(newZIndex,name,directory){
         this.ZIndex = newZIndex
         this.name = name
+
+        // indicates which directory I am a part of
+        this.directory = directory
 
         // once the controller knows about us we create our appearance and disappearance events
         this.appearanceEvent = {
