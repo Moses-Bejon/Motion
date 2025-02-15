@@ -148,6 +148,15 @@ class controllerClass{
         this.addModel("selectedShapes",shape)
     }
 
+    deselectShape(shape){
+        if (!this.isSelected(shape)){
+            return
+        }
+
+        this.aggregateModels.selectedShapes.content.delete(shape)
+        this.removeModel("selectedShapes",shape)
+    }
+
     isSelected(shape){
         return this.selectedShapes().has(shape);
     }

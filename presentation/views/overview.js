@@ -104,7 +104,13 @@ export class overview extends abstractView{
 
             shapeListing.onpointerdown = (pointerEvent) => {
                 if (pointerEvent.ctrlKey){
-                    controller.selectShape(model)
+
+                    // if it's selected, deselect it instead
+                    if (controller.isSelected(model)){
+                        controller.deselectShape(model)
+                    } else {
+                        controller.selectShape(model)
+                    }
                 } else if (pointerEvent.shiftKey){
 
                     // select elements between selected shape and clicked shape, including clicked shape
