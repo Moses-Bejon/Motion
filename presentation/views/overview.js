@@ -34,7 +34,7 @@ template.innerHTML = `
         .withinDirectory{
             position: relative;
             left: ${typicalIconSize};
-            width: calc(100% - ${typicalIconSize});
+            width: calc(100% - ${typicalIconSize} - 2px);
         }
         .shapeName,.directoryName{
             background-color: transparent;
