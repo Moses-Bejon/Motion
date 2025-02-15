@@ -470,15 +470,28 @@ export class overview extends abstractView{
         this.errorCheckAggregateModel(aggregateModel)
 
         if (aggregateModel === "allShapes") {
+            for (const [directoryListing,directory] of this.directoryListingToDirectory){
+                if (directoryListing.innerShapes.has(this.shapeToShapeListing.get(model))){
+                    directoryListing.innerShapes.delete(this.shapeToShapeListing.get(model))
+
+                    if (directoryListing.innerShapes.size === 0){
+                        directoryListing.remove()
+                        this.directoryListingToDirectory.delete(directoryListing)
+                        this.directoryToDirectoryListing.delete(directory)
+                    }
+                }
+            }
+
             this.shapeToShapeListing.get(model).remove()
             this.shapeListingToShape.delete(this.shapeToShapeListing.get(model))
             this.shapeToShapeListing.delete(model)
+
             return
         }
 
         // otherwise, selected shapes must have updated
-        this.shapeToShapeListing.get(model).classList.remove("selectedShapeListing")
-        this.shapeToShapeListing.get(model).classList.add("shapeListing")
+        this.shapeToShapeListing.get(model)?.classList.remove("selectedShapeListing")
+        this.shapeToShapeListing.get(model)?.classList.add("shapeListing")
     }
 
     // here for polymorphic reasons
