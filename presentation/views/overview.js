@@ -5,10 +5,14 @@ import {typicalIconSizeInt,typicalIconSize} from "../../constants.js";
 const template = document.createElement("template")
 template.innerHTML = `
     <style>
-        #newDirectoryButton{
+        #buttonsContainer{
             position: relative;
             left: ${typicalIconSizeInt*2}px;
             height: ${typicalIconSizeInt}px;
+            display: flex;
+        }
+        #newDirectoryButton,#moveToDirectoryButton{
+            height: 100%;
             cursor: pointer;
         }
         #shapesList{
@@ -54,7 +58,10 @@ template.innerHTML = `
             cursor: pointer;
         }
     </style>
-    <button id="newDirectoryButton">New Directory</button>
+    <div id="buttonsContainer">
+        <button id="newDirectoryButton">New directory</button>
+        <button id="moveToDirectoryButton">Move to directory</button>
+    </div>
     <div id="shapesList"></div>
 `
 
@@ -87,6 +94,23 @@ export class overview extends abstractView{
 
             for (const shape of controller.selectedShapes()){
                 shape.directory = directoryName
+
+                controller.updateShape(shape)
+            }
+        }
+
+        this.shadowRoot.getElementById("moveToDirectoryButton").onpointerdown = (pointerEvent) => {
+
+            pointerEvent.stopPropagation()
+            pointerEvent.preventDefault()
+
+            if (controller.selectedShapes().size === 0){
+                alert("Please select the shapes you want to put into this directory")
+                return
+            }
+
+            for (const shape of controller.selectedShapes()){
+                shape.directory = controller.selectedDirectory
 
                 controller.updateShape(shape)
             }
