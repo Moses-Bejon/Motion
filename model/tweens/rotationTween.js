@@ -16,11 +16,7 @@ export class rotationTween extends tween{
         this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getPosition())
     }
 
-    goToTime(time){
-        const currentAngle = this.totalAngle*(time-this.startTime)/this.timeLength
-
-        const angleToRotate = currentAngle-this.previousAngle
-
+    rotateByAngle(angle){
         const centre = add2dVectors(
             this.shape.getPosition(),
             subtract2dVectors(
@@ -31,20 +27,32 @@ export class rotationTween extends tween{
 
         const positionBeforeRotation = this.shape.getPosition()
 
-        this.shape.rotate(angleToRotate,centre)
+        this.shape.rotate(angle,centre)
 
         increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getPosition(),positionBeforeRotation))
 
         controller.updateShape(this.shape)
+    }
+
+    goToTime(time){
+        const currentAngle = this.totalAngle*(time-this.startTime)/this.timeLength
+
+        const angleToRotate = currentAngle-this.previousAngle
+
+        this.rotateByAngle(angleToRotate)
 
         this.previousAngle = currentAngle
     }
 
     finish(){
-        this.goToTime(this.startTime+this.timeLength)
+        this.rotateByAngle(this.totalAngle-this.previousAngle)
+
+        this.previousAngle = this.totalAngle
     }
 
     beforeStart(){
-        this.goToTime(this.startTime)
+        this.rotateByAngle(-this.previousAngle)
+
+        this.previousAngle = 0
     }
 }

@@ -16,11 +16,7 @@ export class scaleTween extends tween{
         this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getPosition())
     }
 
-    goToTime(time){
-        const currentScale = 1+(this.totalScale-1)*(time-this.startTime)/this.timeLength
-
-        const amountToScale = currentScale/this.previousScale
-
+    scaleBy(scaleFactor){
         const centre = add2dVectors(
             this.shape.getPosition(),
             subtract2dVectors(
@@ -31,20 +27,32 @@ export class scaleTween extends tween{
 
         const positionBeforeScale = this.shape.getPosition()
 
-        this.shape.scale(amountToScale,centre)
+        this.shape.scale(scaleFactor,centre)
 
         increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getPosition(),positionBeforeScale))
 
         controller.updateShape(this.shape)
+    }
+
+    goToTime(time){
+        const currentScale = 1+(this.totalScale-1)*(time-this.startTime)/this.timeLength
+
+        const amountToScale = currentScale/this.previousScale
+
+        this.scaleBy(amountToScale)
 
         this.previousScale = currentScale
     }
 
     finish(){
-        this.goToTime(this.startTime+this.timeLength)
+        this.scaleBy(this.totalScale/this.previousScale)
+
+        this.previousScale = this.totalScale
     }
 
     beforeStart(){
-        this.goToTime(this.startTime)
+        this.scaleBy(1/this.previousScale)
+
+        this.previousScale = 1
     }
 }
