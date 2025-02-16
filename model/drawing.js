@@ -38,6 +38,28 @@ export class drawing extends shape{
         return circle
     }
 
+    save(){
+        const shapeSave = super.save()
+
+        shapeSave.colour = this.colour
+        shapeSave.thickness = this.thickness
+        shapeSave.points = this.points
+        shapeSave.shapeType = "drawing"
+
+        return shapeSave
+    }
+
+    load(save){
+        super.load(save)
+
+        this.colour = save.colour
+        this.thickness = save.thickness
+        this.points = save.points
+
+        this.updateGeometry()
+
+    }
+
     getNewGeometryGroup(){
         const newGeometry = document.createElementNS("http://www.w3.org/2000/svg","g")
 

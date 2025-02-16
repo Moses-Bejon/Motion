@@ -2,8 +2,24 @@
 
 import {controller} from "./controller.js";
 
+document.getElementById("saveButton").onpointerdown = controller.saveFile.bind(controller)
 document.getElementById("undoButton").onpointerdown = controller.undoAction.bind(controller)
 document.getElementById("redoButton").onpointerdown = controller.redoAction.bind(controller)
+
+const loadButton = document.getElementById("loadButton")
+const fakeLoadButton = document.getElementById("fakeLoadButton")
+
+/* Simulating hover over button effect */
+loadButton.onpointerenter = () => {
+        fakeLoadButton.style.backgroundColor = "#d5d5d5"
+}
+loadButton.onpointerleave = () => {
+        fakeLoadButton.style.backgroundColor = "#e0e0e0"
+}
+
+loadButton.oninput = (input) => {
+        controller.loadFile(input.target.files[0])
+}
 
 const topEdge = document.getElementById("topEdge")
 const leftEdge = document.getElementById("leftEdge")

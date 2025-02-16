@@ -8,14 +8,47 @@
 #banner{
     position: fixed;
     top: 0;
-    left: 0;
+    left: var(--margin);
     height: var(--banner-height);
+    display: flex;
 
     user-select: none;
 }
 
 .bannerButton{
     height: 100%;
+}
+
+.realFakeButtonContainer{
+    width: 50px;
+    height: var(--banner-height);
+}
+
+#fakeLoadButton,#loadButton{
+    width: 50px;
+    height: var(--banner-height);
+    position: relative;
+}
+
+#loadButton{
+    opacity: 0;
+    top: -100%;
+}
+
+/* defined here for consistency across browsers, which I'm generally not super concerned with */
+/* however, in this case javascript is changing these colours so I need a standard */
+button{
+    background-color: #e0e0e0;
+    border: none;
+    border-radius: 0;
+}
+
+button:hover{
+    background-color: #d5d5d5;
+}
+
+button:active{
+    background-color: #b0b0b0;
 }
 
 #rootWindow{

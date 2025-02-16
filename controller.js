@@ -710,6 +710,111 @@ class controllerClass{
     unsubscribeToPreviousActionTimelineEvents(subscriber){
         this.previousActionTimelineEventsSubscribers.delete(subscriber)
     }
+
+    saveFile(){
+
+        const fileName = window.prompt("Enter file name:","untitled")
+
+        // if user clicks cancel
+        if (fileName === null){
+            return
+        }
+
+        const file = {
+            "fileVersion":0,
+            "aggregateModels":{"allShapes":[],"timelineEvents":[],"clock":this.clock()},
+            "allTweens":[],
+            "numberOfEachTypeOfShape":this.numberOfEachTypeOfShape,
+            "ZIndexOfHighestShape":this.ZIndexOfHighestShape,
+            "rootWindow":{}
+        }
+
+        const allShapes = []
+        for (const shape of this.allShapes()){
+            allShapes.push(shape.save())
+        }
+
+        file.aggregateModels.allShapes = allShapes
+
+        const jsonFile = JSON.stringify(file)
+
+        const blob = new Blob([jsonFile], { type: 'application/json' })
+
+        // Temporary anchor element
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = fileName
+
+        // Trigger download
+        document.body.appendChild(a)
+        a.click()
+
+        document.body.removeChild(a)
+        URL.revokeObjectURL(a.href)
+    }
+
+    async loadFile(file){
+
+        try {
+            file = await this.readJSONFile(file)
+        } catch (error){
+            throw error
+        }
+
+        // all the aggregate models are permanent, and should be saved at the end of session
+        this.aggregateModels = model
+
+        // ordered list of views that hear about keyboard inputs
+        // the higher in the hierarchy, the more likely informed (more "in focus")
+        this.inputSubscribersHierarchy = []
+
+        // used as pointer to undo/redo stack, which is implemented as a linked list
+        this.previousAction = new rootAction()
+
+        this.previousActionTimelineEventsSubscribers = new Set()
+
+        // index of the timeline event in forward state closest to current time i.e. the one that's just been done
+        // -1 if there are no timeline events or none in forward state
+        this.currentTimelineEvent = -1
+
+        // all the tweens the controller should think about when updating
+        this.currentTimelineTweens = new Set()
+
+        this.newClockTime(file.aggregateModels.clock)
+
+        // shapes that views want to copy
+        this.copiedShapes = []
+
+        // subscribers to alert when playback stops/starts
+        this.animationPlayingSubscribers = new Set()
+        this.animationPlaying = false
+
+        this.numberOfEachTypeOfShape = file.numberOfEachTypeOfShape
+
+        // used to ensure each new shape is placed higher than the last
+        this.ZIndexOfHighestShape = file.ZIndexOfHighestShape
+
+        // to know which directory we should add shapes to, null indicates to not add it to a directory
+        this.selectedDirectorySubscribers = new Set()
+        this.selectedDirectory = null
+    }
+
+    readJSONFile(JSONFile){
+
+        const fileReader = new FileReader()
+
+        return new Promise((resolve, reject) => {
+            fileReader.onload = () => {
+                try {
+                    resolve(JSON.parse(fileReader.result))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+            fileReader.onerror = () => reject(fileReader.error)
+            fileReader.readAsText(JSONFile)
+        })
+    }
 }
 
 export const controller = new controllerClass()

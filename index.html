@@ -15,7 +15,10 @@
 <body>
     <div id="banner">
         <button id="saveButton" class="bannerButton">Save</button>
-        <button id="loadButton" class="bannerButton">Load</button>
+        <div class="realFakeButtonContainer bannerButton">
+            <button id="fakeLoadButton">Load</button>
+            <input type="file" id="loadButton">
+        </div>
         <button id="undoButton" class="bannerButton">Undo</button>
         <button id="redoButton" class="bannerButton">Redo</button>
     </div>

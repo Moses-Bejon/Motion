@@ -47,6 +47,26 @@ export class shape{
         this.modelConstructed = true
     }
 
+    save(){
+        return {
+            "name":this.name,
+            "directory":this.directory,
+            "appearanceTime":this.appearanceTime,
+            "disappearanceTime":this.disappearanceTime,
+            "ZIndex":this.ZIndex
+        }
+    }
+
+    load(save){
+        this.name = save.name
+        this.directory = save.directory
+        this.appearanceTime = save.appearanceTime
+        this.disappearanceTime = save.disappearanceTime
+        this.ZIndex = save.ZIndex
+
+        this.modelConstructed = true
+    }
+
     newAppearanceTime(newTime){
         this.appearanceTime = newTime
         controller.changeTimeOfEvent(this.appearanceEvent,newTime)
