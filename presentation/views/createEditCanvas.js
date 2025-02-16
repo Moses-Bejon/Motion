@@ -20,7 +20,7 @@ import {controller} from "../../controller.js";
 import {manyPointsMode} from "./createModes/manyPointsMode.js";
 import {graphicMode} from "./createModes/graphicMode.js";
 import {selectionBox} from "./createModes/selectionBox.js";
-import {isLess} from "../../maths.js";
+import {isLess, multiply2dVectorByScalar} from "../../maths.js";
 import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
 import {editMode} from "./createModes/editMode.js";
 import {shapeGroup} from "../../model/shapeGroup.js";
@@ -28,6 +28,7 @@ import {transformMode} from "./createModes/transformMode.js";
 import {rotationTween} from "../../model/tweens/rotationTween.js";
 import {interpolateTween} from "../../model/tweens/interpolateTween.js";
 import {scaleTween} from "../../model/tweens/scaleTween.js";
+import {translationTween} from "../../model/tweens/translateTween.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -790,24 +791,16 @@ export class createEditCanvas extends canvas{
         )
     }
 
-    userTransform(operation,inverseOperation,startState,endState){
+    userTranslate(translationVector){
         // a new set is used because, as this loop may run after geometry is updated, the set is changing
 
         const selectedCopy = new Set(this.selectedShapes)
 
         const timelineEvents = []
 
-        const transformation = (shape) => {
-            operation(shape,endState)
-        }
-
-        const inverseTransformation = (shape) => {
-            inverseOperation(shape,endState)
-        }
-
         for (const shape of selectedCopy){
 
-            const shapeTween = new interpolateTween(startState, endState, operation, inverseOperation, shape)
+            const shapeTween = new translationTween(translationVector, shape)
 
             timelineEvents.push(...shapeTween.getTimelineEvents())
         }
@@ -815,14 +808,14 @@ export class createEditCanvas extends canvas{
         controller.newAction(
             () => {
                 for (const shape of selectedCopy){
-                    transformation(shape)
+                    shape.translate(translationVector)
 
                     controller.updateShape(shape)
                 }
             },
             () => {
                 for (const shape of selectedCopy){
-                    inverseTransformation(shape)
+                    shape.translate(multiply2dVectorByScalar(-1,translationVector))
 
                     controller.updateShape(shape)
                 }

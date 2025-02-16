@@ -243,12 +243,7 @@ export class selectionBox{
 
         const translation = subtract2dVectors(currentSelectionPosition,this.previousSelectionPosition)
 
-        this.editCanvas.userTransform(
-            (shape,tweenPoint) => {shape.translate(multiply2dVectorByScalar(tweenPoint,translation))},
-            (shape,tweenPoint) => {shape.translate(multiply2dVectorByScalar(-tweenPoint,translation))},
-            0,
-            1
-        )
+        this.editCanvas.userTranslate(translation)
 
         this.selectionBox.style.transform = null
 
