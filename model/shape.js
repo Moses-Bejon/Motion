@@ -48,12 +48,20 @@ export class shape{
     }
 
     save(){
+
+        const savedTimelineEvents = []
+
+        for (const timelineEvent of this.timelineEvents){
+            savedTimelineEvents.push(controller.saveTimelineEvent(timelineEvent))
+        }
+
         return {
             "name":this.name,
             "directory":this.directory,
             "appearanceTime":this.appearanceTime,
             "disappearanceTime":this.disappearanceTime,
-            "ZIndex":this.ZIndex
+            "ZIndex":this.ZIndex,
+            "timelineEvents":savedTimelineEvents
         }
     }
 
@@ -63,6 +71,12 @@ export class shape{
         this.appearanceTime = save.appearanceTime
         this.disappearanceTime = save.disappearanceTime
         this.ZIndex = save.ZIndex
+
+        this.timelineEvents = new Set()
+
+        for (const timelineEvent of save.timelineEvents){
+            this.timelineEvents.add(controller.loadTimelineEvent(this,timelineEvent))
+        }
 
         this.modelConstructed = true
     }

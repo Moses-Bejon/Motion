@@ -21,6 +21,36 @@ export class ellipse extends shape{
         this.updateGeometry()
     }
 
+    save(){
+        const shapeSave = super.save()
+
+        shapeSave.centre = this.centre
+        shapeSave.height = this.height
+        shapeSave.width = this.width
+        shapeSave.outlineColour = this.outlineColour
+        shapeSave.colour = this.colour
+        shapeSave.rotation = this.rotation
+        shapeSave.thickness = this.thickness
+
+        shapeSave.shapeType = "ellipse"
+
+        return shapeSave
+    }
+
+    load(save){
+        super.load(save)
+
+        this.centre = save.centre
+        this.height = save.height
+        this.width = save.width
+        this.outlineColour = save.outlineColour
+        this.colour = save.colour
+        this.rotation = save.rotation
+        this.thickness = save.thickness
+
+        this.updateGeometry()
+    }
+
     updateGeometry(){
         const geometryGroup = document.createElementNS("http://www.w3.org/2000/svg","g")
 

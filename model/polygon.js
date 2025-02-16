@@ -25,6 +25,24 @@ export class polygon extends drawing{
         return polygon
     }
 
+    save(){
+        const shapeSave = super.save()
+
+        shapeSave.fillColour = this.fillColour
+
+        shapeSave.shapeType = "polygon"
+
+        return shapeSave
+    }
+
+    load(save){
+        super.load(save)
+
+        this.fillColour = save.fillColour
+
+        this.updateGeometry()
+    }
+
     updateGeometry() {
         super.updateGeometry()
 

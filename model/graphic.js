@@ -15,6 +15,26 @@ export class graphic extends shape{
         this.rotation = rotation
     }
 
+    save(){
+        const shapeSave = super.save()
+
+        shapeSave.topLeft = this.topLeft
+        shapeSave.rotation = this.rotation
+
+        shapeSave.shapeType = "graphic"
+
+        return shapeSave
+    }
+
+    load(save){
+        super.load(save)
+
+        this.topLeft = save.topLeft
+        this.rotation = save.rotation
+
+        this.updateGeometry()
+    }
+
     // as loading up a new image source can take a while, it is separate from the update geometry and constructor logic
     loadImageSource(source){
         const fileReader = new FileReader()

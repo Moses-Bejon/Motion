@@ -5,6 +5,15 @@ import {action} from "./model/action.js";
 import {rootAction} from "./model/rootAction.js";
 import {animationEndTimeSeconds} from "./constants.js";
 import {clamp} from "./maths.js";
+import {drawing} from "./model/drawing.js";
+import {shapeGroup} from "./model/shapeGroup.js";
+import {ellipse} from "./model/ellipse.js";
+import {graphic} from "./model/graphic.js";
+import {polygon} from "./model/polygon.js";
+import {text} from "./model/text.js";
+import {translationTween} from "./model/tweens/translateTween.js";
+import {rotationTween} from "./model/tweens/rotationTween.js";
+import {scaleTween} from "./model/tweens/scaleTween.js";
 
 class controllerClass{
     constructor() {
@@ -720,9 +729,14 @@ class controllerClass{
             return
         }
 
+        const now = this.clock()
+
+        // when we load the file we start here
+        this.newClockTime(0)
+
         const file = {
             "fileVersion":0,
-            "aggregateModels":{"allShapes":[],"timelineEvents":[],"clock":this.clock()},
+            "aggregateModels":{"allShapes":[],"clock":now},
             "allTweens":[],
             "numberOfEachTypeOfShape":this.numberOfEachTypeOfShape,
             "ZIndexOfHighestShape":this.ZIndexOfHighestShape,
@@ -730,11 +744,21 @@ class controllerClass{
         }
 
         const allShapes = []
+        this.shapeToReference = new Map()
+
+        this.allTweens = []
+        this.tweenToReference = new Map()
+
+        let i = 0
         for (const shape of this.allShapes()){
             allShapes.push(shape.save())
+            this.shapeToReference.set(shape,i)
+
+            i++
         }
 
         file.aggregateModels.allShapes = allShapes
+        file.allTweens = this.allTweens
 
         const jsonFile = JSON.stringify(file)
 
@@ -751,6 +775,100 @@ class controllerClass{
 
         document.body.removeChild(a)
         URL.revokeObjectURL(a.href)
+
+        this.newClockTime(now)
+    }
+
+    saveTimelineEvent(timelineEvent){
+        const savedTimelineEvent = {
+            "type":timelineEvent.type,
+            "time":timelineEvent.time,
+            "colour":timelineEvent.colour
+        }
+
+        if (Object.hasOwn(timelineEvent,"tween")){
+            if (!this.tweenToReference.has(timelineEvent.tween)){
+                this.tweenToReference.set(timelineEvent.tween,this.allTweens.length)
+                this.allTweens.push(timelineEvent.tween.save())
+            }
+
+            savedTimelineEvent.tween = this.tweenToReference.get(timelineEvent.tween)
+        }
+
+        return savedTimelineEvent
+    }
+
+    loadTimelineEvent(shape,savedTimelineEvent){
+
+        let timelineEvent
+
+        if (Object.hasOwn(savedTimelineEvent,"tween")){
+
+            if (!this.tweenReferenceToLoadedTween.has(savedTimelineEvent.tween)){
+
+                const tween = this.allTweens[savedTimelineEvent.tween]
+
+                let loadedTween
+
+                switch (tween.tweenType){
+                    case "translationTween":
+                        loadedTween = new translationTween([0,0],shape)
+                        break
+                    case "rotationTween":
+                        loadedTween = new rotationTween(0,[0,0],shape)
+                        break
+                    case "scaleTween":
+                        loadedTween = new scaleTween(1,[0,0],shape)
+                        break
+                    default:
+                        console.error("unrecognised tween type",tween.tweenType)
+                }
+
+                loadedTween.load(tween)
+
+                this.tweenReferenceToLoadedTween.set(savedTimelineEvent.tween,loadedTween)
+            }
+
+            if (savedTimelineEvent.type === "tweenStart"){
+                timelineEvent = this.tweenReferenceToLoadedTween.get(savedTimelineEvent.tween).getTweenStartEvent()
+            } else {
+                timelineEvent = this.tweenReferenceToLoadedTween.get(savedTimelineEvent.tween).getTweenEndEvent()
+            }
+
+            timelineEvent.time = savedTimelineEvent.time
+            timelineEvent.colour = savedTimelineEvent.colour
+
+        } else {
+            timelineEvent = {
+                "type":savedTimelineEvent.type,
+                "time":savedTimelineEvent.time,
+                "colour":savedTimelineEvent.colour,
+                "shape": shape
+            }
+
+            switch (savedTimelineEvent.type){
+                case "appearance":
+                    timelineEvent.forward = () => {
+                        controller.showShape(shape)
+                    }
+                    timelineEvent.backward = () => {
+                        controller.hideShape(shape)
+                    }
+                    break
+                case "disappearance":
+                    timelineEvent.forward = () => {
+                        controller.hideShape(shape)
+                    }
+                    timelineEvent.backward = () => {
+                        controller.showShape(shape)
+                    }
+                    break
+                default:
+                    console.error("unrecognised shape type",savedTimelineEvent.type)
+            }
+        }
+
+        return timelineEvent
     }
 
     async loadFile(file){
@@ -761,9 +879,12 @@ class controllerClass{
             throw error
         }
 
+        /*
         // all the aggregate models are permanent, and should be saved at the end of session
         this.aggregateModels = model
+        */
 
+        /*
         // ordered list of views that hear about keyboard inputs
         // the higher in the hierarchy, the more likely informed (more "in focus")
         this.inputSubscribersHierarchy = []
@@ -772,6 +893,7 @@ class controllerClass{
         this.previousAction = new rootAction()
 
         this.previousActionTimelineEventsSubscribers = new Set()
+         */
 
         // index of the timeline event in forward state closest to current time i.e. the one that's just been done
         // -1 if there are no timeline events or none in forward state
@@ -785,18 +907,36 @@ class controllerClass{
         // shapes that views want to copy
         this.copiedShapes = []
 
+        /*
         // subscribers to alert when playback stops/starts
         this.animationPlayingSubscribers = new Set()
         this.animationPlaying = false
+        */
 
         this.numberOfEachTypeOfShape = file.numberOfEachTypeOfShape
 
         // used to ensure each new shape is placed higher than the last
         this.ZIndexOfHighestShape = file.ZIndexOfHighestShape
 
+        /*
         // to know which directory we should add shapes to, null indicates to not add it to a directory
         this.selectedDirectorySubscribers = new Set()
+        */
+
         this.selectedDirectory = null
+
+        this.tweenReferenceToLoadedTween = new Map()
+
+        this.allTweens = file.allTweens
+
+        for (const shape of file.aggregateModels.allShapes){
+            const loadedShape = this.loadShape(shape)
+
+            this.newShape(loadedShape)
+        }
+
+        // ensures all tweens are in correct place
+        this.newClockTime(this.clock())
     }
 
     readJSONFile(JSONFile){
@@ -814,6 +954,36 @@ class controllerClass{
             fileReader.onerror = () => reject(fileReader.error)
             fileReader.readAsText(JSONFile)
         })
+    }
+
+    loadShape(shapeJSON){
+        let newShape
+        switch (shapeJSON.shapeType){
+            case "drawing":
+                newShape = new drawing(0,0,"black",1,[[1,1]])
+                break
+            case "shapeGroup":
+                newShape = new shapeGroup(0,0,[])
+                break
+            case "ellipse":
+                newShape = new ellipse(0,0,[0,0],1,1,"black","black",0,1)
+                break
+            case "graphic":
+                newShape = new graphic(0,0,[0,0],0)
+                break
+            case "polygon":
+                newShape = new polygon(0,0,"black","black",1,[[1,1],[2,2],[1,3]])
+                break
+            case "text":
+                newShape = new text(0,0,[0,0],0,"black")
+                break
+            default:
+                console.error("could not load shape - ",shapeJSON)
+        }
+
+        newShape.load(shapeJSON)
+
+        return newShape
     }
 }
 

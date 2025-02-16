@@ -6,6 +6,26 @@ export class tween{
     constructor(shape) {
         this.shape = shape
 
+        this.tweenStartEvent = {
+            "type":"tweenStart",
+            "shape":this.shape,
+            "forward":this.startForwardNonZeroLength.bind(this),
+            "backward":this.startBackwardNonZeroLength.bind(this),
+            "timeChange":(time) => {
+                return Math.max(0,time-defaultTweenLength)
+            },
+            "tween":this
+        }
+
+        this.tweenEndEvent = {
+            "type":"tweenEnd",
+            "shape":this.shape,
+            "forward":this.endForwardNonZeroLength.bind(this),
+            "backward":this.endBackwardNonZeroLength.bind(this),
+            "timeChange":returnInput,
+            "tween":this
+        }
+
         this.modelConstructed = false
     }
 
@@ -18,6 +38,23 @@ export class tween{
         this.goToTimeNonZeroLength = this.goToTime
 
         this.modelConstructed = true
+    }
+
+    save(){
+        return {
+            "startTime":this.startTime,
+            "timeLength":this.timeLength
+        }
+    }
+
+    load(save){
+        this.goToTimeNonZeroLength = this.goToTime
+        this.modelConstructed = true
+
+        this.startTime = save.startTime
+        this.timeLength = save.timeLength
+
+        this.updateLength()
     }
 
     // used to handle situations where the length of the tween is zero
@@ -79,28 +116,15 @@ export class tween{
         this.updateLength()
     }
 
+    getTweenStartEvent(){
+        return this.tweenStartEvent
+    }
+
+    getTweenEndEvent(){
+        return this.tweenEndEvent
+    }
+
     getTimelineEvents(){
-
-        this.tweenStartEvent = {
-            "type":"tweenStart",
-            "shape":this.shape,
-            "forward":this.startForwardNonZeroLength.bind(this),
-            "backward":this.startBackwardNonZeroLength.bind(this),
-            "timeChange":(time) => {
-                return Math.max(0,time-defaultTweenLength)
-            },
-            "tween":this
-        }
-
-        this.tweenEndEvent = {
-            "type":"tweenEnd",
-            "shape":this.shape,
-            "forward":this.endForwardNonZeroLength.bind(this),
-            "backward":this.endBackwardNonZeroLength.bind(this),
-            "timeChange":returnInput,
-            "tween":this
-        }
-
-        return [this.tweenStartEvent,this.tweenEndEvent]
+        return [this.getTweenStartEvent(),this.getTweenEndEvent()]
     }
 }

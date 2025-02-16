@@ -15,6 +15,18 @@ export class interpolateTween extends tween{
         this.previousValue = this.startState
     }
 
+    save(){
+        console.error("cannot save interpolate tween")
+
+        return super.save()
+    }
+
+    load(save){
+        console.error("cannot load interpolate tween")
+
+        super.load(save)
+    }
+
     goToTime(time){
 
         const value = this.startState+this.stateLength*(time-this.startTime)/this.timeLength

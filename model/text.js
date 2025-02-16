@@ -25,6 +25,34 @@ export class text extends shape{
 
     }
 
+    save(){
+        const shapeSave = super.save()
+
+        shapeSave.text = this.text
+        shapeSave.bottomLeft = this.bottomLeft
+        shapeSave.fontColour = this.fontColour
+        shapeSave.fontSize = this.fontSize
+        shapeSave.fontFamily = this.fontFamily
+
+        shapeSave.shapeType = "text"
+
+        return shapeSave
+    }
+
+    load(save){
+        super.load(save)
+
+        this.defaultTextReplaced = true
+
+        this.text = save.text
+        this.bottomLeft = save.bottomLeft
+        this.fontColour = save.fontColour
+        this.fontSize = save.fontSize
+        this.fontFamily = save.fontFamily
+
+        this.updateGeometry()
+    }
+
     updateWidthAndHeightFromText(){
         // canvas used to measure width and height of text
         const canvas = document.createElement("canvas")

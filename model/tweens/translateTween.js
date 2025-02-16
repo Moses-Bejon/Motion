@@ -11,6 +11,21 @@ export class translationTween extends tween{
         this.previousTranslation = [0,0]
     }
 
+    save(){
+        const tweenSave = super.save()
+
+        tweenSave.totalTranslation = this.totalTranslation
+        tweenSave.tweenType = "translationTween"
+
+        return tweenSave
+    }
+
+    load(save){
+        this.totalTranslation = save.totalTranslation
+
+        super.load(save)
+    }
+
     goToTime(time){
         const currentTranslation = multiply2dVectorByScalar((time-this.startTime)/this.timeLength,this.totalTranslation)
 

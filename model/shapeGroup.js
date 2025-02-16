@@ -1,4 +1,5 @@
 import {shape} from "./shape.js";
+import {controller} from "../controller.js";
 
 export class shapeGroup extends shape{
     constructor(appearanceTime,disappearanceTime,innerShapes) {
@@ -6,6 +7,34 @@ export class shapeGroup extends shape{
         super(appearanceTime,disappearanceTime)
 
         this.innerShapes = innerShapes
+
+        this.updateGeometry()
+    }
+
+    save(){
+        const shapeSave = super.save()
+
+        const serialisedInnerShapes = []
+
+        for (const innerShape of this.innerShapes){
+            serialisedInnerShapes.push(innerShape.save())
+        }
+
+        shapeSave.innerShapes = serialisedInnerShapes
+
+        shapeSave.shapeType = "shapeGroup"
+
+        return shapeSave
+    }
+
+    load(save){
+        super.load(save)
+
+        this.innerShapes = []
+
+        for (const innerShape of save.innerShapes){
+            this.innerShapes.push(controller.loadShape(innerShape))
+        }
 
         this.updateGeometry()
     }

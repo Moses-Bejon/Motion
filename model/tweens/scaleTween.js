@@ -16,6 +16,23 @@ export class scaleTween extends tween{
         this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getPosition())
     }
 
+    save(){
+        const tweenSave = super.save()
+
+        tweenSave.totalScale = this.totalScale
+        tweenSave.relativeCentre = this.relativeCentre
+        tweenSave.tweenType = "scaleTween"
+
+        return tweenSave
+    }
+
+    load(save){
+        this.totalScale = save.totalScale
+        this.relativeCentre = save.relativeCentre
+
+        super.load(save)
+    }
+
     scaleBy(scaleFactor){
         const centre = add2dVectors(
             this.shape.getPosition(),
