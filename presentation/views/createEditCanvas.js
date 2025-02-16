@@ -579,6 +579,14 @@ export class createEditCanvas extends canvas{
         controller.unsubscribeTo(this,"selectedShapes")
     }
 
+    save(){
+        return {"windowType":"createEditCanvas"}
+    }
+
+    load(){
+
+    }
+
     toggleOutlineColour(){
         if (this.outlineColourToggled){
             this.outlineColour.style.display = "none"

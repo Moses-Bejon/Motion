@@ -115,4 +115,3 @@ export class abstractView extends abstractWindow{
         this.functionsToPerformWhenClicked.delete(functionToRemove)
     }
 }
-window.customElements.define("abstract-view",abstractView)

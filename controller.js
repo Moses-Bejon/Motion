@@ -19,7 +19,7 @@ class controllerClass{
     constructor() {
 
         // all the aggregate models are permanent, and should be saved at the end of session
-        this.aggregateModels = model
+        this.aggregateModels = structuredClone(model)
 
         // ordered list of views that hear about keyboard inputs
         // the higher in the hierarchy, the more likely informed (more "in focus")
@@ -720,7 +720,7 @@ class controllerClass{
         this.previousActionTimelineEventsSubscribers.delete(subscriber)
     }
 
-    saveFile(){
+    saveFile(rootWindowSaved){
 
         const fileName = window.prompt("Enter file name:","untitled")
 
@@ -740,7 +740,7 @@ class controllerClass{
             "allTweens":[],
             "numberOfEachTypeOfShape":this.numberOfEachTypeOfShape,
             "ZIndexOfHighestShape":this.ZIndexOfHighestShape,
-            "rootWindow":{}
+            "rootWindow":rootWindowSaved
         }
 
         const allShapes = []
@@ -879,51 +879,24 @@ class controllerClass{
             throw error
         }
 
-        /*
-        // all the aggregate models are permanent, and should be saved at the end of session
-        this.aggregateModels = model
-        */
 
-        /*
-        // ordered list of views that hear about keyboard inputs
-        // the higher in the hierarchy, the more likely informed (more "in focus")
+        // resetting to initial state before new file loaded
+        this.aggregateModels = structuredClone(model)
         this.inputSubscribersHierarchy = []
-
-        // used as pointer to undo/redo stack, which is implemented as a linked list
         this.previousAction = new rootAction()
-
         this.previousActionTimelineEventsSubscribers = new Set()
-         */
-
-        // index of the timeline event in forward state closest to current time i.e. the one that's just been done
-        // -1 if there are no timeline events or none in forward state
         this.currentTimelineEvent = -1
-
-        // all the tweens the controller should think about when updating
         this.currentTimelineTweens = new Set()
+        this.copiedShapes = []
+        this.animationPlayingSubscribers = new Set()
+        this.animationPlaying = false
+        this.selectedDirectorySubscribers = new Set()
+        this.selectedDirectory = null
 
         this.newClockTime(file.aggregateModels.clock)
 
-        // shapes that views want to copy
-        this.copiedShapes = []
-
-        /*
-        // subscribers to alert when playback stops/starts
-        this.animationPlayingSubscribers = new Set()
-        this.animationPlaying = false
-        */
-
         this.numberOfEachTypeOfShape = file.numberOfEachTypeOfShape
-
-        // used to ensure each new shape is placed higher than the last
         this.ZIndexOfHighestShape = file.ZIndexOfHighestShape
-
-        /*
-        // to know which directory we should add shapes to, null indicates to not add it to a directory
-        this.selectedDirectorySubscribers = new Set()
-        */
-
-        this.selectedDirectory = null
 
         this.tweenReferenceToLoadedTween = new Map()
 
@@ -937,6 +910,9 @@ class controllerClass{
 
         // ensures all tweens are in correct place
         this.newClockTime(this.clock())
+
+        // allows the saved root window to be loaded in
+        return file.rootWindow
     }
 
     readJSONFile(JSONFile){

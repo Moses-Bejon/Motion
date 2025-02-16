@@ -216,6 +216,14 @@ export class timeline extends abstractView{
         controller.unsubscribeTo(this,"clock")
     }
 
+    save(){
+        return {"windowType":"timeline"}
+    }
+
+    load(){
+
+    }
+
     // position with respect to the right part of the window, filled by the timeline
     timeToTimelinePosition(timeSeconds){
         if (timeSeconds > animationEndTimeSeconds){

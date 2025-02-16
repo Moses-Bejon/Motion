@@ -21,7 +21,7 @@ class horizontallySplitWindow extends abstractWindow{
 
         this.attachShadow({mode:"open"})
 
-        this.setLeftWindow(document.createElement("abstract-view"))
+        this.setLeftWindow(document.createElement("create-edit-canvas"))
 
         this.edge = document.createElement("div")
         this.edge.style.background = "black"
@@ -32,9 +32,30 @@ class horizontallySplitWindow extends abstractWindow{
 
         addDragLogicTo(this.edge,this.drag,this.endDrag,()=>{},"col-resize","col-resize")
 
-        this.setRightWindow(document.createElement("abstract-view"))
+        this.setRightWindow(document.createElement("create-edit-canvas"))
 
         this.updateEdgePosition(defaultEdgePosition)
+    }
+
+    save(){
+        const save = {
+            "edgePosition":this.edgePosition
+        }
+
+        save.leftWindow = this.leftWindow.save()
+        save.rightWindow = this.rightWindow.save()
+        save.windowType = "horizontallySplit"
+
+        return save
+    }
+
+    load(save){
+        this.edgePosition = save.edgePosition
+
+        this.leftWindow.switchWindowTo(abstractWindow.loadWindow(save.leftWindow))
+        this.leftWindow.load(save.leftWindow)
+        this.rightWindow.switchWindowTo(abstractWindow.loadWindow(save.rightWindow))
+        this.rightWindow.load(save.rightWindow)
     }
 
     setFullScreen(newFullScreen) {
@@ -188,6 +209,59 @@ class horizontallySplitWindow extends abstractWindow{
         this.updateEdgePositionWithoutUpdatingSubEdges((pointerEvent.clientX - boundingRectangle.left)/boundingRectangle.width)
     }
 
+    collapseLeftWindow(){
+        const allLeftSubEdges = this.getAllSubEdgesOfLabel("left")
+
+        // merging all subEdges of the edge we are closing into (if they exist)
+        if (allLeftSubEdges.length > 0){
+
+            const newLeftSubEdge = allLeftSubEdges[0]
+            newLeftSubEdge.mergeForward(allLeftSubEdges[allLeftSubEdges.length-1].nextSubEdge)
+
+            // projecting the new geometry onto the newly merged subEdge
+            this.rightWindow.projectLeftSubEdgeOn(newLeftSubEdge)
+        }
+
+        // merging any left and right subEdges dedicated to now closed windows
+        const subEdgesAbove = this.leftWindow.getAllSubEdgesOfLabel("top")
+        if (subEdgesAbove.length > 0){
+            subEdgesAbove[subEdgesAbove.length - 1].nextSubEdge.mergeBackward(subEdgesAbove[0].previousSubEdge)
+        }
+
+        const subEdgesBelow = this.leftWindow.getAllSubEdgesOfLabel("bottom")
+        if (subEdgesBelow.length > 0) {
+            subEdgesBelow[subEdgesBelow.length - 1].nextSubEdge.mergeBackward(subEdgesBelow[0].previousSubEdge)
+        }
+
+        this.updateParentFunction(this.rightWindow)
+        this.remove()
+    }
+
+    collapseRightWindow(){
+        const allRightSubEdges = this.getAllSubEdgesOfLabel("right")
+
+        if (allRightSubEdges.length > 0) {
+
+            const newRightSubEdge = allRightSubEdges[0]
+            newRightSubEdge.mergeForward(allRightSubEdges[allRightSubEdges.length-1].nextSubEdge)
+
+            this.leftWindow.projectRightSubEdgeOn(newRightSubEdge)
+        }
+
+        const subEdgesAbove = this.rightWindow.getAllSubEdgesOfLabel("top")
+        if (subEdgesAbove.length > 0){
+            subEdgesAbove[0].previousSubEdge.mergeForward(subEdgesAbove[subEdgesAbove.length-1].nextSubEdge)
+        }
+
+        const subEdgesBelow = this.rightWindow.getAllSubEdgesOfLabel("bottom")
+        if (subEdgesBelow.length > 0){
+            subEdgesBelow[0].previousSubEdge.mergeForward(subEdgesBelow[subEdgesBelow.length-1].nextSubEdge)
+        }
+
+        this.updateParentFunction(this.leftWindow)
+        this.remove()
+    }
+
     endDrag(pointerEvent){
         const boundingRectangle = this.getBoundingClientRect()
 
@@ -195,56 +269,9 @@ class horizontallySplitWindow extends abstractWindow{
 
         // if the left window is being closed
         if (pointerEvent.clientX < boundingRectangle.left){
-            const allLeftSubEdges = this.getAllSubEdgesOfLabel("left")
-
-            // merging all subEdges of the edge we are closing into (if they exist)
-            if (allLeftSubEdges.length > 0){
-
-                const newLeftSubEdge = allLeftSubEdges[0]
-                newLeftSubEdge.mergeForward(allLeftSubEdges[allLeftSubEdges.length-1].nextSubEdge)
-
-                // projecting the new geometry onto the newly merged subEdge
-                this.rightWindow.projectLeftSubEdgeOn(newLeftSubEdge)
-            }
-
-            // merging any left and right subEdges dedicated to now closed windows
-            const subEdgesAbove = this.leftWindow.getAllSubEdgesOfLabel("top")
-            if (subEdgesAbove.length > 0){
-                subEdgesAbove[subEdgesAbove.length - 1].nextSubEdge.mergeBackward(subEdgesAbove[0].previousSubEdge)
-            }
-
-            const subEdgesBelow = this.leftWindow.getAllSubEdgesOfLabel("bottom")
-            if (subEdgesBelow.length > 0) {
-                subEdgesBelow[subEdgesBelow.length - 1].nextSubEdge.mergeBackward(subEdgesBelow[0].previousSubEdge)
-            }
-
-            this.updateParentFunction(this.rightWindow)
-            this.remove()
-
+            this.collapseLeftWindow()
         } else if (pointerEvent.clientX > boundingRectangle.right){
-
-            const allRightSubEdges = this.getAllSubEdgesOfLabel("right")
-
-            if (allRightSubEdges.length > 0) {
-
-                const newRightSubEdge = allRightSubEdges[0]
-                newRightSubEdge.mergeForward(allRightSubEdges[allRightSubEdges.length-1].nextSubEdge)
-
-                this.leftWindow.projectRightSubEdgeOn(newRightSubEdge)
-            }
-
-            const subEdgesAbove = this.rightWindow.getAllSubEdgesOfLabel("top")
-            if (subEdgesAbove.length > 0){
-                subEdgesAbove[0].previousSubEdge.mergeForward(subEdgesAbove[subEdgesAbove.length-1].nextSubEdge)
-            }
-
-            const subEdgesBelow = this.rightWindow.getAllSubEdgesOfLabel("bottom")
-            if (subEdgesBelow.length > 0){
-                subEdgesBelow[0].previousSubEdge.mergeForward(subEdgesBelow[subEdgesBelow.length-1].nextSubEdge)
-            }
-
-            this.updateParentFunction(this.leftWindow)
-            this.remove()
+            this.collapseRightWindow()
         }
     }
 

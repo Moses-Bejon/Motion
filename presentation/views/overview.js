@@ -151,6 +151,14 @@ export class overview extends abstractView{
         controller.unsubscribeFromSelectedDirectory(this)
     }
 
+    save(){
+        return {"windowType":"overview"}
+    }
+
+    load(){
+
+    }
+
     errorCheckAggregateModel(aggregateModel){
         if (aggregateModel !== "allShapes" && aggregateModel !== "selectedShapes"){
             console.error("shape editor got updates from",aggregateModel)

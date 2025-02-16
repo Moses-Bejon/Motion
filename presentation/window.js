@@ -19,6 +19,35 @@ export class abstractWindow extends HTMLElement{
         this.getGlobalBottomPosition = () => {return 1}
     }
 
+    static loadWindow(save){
+        let window
+
+        switch (save.windowType){
+            case "horizontallySplit":
+                window = document.createElement("horizontally-split-window")
+                break
+            case "verticallySplit":
+                window = document.createElement("vertically-split-window")
+                break
+            case "createEditCanvas":
+                window = document.createElement("create-edit-canvas")
+                break
+            case "timeline":
+                window = document.createElement("time-line")
+                break
+            case "shapeEditor":
+                window = document.createElement("shape-editor")
+                break
+            case "overview":
+                window = document.createElement("over-view")
+                break
+            default:
+                console.error("unrecognised window type",save.windowType)
+        }
+
+        return window
+    }
+
     setFullScreen(newFullScreen){
         this.fullScreen = newFullScreen
     }

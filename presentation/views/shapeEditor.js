@@ -296,6 +296,14 @@ export class shapeEditor extends abstractView{
         controller.unsubscribeTo(this,"timelineEvents")
     }
 
+    save(){
+        return {"windowType":"shapeEditor"}
+    }
+
+    load(){
+
+    }
+
     errorCheckAggregateModel(aggregateModel){
         if (aggregateModel !== "selectedShapes" && aggregateModel !== "timelineEvents"){
             console.error("shape editor got updates from",aggregateModel)

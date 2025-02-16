@@ -1,8 +1,8 @@
 // main javascript file for the project
 
 import {controller} from "./controller.js";
+import {abstractWindow} from "./presentation/window.js";
 
-document.getElementById("saveButton").onpointerdown = controller.saveFile.bind(controller)
 document.getElementById("undoButton").onpointerdown = controller.undoAction.bind(controller)
 document.getElementById("redoButton").onpointerdown = controller.redoAction.bind(controller)
 
@@ -18,7 +18,30 @@ loadButton.onpointerleave = () => {
 }
 
 loadButton.oninput = (input) => {
-        controller.loadFile(input.target.files[0])
+        controller.loadFile(input.target.files[0]).then((savedRootWindow) => {
+
+                // collapse root window into single window
+                while (true){
+                        if (rootWindow.constructor.name === "horizontallySplitWindow"){
+                                rootWindow.collapseLeftWindow()
+                        } else if (rootWindow.constructor.name === "verticallySplitWindow"){
+                                rootWindow.collapseTopWindow()
+                        } else {
+                                break
+                        }
+                }
+
+                rootWindow.switchWindowTo(abstractWindow.loadWindow(savedRootWindow))
+
+                rootWindow.load(savedRootWindow)
+            }
+        )/*.catch((error) => {
+                alert("There was an error loading the file",error)
+        })*/
+}
+
+document.getElementById("saveButton").onpointerdown = () => {
+        controller.saveFile(rootWindow.save())
 }
 
 const topEdge = document.getElementById("topEdge")
