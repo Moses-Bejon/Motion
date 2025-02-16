@@ -27,13 +27,13 @@ export class shapeGroup extends shape{
         return shapeSave
     }
 
-    load(save){
+    async load(save){
         super.load(save)
 
         this.innerShapes = []
 
         for (const innerShape of save.innerShapes){
-            this.innerShapes.push(controller.loadShape(innerShape))
+            this.innerShapes.push(await controller.loadShape(innerShape))
         }
 
         this.updateGeometry()

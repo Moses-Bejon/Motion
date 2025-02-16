@@ -20,17 +20,27 @@ export class graphic extends shape{
 
         shapeSave.topLeft = this.topLeft
         shapeSave.rotation = this.rotation
+        shapeSave.width = this.width
+        shapeSave.height = this.height
+        shapeSave.source = this.source
 
         shapeSave.shapeType = "graphic"
 
         return shapeSave
     }
 
-    load(save){
+    async load(save){
         super.load(save)
 
         this.topLeft = save.topLeft
         this.rotation = save.rotation
+
+        this.source = save.source
+
+        await this.loadImage()
+
+        this.width = save.width
+        this.height = save.height
 
         this.updateGeometry()
     }
@@ -44,32 +54,38 @@ export class graphic extends shape{
             fileReader.onload = () => {
                 this.source = fileReader.result
 
-                this.image = document.createElementNS("http://www.w3.org/2000/svg","image")
-                this.image.setAttribute("href",this.source)
-
-                // using a html image in order to get the width and height of the image
-                // it seems to not be trivial to get the width/height of an SVG image before it is appended
-                const htmlImage = document.createElement("img")
-                htmlImage.src = this.source
-
-                htmlImage.onload = () => {
-                    this.width = htmlImage.width
-                    this.height = htmlImage.height
-
-                    this.updateGeometry()
-
-                    resolve()
-                }
-
-                htmlImage.onerror = () => {
-                    reject(
-                        new Error("Cannot load HTML image (likely because the format is unsupported or isn't an image)")
-                    )
-                }
+                this.loadImage().then(resolve).catch((error) => {reject(error)})
             }
 
             fileReader.onerror = () => {
                 reject(new Error("The file reader could not read your file (likely because the format is unsupported)"))
+            }
+        })
+    }
+
+    loadImage(){
+        return new Promise((resolve,reject) => {
+            this.image = document.createElementNS("http://www.w3.org/2000/svg","image")
+            this.image.setAttribute("href",this.source)
+
+            // using a html image in order to get the width and height of the image
+            // it seems to not be trivial to get the width/height of an SVG image before it is appended
+            const htmlImage = document.createElement("img")
+            htmlImage.src = this.source
+
+            htmlImage.onload = () => {
+                this.width = htmlImage.width
+                this.height = htmlImage.height
+
+                this.updateGeometry()
+
+                resolve()
+            }
+
+            htmlImage.onerror = () => {
+                reject(
+                    new Error("Cannot load HTML image (likely because the format is unsupported or isn't an image)")
+                )
             }
         })
     }

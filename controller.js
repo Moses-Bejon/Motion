@@ -930,7 +930,7 @@ class controllerClass{
         this.allTweens = file.allTweens
 
         for (const shape of file.aggregateModels.allShapes){
-            const loadedShape = this.loadShape(shape)
+            const loadedShape = await this.loadShape(shape)
 
             this.newShape(loadedShape)
         }
@@ -956,7 +956,7 @@ class controllerClass{
         })
     }
 
-    loadShape(shapeJSON){
+    async loadShape(shapeJSON){
         let newShape
         switch (shapeJSON.shapeType){
             case "drawing":
@@ -981,7 +981,7 @@ class controllerClass{
                 console.error("could not load shape - ",shapeJSON)
         }
 
-        newShape.load(shapeJSON)
+        await newShape.load(shapeJSON)
 
         return newShape
     }
