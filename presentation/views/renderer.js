@@ -162,7 +162,6 @@ export class renderer extends canvas{
 
     getSVGURL(){
         const svgString = serializer.serializeToString(this.canvas)
-        console.log(svgString)
 
         const svgBinary = new Blob([svgString],{type:"image/svg+xml;charset=utf-8"})
 
