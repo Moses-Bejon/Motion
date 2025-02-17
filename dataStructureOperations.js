@@ -1,4 +1,5 @@
 import { isGreater } from "./maths.js";
+import {epsilon} from "./constants.js";
 
 // may be optimised by reduce function if performance becomes concern:
 export function maximumOfArray(array,key,comparison=isGreater){
@@ -65,10 +66,29 @@ export function binarySearch(list,value,listToValue=(value)=>{return value}){
 export function validateReal(possibleNumber){
     possibleNumber = parseFloat(possibleNumber)
 
-    return !isNaN(possibleNumber)
+    if (isNaN(possibleNumber)){
+        return null
+    } else {
+        return possibleNumber
+    }
+}
+
+export function validatePositiveReal(possibleNumber){
+    const value = validateReal(possibleNumber)
+
+    if (value === null){
+        return null
+    }
+
+    return Math.max(value,epsilon)
 }
 
 export function validateColour(colour){
     const regularExpression = /^#([0-9]|[A-F]|[a-f]){6}$/
-    return regularExpression.test(colour)
+
+    if (regularExpression.test(colour)){
+        return colour
+    } else {
+        return null
+    }
 }

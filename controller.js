@@ -797,6 +797,12 @@ class controllerClass{
             savedTimelineEvent.tween = this.tweenToReference.get(timelineEvent.tween)
         }
 
+        if (timelineEvent.type === "change"){
+            savedTimelineEvent.attribute = timelineEvent.attribute
+            savedTimelineEvent.previousValue = timelineEvent.previousValue
+            savedTimelineEvent.value = timelineEvent.value
+        }
+
         return savedTimelineEvent
     }
 
@@ -865,8 +871,19 @@ class controllerClass{
                         controller.showShape(shape)
                     }
                     break
+                case "change":
+                    timelineEvent.attribute = savedTimelineEvent.attribute
+                    timelineEvent.previousValue = savedTimelineEvent.previousValue
+                    timelineEvent.value = savedTimelineEvent.value
+                    timelineEvent.forward = () => {
+                        shape.geometryAttributeUpdate(timelineEvent.attribute,timelineEvent.value)
+                    }
+                    timelineEvent.backward = () => {
+                        shape.geometryAttributeUpdate(timelineEvent.attribute,timelineEvent.previousValue)
+                    }
+                    break
                 default:
-                    console.error("unrecognised shape type",savedTimelineEvent.type)
+                    console.error("unrecognised timelineEvent type",savedTimelineEvent.type)
             }
         }
 

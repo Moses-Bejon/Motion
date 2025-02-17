@@ -10,7 +10,7 @@ import {
     typicalIconSizeInt
 } from "../../constants.js";
 import {clamp, returnInput} from "../../maths.js";
-import {validateColour,validateReal} from "../../dataStructureOperations.js";
+import {validateColour, validatePositiveReal, validateReal} from "../../dataStructureOperations.js";
 
 const stringInput = document.createElement("input")
 stringInput.type = "text"
@@ -74,30 +74,15 @@ const shapeToShapeProperties = {
 
 const nameToChangeFunction = {
     "Appearance time": (shape,value) => {
-
-        // validation
-        value = parseFloat(value)
-        value = clamp(value,0,shape.disappearanceTime)
-
         shape.newAppearanceTime(value)
     },
     "Disappearance time": (shape,value) => {
-
-        // validation
-        value = parseFloat(value)
-        value = clamp(value,shape.appearanceTime,animationEndTimeSeconds)
-
         shape.newDisappearanceTime(value)
     },
     "Colour": (shape,value) => {
         shape.geometryAttributeUpdate("colour",value)
     },
     "Thickness": (shape,value) => {
-
-        // validation
-        value = parseFloat(value)
-        value = Math.max(minimumThickness,value)
-
         shape.geometryAttributeUpdate("thickness",value)
     },
     "Polygon fill": (shape,value) => {
@@ -107,17 +92,9 @@ const nameToChangeFunction = {
         shape.geometryAttributeUpdate("outlineColour",value)
     },
     "Width": (shape,value) => {
-        // validation
-        value = parseFloat(value)
-        value = Math.max(0,value)
-
         shape.geometryAttributeUpdate("width",value)
     },
     "Height": (shape,value) => {
-        // validation
-        value = parseFloat(value)
-        value = Math.max(0,value)
-
         shape.geometryAttributeUpdate("height",value)
     },
     "Text": (shape,value) => {
@@ -128,10 +105,6 @@ const nameToChangeFunction = {
         shape.geometryAttributeUpdate("fontColour",value)
     },
     "Font size (pt)": (shape,value) => {
-        // validation
-        value = parseFloat(value)
-        value = Math.max(0,value)
-
         shape.geometryAttributeUpdate("fontSize",value)
     },
     "Font": (shape,value) => {
@@ -179,38 +152,76 @@ const nameToGetFunction = {
 }
 
 const nameToValidation =   {
-    "Appearance time": validateReal,
-    "Disappearance time": validateReal,
+    "Appearance time": (value,shape) => {
+
+        value = validateReal(value)
+
+        if (value === null){
+            return null
+        }
+
+        value = clamp(value,0,shape.disappearanceTime)
+
+        return value
+    },
+    "Disappearance time": (value,shape) => {
+        value = validateReal(value)
+
+        if (value === null){
+            return null
+        }
+
+        value = clamp(value,shape.appearanceTime,animationEndTimeSeconds)
+
+        return value
+    },
     "Colour":validateColour,
-    "Thickness":validateReal,
+    "Thickness":(value) => {
+        value = validateReal(value)
+
+        if (value === null){
+            return null
+        }
+
+        value = Math.max(minimumThickness,value)
+
+        return value
+    },
     "Polygon fill":validateColour,
     "Outline colour":validateColour,
-    "Width":validateReal,
-    "Height":validateReal,
+    "Width":validatePositiveReal,
+    "Height":validatePositiveReal,
 
     // all values from html inputs are guaranteed to be strings
     // validation for stuff like possible code insertion is done in text.js
     // (not for security, but for client convenience and to prevent unexpected behaviour, as is client side anyway)
-    "Text":()=>{return true},
+    "Text":returnInput,
 
     "Font colour":validateColour,
-    "Font size (pt)":validateReal,
-    "Font":()=>{return true}
+    "Font size (pt)":validatePositiveReal,
+    "Font":(font)=>{
+
+        if (fonts.includes(font)){
+            return font
+        }
+
+        return null
+    }
 }
 
-const nameToTimelineEvents = {
+const nameToTimelineAttribute = {
     "Appearance time": false,
     "Disappearance time": false,
-    "Colour": true,
-    "Thickness": true,
-    "Polygon fill": true,
-    "Outline colour": true,
-    "Width": true,
-    "Height": true,
-    "Text": true,
-    "Font colour":true,
-    "Font size (pt)": true,
-    "Font": true
+    "Colour": "colour",
+    "Thickness": "thickness",
+    "Polygon fill": "fillColour",
+    "Outline colour": "outlineColour",
+    "Width": "width",
+    "Height": "height",
+    "Text": "text",
+    "Font colour":"fontColour",
+    "Font size (pt)": "fontSize",
+    "Font": "fontFamily"
 }
 
 const template = document.createElement("template")
@@ -372,8 +383,10 @@ export class shapeEditor extends abstractView{
 
     updateProperty(propertyName,newValue){
 
-        // validated to false
-        if (!nameToValidation[propertyName](newValue)){
+        newValue = nameToValidation[propertyName](newValue)
+
+        // validated to null
+        if (newValue === null){
             // don't touch the controller and just rebuild everything from scratch
             this.updateAggregateModel("selectedShapes",controller.selectedShapes())
             return
@@ -396,8 +409,10 @@ export class shapeEditor extends abstractView{
         const changeFunction = nameToChangeFunction[propertyName]
 
         const timelineEvents = []
+        const attribute = nameToTimelineAttribute[propertyName]
 
-        if (nameToTimelineEvents[propertyName]) {
+        // for example, appearance and disappearance return false since they aren't attribute changes
+        if (attribute) {
             for (let i = 0; i < shapesAffected.length; i++) {
                 timelineEvents.push(
                     {
@@ -409,7 +424,10 @@ export class shapeEditor extends abstractView{
                         "backward": () => {
                             changeFunction(shapesAffected[i], previousValues[i])
                         },
-                        "timeChange": returnInput
+                        "timeChange": returnInput,
+                        "attribute":attribute,
+                        "previousValue":previousValues[i],
+                        "value":newValue
                     }
                 )
             }
