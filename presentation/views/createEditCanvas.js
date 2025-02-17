@@ -586,7 +586,7 @@ export class createEditCanvas extends canvas{
         windowSave.currentMode = this.currentMode.constructor.name
         windowSave.persistentTemporary = this.persistentTemporarySwitch.currentlyOn
         windowSave.thickness = this.thicknessSlider.value
-        windowSave.outlineToggled = this.outlineColourToggled
+        windowSave.outlineColourToggled = this.outlineColourToggled
         windowSave.outlineColour = this.outlineColour.value
         windowSave.fillColourToggled = this.fillColourToggled
         windowSave.fillColour = this.fillColour.value
