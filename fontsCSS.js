@@ -1,5 +1,5 @@
 // I hate it too, but after trying for ages to get the fonts to render in the exported SVG...
-// ...this seemed to be the only thing I could get to work
+// ...this seemed to be the only thing I could do to get to work
 
 export const fontsCSS = `
 <style>
