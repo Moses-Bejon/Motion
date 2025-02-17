@@ -23,7 +23,7 @@ template.innerHTML = `
         }
     </style>
     <div id="buttonsContainer">
-        <button id="renderAnimationButton">Render animation</button>
+        <button id="renderAnimationButton"></button>
         <button id="renderFrameButton">Render current frame</button>
         <label for="fps">FPS: </label>
         <input type="number" name="fps" id="fpsInput" min="1" max="120" value="30">
@@ -38,7 +38,8 @@ export class renderer extends canvas{
 
         this.fps = this.shadowRoot.getElementById("fpsInput")
 
-        this.shadowRoot.getElementById("renderAnimationButton").onpointerdown = this.renderAnimation.bind(this)
+        this.renderAnimationButton = this.shadowRoot.getElementById("renderAnimationButton")
+        this.restoreRenderAnimationButton()
         this.shadowRoot.getElementById("renderFrameButton").onpointerdown = () => {
             controller.downloadFile(this.getSVGURL(),"animation frame")
         }
@@ -75,12 +76,30 @@ export class renderer extends canvas{
         super.disconnectedCallback()
     }
 
+    save(){
+        return {"windowType":"renderer"}
+    }
+
+    load(save){
+
+    }
+
+    restoreRenderAnimationButton(){
+        this.renderAnimationButton.onpointerdown = this.renderAnimation.bind(this)
+        this.renderAnimationButton.innerText = "Render animation"
+    }
+
     async renderAnimation(){
         const fps = parseFloat(this.fps.value)
 
         if (isNaN(fps) || fps < 1 || fps > 120){
             alert("Please enter a valid fps between 1 and 120")
             return
+        }
+
+        this.renderAnimationButton.innerText = "Cancel render"
+        this.renderAnimationButton.onpointerdown = () => {
+            this.renderCancelled = true
         }
 
         this.renderCancelled = false
@@ -135,6 +154,7 @@ export class renderer extends canvas{
         }
 
         controller.newClockTime(now)
+        this.restoreRenderAnimationButton()
     }
 
     async captureFrame(timeStamp,duration){
