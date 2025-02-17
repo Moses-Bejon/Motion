@@ -53,12 +53,18 @@ let rootWindow = document.getElementById("rootWindow")
 makeWindowFullScreen(rootWindow)
 
 const defaultCanvas = document.createElement("create-edit-canvas")
+const defaultShapeEditor = document.createElement("shape-editor")
+const defaultTopWindow = document.createElement("horizontally-split-window")
 const defaultTimeline = document.createElement("time-line")
 const defaultWindow = document.createElement("vertically-split-window")
 
 rootWindow.switchWindowTo(defaultWindow)
-defaultWindow.topWindow.switchWindowTo(defaultCanvas)
+defaultWindow.topWindow.switchWindowTo(defaultTopWindow)
+defaultTopWindow.leftWindow.switchWindowTo(defaultCanvas)
+defaultTopWindow.rightWindow.switchWindowTo(defaultShapeEditor)
+defaultTopWindow.updateEdgePosition(0.8)
 defaultWindow.bottomWindow.switchWindowTo(defaultTimeline)
+defaultWindow.updateEdgePosition(0.8)
 
 function setNewRootWindow(newRootWindow){
         rootWindow.removeAttribute("id")
