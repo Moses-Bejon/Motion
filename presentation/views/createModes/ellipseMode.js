@@ -1,5 +1,5 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
-import {buttonSelectedColour, maximumThickness} from "../../../constants.js";
+import {buttonSelectedColour, maximumThickness} from "../../../globalValues.js";
 import {midPoint2d} from "../../../maths.js";
 import {controller} from "../../../controller.js";
 import {ellipse} from "../../../model/ellipse.js";

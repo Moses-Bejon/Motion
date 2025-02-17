@@ -15,7 +15,7 @@ import {
     typicalIconSize,
     typicalIconSizeInt,
     eventTokenWidth, timelineSnapLength
-} from "../../constants.js";
+} from "../../globalValues.js";
 import {clamp} from "../../maths.js";
 
 const template = document.createElement("template")

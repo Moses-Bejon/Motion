@@ -2,7 +2,7 @@ import {addDragLogicTo} from "../../../dragLogic.js";
 import {angleTracker, distanceBetween2dPoints,} from "../../../maths.js";
 import {editMode} from "./editMode.js";
 import {rotatePath} from "../../../assets/rotatePath.js"
-import {canvasOverlayUISize} from "../../../constants.js";
+import {canvasOverlayUISize} from "../../../globalValues.js";
 
 // the rotate overlay needs to be larger than the scale overlay so the scale overlay fits within it
 const rotateOverlaySize = 1.75*canvasOverlayUISize

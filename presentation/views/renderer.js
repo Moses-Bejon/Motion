@@ -1,6 +1,6 @@
 import {controller} from "../../controller.js";
 import {canvas} from "./canvas.js";
-import {animationEndTimeSeconds, canvasHeight, canvasWidth, typicalIconSizeInt} from "../../constants.js";
+import {animationEndTimeSeconds, canvasHeight, canvasWidth, typicalIconSizeInt} from "../../globalValues.js";
 import {fontsCSS} from "../../fontsCSS.js";
 import {ArrayBufferTarget,Muxer} from "../../mp4-muxer.mjs";
 
@@ -25,8 +25,8 @@ template.innerHTML = `
     <div id="buttonsContainer">
         <button id="renderAnimationButton"></button>
         <button id="renderFrameButton">Render current frame</button>
-        <label for="fps">FPS: </label>
-        <input type="number" name="fps" id="fpsInput" min="1" max="120" value="30">
+        <label for="fpsInput">FPS: </label>
+        <input type="number" id="fpsInput" min="1" max="120" value="30">
     </div>
 `
 

@@ -1,6 +1,6 @@
 import {controller} from "../../../controller.js";
 import {clamp} from "../../../maths.js";
-import {animationEndTimeSeconds, typicalIconSize} from "../../../constants.js";
+import {animationEndTimeSeconds, typicalIconSize} from "../../../globalValues.js";
 
 export class timeCursor{
     constructor(parentTimeline) {

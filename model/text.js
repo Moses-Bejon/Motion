@@ -1,5 +1,5 @@
 import {shape} from "./shape.js";
-import {fontSizeInt,fontFamily} from "../constants.js";
+import {fontSizeInt,fontFamily} from "../globalValues.js";
 import {
     add2dVectors,
     getEdgesOfBoxAfterRotation,

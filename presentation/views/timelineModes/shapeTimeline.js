@@ -6,7 +6,7 @@ import {
     bumperTranslation,
     timelineRightMenuSizePercentage,
     timelineSnapLength
-} from "../../../constants.js";
+} from "../../../globalValues.js";
 import {timelineTween} from "./timelineTween.js";
 import {timelineChange} from "./timelineChange.js";
 

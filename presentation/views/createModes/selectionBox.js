@@ -5,7 +5,7 @@ import {
     multiply2dVectorByScalar,
     subtract2dVectors
 } from "../../../maths.js";
-import {canvasOverlayUISize} from "../../../constants.js";
+import {canvasOverlayUISize} from "../../../globalValues.js";
 
 export class selectionBox{
     constructor(editCanvas) {

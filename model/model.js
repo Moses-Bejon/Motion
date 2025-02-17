@@ -1,4 +1,4 @@
-import {timelineSnapLength} from "../constants.js";
+import {timelineSnapLength} from "../globalValues.js";
 
 export const model = {
     "allShapes":{

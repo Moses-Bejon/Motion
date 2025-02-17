@@ -19,25 +19,9 @@ loadButton.onpointerleave = () => {
 
 loadButton.oninput = (input) => {
         controller.loadFile(input.target.files[0]).then((savedRootWindow) => {
-
-                // collapse root window into single window
-                while (true){
-                        if (rootWindow.constructor.name === "horizontallySplitWindow"){
-                                rootWindow.collapseLeftWindow()
-                        } else if (rootWindow.constructor.name === "verticallySplitWindow"){
-                                rootWindow.collapseTopWindow()
-                        } else {
-                                break
-                        }
-                }
-
-                rootWindow.switchWindowTo(abstractWindow.loadWindow(savedRootWindow))
-
-                rootWindow.load(savedRootWindow)
+                    replaceRootWindowWithSave(savedRootWindow)
             }
-        )/*.catch((error) => {
-                alert("There was an error loading the file",error)
-        })*/
+        )
 }
 
 document.getElementById("saveButton").onpointerdown = () => {
@@ -65,6 +49,27 @@ defaultTopWindow.rightWindow.switchWindowTo(defaultShapeEditor)
 defaultTopWindow.updateEdgePosition(0.8)
 defaultWindow.bottomWindow.switchWindowTo(defaultTimeline)
 defaultWindow.updateEdgePosition(0.8)
+
+function replaceRootWindowWithSave(save){
+        // collapse root window into single window
+        while (true){
+                if (rootWindow.constructor.name === "horizontallySplitWindow"){
+                        rootWindow.collapseLeftWindow()
+                } else if (rootWindow.constructor.name === "verticallySplitWindow"){
+                        rootWindow.collapseTopWindow()
+                } else {
+                        break
+                }
+        }
+
+        rootWindow.switchWindowTo(abstractWindow.loadWindow(save))
+        rootWindow.load(save)
+}
+
+export function refreshViews(){
+        const viewsSave = rootWindow.save()
+        replaceRootWindowWithSave(viewsSave)
+}
 
 function setNewRootWindow(newRootWindow){
         rootWindow.removeAttribute("id")

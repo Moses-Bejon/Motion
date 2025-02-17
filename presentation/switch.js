@@ -1,4 +1,4 @@
-import {fontFamily, fontSize} from "../constants.js";
+import {fontFamily, fontSize} from "../globalValues.js";
 
 const template = document.createElement("template")
 

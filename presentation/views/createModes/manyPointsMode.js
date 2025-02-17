@@ -1,4 +1,4 @@
-import {maximumThickness} from "../../../constants.js";
+import {maximumThickness} from "../../../globalValues.js";
 import {controller} from "../../../controller.js";
 import {polygon} from "../../../model/polygon.js";
 import {drawing} from "../../../model/drawing.js";

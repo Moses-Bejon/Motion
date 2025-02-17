@@ -1,6 +1,6 @@
 import {controller} from "../../controller.js";
 import {returnInput} from "../../maths.js";
-import {defaultTweenLength} from "../../constants.js";
+import {defaultTweenLength} from "../../globalValues.js";
 
 export class tween{
     constructor(shape) {

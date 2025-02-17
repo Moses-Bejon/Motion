@@ -1,4 +1,4 @@
-import {animationEndTimeSeconds} from "../../../constants.js";
+import {animationEndTimeSeconds} from "../../../globalValues.js";
 import {controller} from "../../../controller.js";
 import {graphic} from "../../../model/graphic.js";
 

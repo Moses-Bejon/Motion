@@ -1,7 +1,7 @@
 // all views, like canvas, timeline etc. inherit from this class
 
 import {abstractWindow} from "./window.js"
-import {fullScreenAndDropdownContainerWidth, typicalIconSize} from "../constants.js";
+import {fullScreenAndDropdownContainerWidth, typicalIconSize} from "../globalValues.js";
 
 // All types of window listed here can be switched to by a user
 // The data is of the form {"name displayed to user":"type of window I should create"}
@@ -12,7 +12,8 @@ const typesOfWindow = {
     "timeline":"time-line",
     "shape editor":"shape-editor",
     "overview":"over-view",
-    "renderer":"renderer-window"
+    "renderer":"renderer-window",
+    "settings":"settings-window"
 }
 
 const template = document.createElement("template")

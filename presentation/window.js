@@ -44,6 +44,9 @@ export class abstractWindow extends HTMLElement{
             case "renderer":
                 window = document.createElement("renderer-window")
                 break
+            case "settings":
+                window = document.createElement("settings-window")
+                break
             default:
                 console.error("unrecognised window type",save.windowType)
         }

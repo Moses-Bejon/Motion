@@ -1,6 +1,6 @@
 import {text} from "../../../model/text.js";
 import {controller} from "../../../controller.js";
-import {buttonSelectedColour} from "../../../constants.js";
+import {buttonSelectedColour} from "../../../globalValues.js";
 
 export class textMode{
     constructor(createCanvas) {

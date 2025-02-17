@@ -3,7 +3,18 @@ import {binaryInsertion} from "./dataStructureOperations.js";
 import {randomBrightColour} from "./random.js"
 import {action} from "./model/action.js";
 import {rootAction} from "./model/rootAction.js";
-import {animationEndTimeSeconds} from "./constants.js";
+import {
+    animationEndTimeSeconds,
+    canvasHeight,
+    canvasWidth,
+    changeAnimationEndTimeSeconds,
+    changeCanvasHeight,
+    changeCanvasWidth,
+    changeDefaultTweenLength,
+    changeTimelineSnapLength,
+    defaultTweenLength,
+    timelineSnapLength
+} from "./globalValues.js";
 import {clamp} from "./maths.js";
 import {drawing} from "./model/drawing.js";
 import {shapeGroup} from "./model/shapeGroup.js";
@@ -740,7 +751,12 @@ class controllerClass{
             "allTweens":[],
             "numberOfEachTypeOfShape":this.numberOfEachTypeOfShape,
             "ZIndexOfHighestShape":this.ZIndexOfHighestShape,
-            "rootWindow":rootWindowSaved
+            "rootWindow":rootWindowSaved,
+            "animationEndTimeSeconds":animationEndTimeSeconds,
+            "canvasHeight":canvasHeight,
+            "canvasWidth":canvasWidth,
+            "timelineSnapLength":timelineSnapLength,
+            "defaultTweenLength":defaultTweenLength
         }
 
         const allShapes = []
@@ -916,6 +932,12 @@ class controllerClass{
 
         this.numberOfEachTypeOfShape = file.numberOfEachTypeOfShape
         this.ZIndexOfHighestShape = file.ZIndexOfHighestShape
+
+        changeAnimationEndTimeSeconds(file.animationEndTimeSeconds)
+        changeCanvasWidth(file.canvasWidth)
+        changeCanvasHeight(file.canvasHeight)
+        changeTimelineSnapLength(file.timelineSnapLength)
+        changeDefaultTweenLength(file.defaultTweenLength)
 
         this.tweenReferenceToLoadedTween = new Map()
 

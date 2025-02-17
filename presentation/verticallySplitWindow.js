@@ -3,7 +3,7 @@
 import {abstractWindow} from "./window.js"
 import {addDragLogicTo} from "../dragLogic.js";
 import {clamp} from "../maths.js";
-import {innerEdgeThicknessInt,innerEdgeThickness,defaultEdgePosition} from "../constants.js"
+import {innerEdgeThicknessInt,innerEdgeThickness,defaultEdgePosition} from "../globalValues.js"
 
 class verticallySplitWindow extends abstractWindow{
     constructor() {

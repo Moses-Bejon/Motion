@@ -1,5 +1,5 @@
 import { isGreater } from "./maths.js";
-import {epsilon} from "./constants.js";
+import {epsilon} from "./globalValues.js";
 
 // may be optimised by reduce function if performance becomes concern:
 export function maximumOfArray(array,key,comparison=isGreater){
@@ -61,6 +61,16 @@ export function binarySearch(list,value,listToValue=(value)=>{return value}){
             left = middle
         }
     }
+}
+
+export function validateNatural(possibleNatural){
+    possibleNatural = parseInt(possibleNatural)
+
+    if (isNaN(possibleNatural)){
+        return null
+    }
+
+    return Math.max(1,possibleNatural)
 }
 
 export function validateReal(possibleNumber){

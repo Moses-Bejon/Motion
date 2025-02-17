@@ -10,7 +10,7 @@ import {
     thicknessLevel,
     timelineSnapLength,
     buttonSelectedColour
-} from "../../constants.js";
+} from "../../globalValues.js";
 import {canvas} from "./canvas.js";
 import {drawMode} from "./createModes/drawMode.js";
 import {polygonMode} from "./createModes/polygonMode.js";

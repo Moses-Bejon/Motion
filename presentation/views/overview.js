@@ -1,6 +1,6 @@
 import {abstractView} from "../view.js";
 import {controller} from "../../controller.js";
-import {typicalIconSizeInt,typicalIconSize} from "../../constants.js";
+import {typicalIconSizeInt,typicalIconSize} from "../../globalValues.js";
 
 const template = document.createElement("template")
 template.innerHTML = `

@@ -9,7 +9,7 @@ import {
     canvasWidth,
     canvasHeight,
     sensitivity, maximumThickness
-} from "../../constants.js";
+} from "../../globalValues.js";
 
 // maps keys to their intended movement vectors
 const keyToMovement = {
@@ -105,9 +105,6 @@ template.innerHTML = `
     left: ${canvasOffsetX}px;
     top: ${canvasOffsetY}px;
     
-    width: ${canvasWidth}px;
-    height: ${canvasHeight}px;
-    
     overflow: visible;
     
     border: dashed;
@@ -119,7 +116,7 @@ template.innerHTML = `
 <img id="zoomIn" src="assets/zoomIn.svg" alt="zoom out button">
 </div>
 
-<svg id="canvas" viewBox="0 0 ${canvasWidth} ${canvasHeight}" preserveAspectRatio="none"></svg>
+<svg id="canvas" preserveAspectRatio="none"></svg>
 `
 
 export class canvas extends abstractView{
@@ -129,6 +126,10 @@ export class canvas extends abstractView{
         this.shadowRoot.appendChild(template.content.cloneNode(true))
 
         this.canvas = this.shadowRoot.getElementById("canvas")
+        this.canvas.style.width = canvasWidth
+        this.canvas.style.height = canvasHeight
+        this.canvas.setAttribute("viewBox",`0 0 ${canvasWidth} ${canvasHeight}`)
+
         this.canvasPosition = [canvasOffsetX,canvasOffsetY]
 
         this.zoomBar = this.shadowRoot.getElementById("zoomBar")
