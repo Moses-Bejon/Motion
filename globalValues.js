@@ -55,6 +55,12 @@ export function changeTimelineSnapLength(newSnapLength){
 // how close points have to be to be considered "connected"
 export const snappingDistance = Math.hypot(canvasWidth,canvasHeight)/100
 
+// used to decide how much to simplify user line inputs
+export let lineSimplificationEpsilon = 1
+export function changeLineSimplificationEpsilon(newLineSimplificationEpsilon){
+    lineSimplificationEpsilon = newLineSimplificationEpsilon
+}
+
 // how large UI overlays (like rotate icons) on the canvas typically are
 export const canvasOverlayUISize = 50
 

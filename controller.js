@@ -11,8 +11,10 @@ import {
     changeCanvasHeight,
     changeCanvasWidth,
     changeDefaultTweenLength,
+    changeLineSimplificationEpsilon,
     changeTimelineSnapLength,
     defaultTweenLength,
+    lineSimplificationEpsilon,
     timelineSnapLength
 } from "./globalValues.js";
 import {clamp} from "./maths.js";
@@ -756,7 +758,8 @@ class controllerClass{
             "canvasHeight":canvasHeight,
             "canvasWidth":canvasWidth,
             "timelineSnapLength":timelineSnapLength,
-            "defaultTweenLength":defaultTweenLength
+            "defaultTweenLength":defaultTweenLength,
+            "lineSimplificationEpsilon":lineSimplificationEpsilon
         }
 
         const allShapes = []
@@ -938,6 +941,7 @@ class controllerClass{
         changeCanvasHeight(file.canvasHeight)
         changeTimelineSnapLength(file.timelineSnapLength)
         changeDefaultTweenLength(file.defaultTweenLength)
+        changeLineSimplificationEpsilon(file.lineSimplificationEpsilon)
 
         this.tweenReferenceToLoadedTween = new Map()
 

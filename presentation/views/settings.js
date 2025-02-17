@@ -12,7 +12,9 @@ import {
     defaultTweenLength,
     changeDefaultTweenLength,
     timelineSnapLength,
-    changeTimelineSnapLength
+    changeTimelineSnapLength,
+    lineSimplificationEpsilon,
+    changeLineSimplificationEpsilon
 } from "../../globalValues.js";
 import {validateNatural, validatePositiveReal, validateReal} from "../../dataStructureOperations.js";
 import {controller} from "../../controller.js";
@@ -64,6 +66,10 @@ template.innerHTML = `
         <input type="number" id="canvasHeight">
     </div>
     <div class="labelInputContainer">
+        <label for="lineSimplificationEpsilon">Line simplifying (0 - don't simplify)</label>
+        <input type="number" id="lineSimplificationEpsilon">
+    </div>
+    <div class="labelInputContainer">
         <label for="timelineFPS">Timeline framerate (timeline snaps according to this) (fps)</label>
         <input type="number" id="timelineFPS">
     </div>
@@ -83,6 +89,7 @@ export class settings extends abstractView{
         this.animationEndTimeInput = this.shadowRoot.getElementById("animationEndTime")
         this.canvasWidthInput = this.shadowRoot.getElementById("canvasWidth")
         this.canvasHeightInput = this.shadowRoot.getElementById("canvasHeight")
+        this.lineSimplififcationEpsilonInput = this.shadowRoot.getElementById("lineSimplificationEpsilon")
         this.timelineFPSInput = this.shadowRoot.getElementById("timelineFPS")
         this.defaultTweenLengthInput = this.shadowRoot.getElementById("defaultTweenLength")
         this.setupInputs()
@@ -151,6 +158,25 @@ export class settings extends abstractView{
 
             changeCanvasHeight(value)
             refreshViews()
+        }
+
+        this.lineSimplififcationEpsilonInput.value = lineSimplificationEpsilon
+        this.lineSimplififcationEpsilonInput.onchange = () => {
+
+            // validation
+
+            let value = validateReal(this.lineSimplififcationEpsilonInput.value)
+
+            if (value === null){
+                alert("Please enter a valid number")
+                this.lineSimplififcationEpsilonInput.value = lineSimplificationEpsilon
+                return
+            }
+
+            value = Math.max(0,value)
+
+            changeLineSimplificationEpsilon(value)
+            this.lineSimplififcationEpsilonInput.value = lineSimplificationEpsilon
         }
 
         this.timelineFPSInput.value = 1/timelineSnapLength

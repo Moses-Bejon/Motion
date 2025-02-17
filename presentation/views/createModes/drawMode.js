@@ -3,7 +3,7 @@ import {distanceBetween2dPoints,decimateLine} from "../../../maths.js";
 import {manyPointsMode} from "./manyPointsMode.js";
 import {drawing} from "../../../model/drawing.js";
 import {controller} from "../../../controller.js";
-import {buttonSelectedColour, snappingDistance} from "../../../globalValues.js";
+import {buttonSelectedColour, lineSimplificationEpsilon, snappingDistance} from "../../../globalValues.js";
 
 export class drawMode extends manyPointsMode{
     constructor(createCanvas) {
@@ -34,7 +34,7 @@ export class drawMode extends manyPointsMode{
 
     endDrawing(pointerEvent){
 
-        this.pointArray = decimateLine(this.pointArray,1)
+        this.pointArray = decimateLine(this.pointArray,lineSimplificationEpsilon)
 
         /* If the last and first points drawn on the shape are close enough together or there is no fill*/
         if (distanceBetween2dPoints(
