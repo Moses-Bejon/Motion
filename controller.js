@@ -763,20 +763,22 @@ class controllerClass{
         const jsonFile = JSON.stringify(file)
 
         const blob = new Blob([jsonFile], { type: 'application/json' })
-
-        // Temporary anchor element
-        const a = document.createElement('a')
-        a.href = URL.createObjectURL(blob)
-        a.download = fileName
-
-        // Trigger download
-        document.body.appendChild(a)
-        a.click()
-
-        document.body.removeChild(a)
-        URL.revokeObjectURL(a.href)
+        this.downloadFile(URL.createObjectURL(blob),fileName)
 
         this.newClockTime(now)
+    }
+
+    downloadFile(fileURL,fileName){
+        const downloadLink = document.createElement('a')
+        downloadLink.href = fileURL
+        downloadLink.download = fileName
+        document.body.appendChild(downloadLink)
+
+        // trigger download automatically
+        downloadLink.click()
+
+        document.body.removeChild(downloadLink)
+        URL.revokeObjectURL(downloadLink.href)
     }
 
     saveTimelineEvent(timelineEvent){

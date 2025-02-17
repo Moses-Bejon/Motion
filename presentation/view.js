@@ -11,7 +11,8 @@ const typesOfWindow = {
     "canvas":"create-edit-canvas",
     "timeline":"time-line",
     "shape editor":"shape-editor",
-    "overview":"over-view"
+    "overview":"over-view",
+    "renderer":"renderer-window"
 }
 
 const template = document.createElement("template")
