@@ -45,7 +45,7 @@ export class switchElement extends HTMLElement{
 
         // by default, we are in our off state
         this.turnOff()
-
+        this.currentlyOn = false
         this.onclick = this.turnOn
     }
 
@@ -66,6 +66,8 @@ export class switchElement extends HTMLElement{
         this.onclick = this.turnOff
 
         this.onCallback?.()
+
+        this.currentlyOn = true
     }
 
     turnOff(){
@@ -77,6 +79,8 @@ export class switchElement extends HTMLElement{
         this.onclick = this.turnOn
 
         this.offCallback?.()
+
+        this.currentlyOn = false
     }
 }
 

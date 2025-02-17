@@ -26,7 +26,6 @@ import {editMode} from "./createModes/editMode.js";
 import {shapeGroup} from "../../model/shapeGroup.js";
 import {transformMode} from "./createModes/transformMode.js";
 import {rotationTween} from "../../model/tweens/rotationTween.js";
-import {interpolateTween} from "../../model/tweens/interpolateTween.js";
 import {scaleTween} from "../../model/tweens/scaleTween.js";
 import {translationTween} from "../../model/tweens/translateTween.js";
 
@@ -580,11 +579,66 @@ export class createEditCanvas extends canvas{
     }
 
     save(){
-        return {"windowType":"createEditCanvas"}
+
+        const windowSave = super.save()
+
+        windowSave.windowType = "createEditCanvas"
+        windowSave.currentMode = this.currentMode.constructor.name
+        windowSave.persistentTemporary = this.persistentTemporarySwitch.currentlyOn
+        windowSave.thickness = this.thicknessSlider.value
+        windowSave.outlineToggled = this.outlineColourToggled
+        windowSave.outlineColour = this.outlineColour.value
+        windowSave.fillColourToggled = this.fillColourToggled
+        windowSave.fillColour = this.fillColour.value
+
+        return windowSave
     }
 
-    load(){
+    load(save){
+        super.load(save)
 
+        switch (save.currentMode){
+            case "editMode":
+            // I'm not saving it if you're mid-transform when you hit save (not sure how that's even possible)
+            case "transformMode":
+                this.createEditSwitch.turnOn()
+                break
+            case "drawMode":
+                // we are already in draw mode, that is the default mode
+                break
+            case "polygonMode":
+                this.currentMode.switchMode()
+                this.currentMode = new polygonMode(this)
+                break
+            case "ellipseMode":
+                this.currentMode.switchMode()
+                this.currentMode = new ellipseMode(this)
+                break
+            case "textMode":
+                this.currentMode.switchMode()
+                this.currentMode = new textMode(this)
+                break
+            case "graphicMode":
+                this.currentMode.switchMode()
+                this.currentMode = new graphicMode(this)
+                break
+        }
+
+        if (save.persistentTemporary){
+            this.persistentTemporarySwitch.turnOn()
+        }
+
+        this.thicknessSlider.value = save.thickness
+
+        if (!save.outlineColourToggled){
+            this.toggleOutlineColour()
+        }
+        this.outlineColour.value = save.outlineColour
+
+        if (save.fillColourToggled){
+            this.toggleFillColour()
+        }
+        this.fillColour.value = save.fillColour
     }
 
     toggleOutlineColour(){

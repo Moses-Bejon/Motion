@@ -188,6 +188,22 @@ export class canvas extends abstractView{
         controller.unsubscribeTo(this,"displayShapes")
     }
 
+    save(){
+        return {"canvasPosition":this.canvasPosition,"previousCanvasScale":this.previousCanvasScale}
+    }
+
+    load(save){
+        this.canvasPosition = save.canvasPosition
+        this.canvas.style.left = this.canvasPosition[0]+"px"
+        this.canvas.style.top = this.canvasPosition[1]+"px"
+
+        this.previousCanvasScale = save.previousCanvasScale
+
+        this.zoomBar.value = this.previousCanvasScale.toString()
+        this.canvas.style.width = this.previousCanvasScale*canvasWidth + "px"
+        this.canvas.style.height = this.previousCanvasScale*canvasHeight + "px"
+    }
+
     errorCheckAggregateModel(aggregateModel){
         if (aggregateModel !== "displayShapes"){
             throw new Error(

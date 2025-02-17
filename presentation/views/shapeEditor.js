@@ -300,7 +300,7 @@ export class shapeEditor extends abstractView{
         return {"windowType":"shapeEditor"}
     }
 
-    load(){
+    load(save){
 
     }
 

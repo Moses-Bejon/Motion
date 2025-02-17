@@ -155,7 +155,7 @@ export class overview extends abstractView{
         return {"windowType":"overview"}
     }
 
-    load(){
+    load(save){
 
     }
 

@@ -220,7 +220,7 @@ export class timeline extends abstractView{
         return {"windowType":"timeline"}
     }
 
-    load(){
+    load(save){
 
     }
 
