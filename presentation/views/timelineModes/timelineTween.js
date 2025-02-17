@@ -231,7 +231,7 @@ export class timelineTween{
                 controller.newClockTime(controller.clock())
             },
             () => {
-                this.tween.newEndTime(previousTime)
+                this.tween.newStartTime(previousTime)
                 controller.changeTimeOfEvent(this.start,previousTime)
                 controller.newClockTime(controller.clock())
             },
