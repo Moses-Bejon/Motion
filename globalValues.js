@@ -66,7 +66,7 @@ export function changeOnionSkinTimeGap(newOnionSkinTimeGap){
     onionSkinTimeGap = newOnionSkinTimeGap
 }
 
-export let onionSkinsOn = true
+export let onionSkinsOn = false
 export function changeOnionSkinsOn(newOnionSkinsOn){
     onionSkinsOn = newOnionSkinsOn
 }

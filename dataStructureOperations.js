@@ -93,6 +93,13 @@ export function validatePositiveReal(possibleNumber){
     return Math.max(value,epsilon)
 }
 
+export function validateBoolean(possibleBoolean){
+    if (possibleBoolean !== true && possibleBoolean !== false){
+        return null
+    }
+    return possibleBoolean
+}
+
 export function validateColour(colour){
     const regularExpression = /^#([0-9]|[A-F]|[a-f]){6}$/
 

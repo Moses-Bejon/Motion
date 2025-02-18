@@ -14,9 +14,13 @@ import {
     timelineSnapLength,
     changeTimelineSnapLength,
     lineSimplificationEpsilon,
-    changeLineSimplificationEpsilon
+    changeLineSimplificationEpsilon,
+    onionSkinTimeGap,
+    changeOnionSkinsOn,
+    onionSkinsOn,
+    changeOnionSkinTimeGap
 } from "../../globalValues.js";
-import {validateNatural, validatePositiveReal, validateReal} from "../../dataStructureOperations.js";
+import {validateNatural, validatePositiveReal, validateReal, validateBoolean} from "../../dataStructureOperations.js";
 import {controller} from "../../controller.js";
 import {refreshViews} from "../../index.js";
 
@@ -66,6 +70,14 @@ template.innerHTML = `
         <input type="number" id="canvasHeight">
     </div>
     <div class="labelInputContainer">
+        <label for="onionSkinsOn">Onion skins</label>
+        <input type="checkbox" id="onionSkinsOn">
+    </div>
+    <div class="labelInputContainer" id="onionSkinsTimeGapContainer">
+        <label for="onionSkinsTimeGap">Time between now and onion skin</label>
+        <input type="number" id="onionSkinsTimeGap">
+    </div>
+    <div class="labelInputContainer">
         <label for="lineSimplificationEpsilon">Line simplifying (0 - don't simplify)</label>
         <input type="number" id="lineSimplificationEpsilon">
     </div>
@@ -89,6 +101,9 @@ export class settings extends abstractView{
         this.animationEndTimeInput = this.shadowRoot.getElementById("animationEndTime")
         this.canvasWidthInput = this.shadowRoot.getElementById("canvasWidth")
         this.canvasHeightInput = this.shadowRoot.getElementById("canvasHeight")
+        this.onionSkinsOnInput = this.shadowRoot.getElementById("onionSkinsOn")
+        this.onionSkinsTimeGap = this.shadowRoot.getElementById("onionSkinsTimeGapContainer")
+        this.onionSkinsTimeGapInput = this.shadowRoot.getElementById("onionSkinsTimeGap")
         this.lineSimplififcationEpsilonInput = this.shadowRoot.getElementById("lineSimplificationEpsilon")
         this.timelineFPSInput = this.shadowRoot.getElementById("timelineFPS")
         this.defaultTweenLengthInput = this.shadowRoot.getElementById("defaultTweenLength")
@@ -158,6 +173,43 @@ export class settings extends abstractView{
 
             changeCanvasHeight(value)
             refreshViews()
+        }
+
+        this.onionSkinsOnInput.checked = onionSkinsOn
+        if (!onionSkinsOn){
+            this.onionSkinsTimeGap.display = "none"
+        }
+        this.onionSkinsOnInput.onchange = () => {
+            const value = validateBoolean(this.onionSkinsOnInput.checked)
+
+            if (value === null){
+                alert("Please enter either true or false")
+                this.onionSkinsOnInput.checked = onionSkinsOn
+                return
+            }
+
+            changeOnionSkinsOn(value)
+            if (onionSkinsOn){
+                this.onionSkinsTimeGap.display = "block"
+                controller.onionSkinsOn()
+            } else {
+                this.onionSkinsTimeGap.display = "none"
+                controller.onionSkinsOff()
+            }
+        }
+
+        this.onionSkinsTimeGapInput.value = onionSkinTimeGap
+        this.onionSkinsTimeGapInput.onchange = () => {
+            const value = validatePositiveReal(this.onionSkinsTimeGapInput.value)
+
+            if (value === null){
+                alert("Please enter a positive number for time")
+                this.onionSkinsTimeGapInput.value = onionSkinTimeGap
+                return
+            }
+
+            changeOnionSkinTimeGap(value)
+            controller.updateOnionSkins()
         }
 
         this.lineSimplififcationEpsilonInput.value = lineSimplificationEpsilon

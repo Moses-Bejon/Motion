@@ -12,6 +12,8 @@ import {
     changeCanvasWidth,
     changeDefaultTweenLength,
     changeLineSimplificationEpsilon,
+    changeOnionSkinsOn,
+    changeOnionSkinTimeGap,
     changeTimelineSnapLength,
     defaultTweenLength,
     lineSimplificationEpsilon, onionSkinsOn,
@@ -847,7 +849,9 @@ class controllerClass{
             "canvasWidth":canvasWidth,
             "timelineSnapLength":timelineSnapLength,
             "defaultTweenLength":defaultTweenLength,
-            "lineSimplificationEpsilon":lineSimplificationEpsilon
+            "lineSimplificationEpsilon":lineSimplificationEpsilon,
+            "onionSkinsOn":onionSkinsOn,
+            "onionSkinTimeGap":onionSkinTimeGap
         }
 
         const allShapes = []
@@ -1020,6 +1024,8 @@ class controllerClass{
         changeTimelineSnapLength(file.timelineSnapLength)
         changeDefaultTweenLength(file.defaultTweenLength)
         changeLineSimplificationEpsilon(file.lineSimplificationEpsilon)
+        changeOnionSkinTimeGap(file.onionSkinTimeGap)
+        changeOnionSkinsOn(file.onionSkinsOn)
 
         if (onionSkinsOn){
             this.onionSkinsOn()
