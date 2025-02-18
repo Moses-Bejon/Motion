@@ -500,44 +500,16 @@ export class createEditCanvas extends canvas{
         }
         this.shadowRoot.getElementById("moveFront").onpointerdown = (pointerEvent) => {
 
-            const shapesToMove = new Set(this.selectedShapes)
-
-            controller.newAction(
-                () => {
-                    // this is just the easiest way to do it, will optimise if becomes an issue
-                    for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
-                        this.moveShapesOneAbove(shapesToMove)
-                    }
-                },
-                () => {
-                    for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
-                        this.moveShapesOneBelow(shapesToMove)
-                    }
-                },
-                []
-            )
-
+            this.moveShapesToFront(Array.from(this.selectedShapes))
 
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("moveBack").onpointerdown = (pointerEvent) => {
 
-            const shapesToMove = new Set(this.selectedShapes)
+            // moving a group of shapes to the back is the same as moving every other shape to the front
+            const shapesToMove = controller.displayShapes().difference(this.selectedShapes)
 
-            controller.newAction(
-                () => {
-                    for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
-                        this.moveShapesOneBelow(shapesToMove)
-                    }
-                },
-                () => {
-                    for (let i = 0; i<this.shapesInOrderOfZIndex.length;i++){
-                        this.moveShapesOneAbove(shapesToMove)
-                    }
-                },
-                []
-            )
-
+            this.moveShapesToFront(Array.from(shapesToMove))
 
             pointerEvent.stopPropagation()
         }
@@ -790,6 +762,39 @@ export class createEditCanvas extends canvas{
 
             this.swapZIndicesOfShapes(shape,shapeBehind)
         }
+    }
+
+    moveShapesToFront(shapesToMove){
+        // sort in reverse order of Z index, we will put lower ones on the top first
+        shapesToMove.sort((shape1,shape2) => {return shape1.ZIndex-shape2.ZIndex})
+
+        const previousZIndices = shapesToMove.map((shape) => {return shape.ZIndex})
+
+        for (const shape of shapesToMove){
+            controller.moveShapeToFront(shape)
+        }
+
+        const newZIndices = shapesToMove.map((shape) => {return shape.ZIndex})
+
+        controller.newAction(
+            () => {
+                for (let i = 0; i<shapesToMove.length;i++){
+                    shapesToMove[i].geometryAttributeUpdate("ZIndex",newZIndices[i])
+                }
+                for (const shape of shapesToMove){
+                    controller.updateShape(shape)
+                }
+            },
+            () => {
+                for (let i = 0; i<shapesToMove.length;i++){
+                    shapesToMove[i].geometryAttributeUpdate("ZIndex",previousZIndices[i])
+                }
+                for (const shape of shapesToMove){
+                    controller.updateShape(shape)
+                }
+            },
+            []
+        )
     }
 
     userRotate(angle,aboutCentre){

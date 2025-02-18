@@ -244,6 +244,11 @@ class controllerClass{
         }
     }
 
+    moveShapeToFront(shape){
+        shape.ZIndex = this.ZIndexOfHighestShape
+        this.ZIndexOfHighestShape ++
+    }
+
     insertIntoTimeline(event){
         const placeToInsert = binaryInsertion(
             this.timelineEvents(),
