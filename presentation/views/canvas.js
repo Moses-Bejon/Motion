@@ -236,6 +236,9 @@ export class canvas extends abstractView{
         this.errorCheckAggregateModel(aggregateModel)
 
         this.canvas.replaceChildren()
+        for (const [shape,model] of this.shapesToGeometry){
+            model.remove()
+        }
         this.shapesToGeometry = new Map()
         this.shapesInOrderOfZIndex = []
         for (const shape of model){
