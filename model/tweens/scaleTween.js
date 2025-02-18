@@ -47,8 +47,6 @@ export class scaleTween extends tween{
         this.shape.scale(scaleFactor,centre)
 
         increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getPosition(),positionBeforeScale))
-
-        controller.updateShape(this.shape)
     }
 
     goToTime(time){
@@ -58,17 +56,23 @@ export class scaleTween extends tween{
 
         this.scaleBy(amountToScale)
 
+        controller.updateShapeWithoutOnionSkins(this.shape)
+
         this.previousScale = currentScale
     }
 
     finish(){
         this.scaleBy(this.totalScale/this.previousScale)
 
+        controller.updateShape(this.shape)
+
         this.previousScale = this.totalScale
     }
 
     beforeStart(){
         this.scaleBy(1/this.previousScale)
+
+        controller.updateShape(this.shape)
 
         this.previousScale = 1
     }

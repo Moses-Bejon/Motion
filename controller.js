@@ -338,7 +338,7 @@ class controllerClass{
         this.addModel("displayShapes",shape)
     }
 
-    updateShape(shape){
+    updateShapeWithoutOnionSkins(shape){
         this.updateModel("allShapes",shape)
 
         if (this.displayShapes().has(shape)){
@@ -348,6 +348,10 @@ class controllerClass{
         if (this.selectedShapes().has(shape)){
             this.updateModel("selectedShapes",shape)
         }
+    }
+
+    updateShape(shape){
+        this.updateShapeWithoutOnionSkins(shape)
 
         this.updateOnionSkins()
     }
@@ -565,12 +569,20 @@ class controllerClass{
 
         // wouldn't want all our views to hear about onion skins as if they were real
         const update = this.updateShape
+        const updateShapeWithoutOnionSkins = this.updateShapeWithoutOnionSkins
         this.updateShape = () => {}
+        this.updateShapeWithoutOnionSkins = () => {}
 
         this.goBackwardToTime(this.clock()-onionSkinTimeGap)
 
         this.onionSkinGeometry = ""
-        for (const shape of this.displayShapes()){
+
+        // ensures onion skins are in the right stacking order
+        const shapesInCorrectZIndexOrder = Array.from(
+            this.displayShapes()).sort((shape1,shape2) => {return shape2.ZIndex-shape1.ZIndex}
+        )
+
+        for (const shape of shapesInCorrectZIndexOrder){
             shape.updateGeometry()
             this.onionSkinGeometry += shape.geometry
         }
@@ -582,6 +594,7 @@ class controllerClass{
         // cover our tracks so that rest of logic can proceed as usual
         this.goForwardToTime(this.clock())
         this.updateShape = update
+        this.updateShapeWithoutOnionSkins = updateShapeWithoutOnionSkins
     }
 
     onionSkinsOff(){

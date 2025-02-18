@@ -35,7 +35,7 @@ export class translationTween extends tween{
 
         this.previousTranslation = currentTranslation
 
-        controller.updateShape(this.shape)
+        controller.updateShapeWithoutOnionSkins(this.shape)
     }
 
     finish(){

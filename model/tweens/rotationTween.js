@@ -47,8 +47,6 @@ export class rotationTween extends tween{
         this.shape.rotate(angle,centre)
 
         increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getPosition(),positionBeforeRotation))
-
-        controller.updateShape(this.shape)
     }
 
     goToTime(time){
@@ -58,17 +56,23 @@ export class rotationTween extends tween{
 
         this.rotateByAngle(angleToRotate)
 
+        controller.updateShapeWithoutOnionSkins(this.shape)
+
         this.previousAngle = currentAngle
     }
 
     finish(){
         this.rotateByAngle(this.totalAngle-this.previousAngle)
 
+        controller.updateShape(this.shape)
+
         this.previousAngle = this.totalAngle
     }
 
     beforeStart(){
         this.rotateByAngle(-this.previousAngle)
+
+        controller.updateShape(this.shape)
 
         this.previousAngle = 0
     }
