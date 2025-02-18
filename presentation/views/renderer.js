@@ -97,10 +97,10 @@ export class renderer extends canvas{
             return
         }
 
-        this.renderAnimationButton.innerText = "Cancel render"
         this.renderAnimationButton.onpointerdown = () => {
             this.renderCancelled = true
         }
+        this.renderAnimationButton.innerText = "Cancel render"
 
         this.renderCancelled = false
         const now = controller.clock()
@@ -131,6 +131,9 @@ export class renderer extends canvas{
 
         const numberOfFrames = Math.trunc(animationEndTimeSeconds*fps)
 
+        // no onion skins in render please
+        controller.onionSkinsOff()
+
         // go to start of animation
         controller.goBackwardToTime(0)
 
@@ -159,6 +162,7 @@ export class renderer extends canvas{
             controller.downloadFile(videoUrl,"animation render")
         }
 
+        controller.onionSkinsOn()
         controller.newClockTime(now)
         this.restoreRenderAnimationButton()
     }
