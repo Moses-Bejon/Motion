@@ -14,7 +14,8 @@ import {
     changeLineSimplificationEpsilon,
     changeTimelineSnapLength,
     defaultTweenLength,
-    lineSimplificationEpsilon,
+    lineSimplificationEpsilon, onionSkinsOn,
+    onionSkinTimeGap,
     timelineSnapLength
 } from "./globalValues.js";
 import {clamp} from "./maths.js";
@@ -31,6 +32,25 @@ import {scaleTween} from "./model/tweens/scaleTween.js";
 class controllerClass{
     constructor() {
 
+        this.resetViewVariables()
+
+        // used to name shapes
+        this.numberOfEachTypeOfShape = {}
+
+        // used to ensure each new shape is placed higher than the last
+        this.ZIndexOfHighestShape = 0
+
+        document.addEventListener("keydown",this.keyDown.bind(this))
+        document.addEventListener("keyup",this.keyUp.bind(this))
+
+        if (onionSkinsOn){
+            this.onionSkinsOn()
+        } else {
+            this.onionSkinsOff()
+        }
+    }
+
+    resetViewVariables(){
         // all the aggregate models are permanent, and should be saved at the end of session
         this.aggregateModels = structuredClone(model)
 
@@ -57,18 +77,12 @@ class controllerClass{
         this.animationPlayingSubscribers = new Set()
         this.animationPlaying = false
 
-        // used to name shapes
-        this.numberOfEachTypeOfShape = {}
-
-        // used to ensure each new shape is placed higher than the last
-        this.ZIndexOfHighestShape = 0
-
         // to know which directory we should add shapes to, null indicates to not add it to a directory
         this.selectedDirectorySubscribers = new Set()
         this.selectedDirectory = null
 
-        document.addEventListener("keydown",this.keyDown.bind(this))
-        document.addEventListener("keyup",this.keyUp.bind(this))
+        // views we need to tell about onion skins
+        this.onionSkinSubscribers = new Set()
     }
 
     // how other classes interface with controller
@@ -327,6 +341,8 @@ class controllerClass{
         if (this.selectedShapes().has(shape)){
             this.updateModel("selectedShapes",shape)
         }
+
+        this.updateOnionSkins()
     }
 
     // could be optimised using binary search in the future
@@ -348,6 +364,8 @@ class controllerClass{
                 }
 
                 this.updateModel("timelineEvents",event)
+
+                this.updateOnionSkins()
 
                 return
             }
@@ -406,6 +424,8 @@ class controllerClass{
     }
 
     playAnimation(){
+        this.onionSkinsOff()
+
         this.previousTime = performance.now()
 
         this.animationPlaying = true
@@ -441,6 +461,8 @@ class controllerClass{
     pauseAnimation() {
         this.animationPlaying = false
         cancelAnimationFrame(this.animationFrame)
+
+        this.onionSkinsOn()
 
         for (const subscriber of this.animationPlayingSubscribers){
             subscriber.animationPaused()
@@ -497,16 +519,20 @@ class controllerClass{
 
     newClockTime(time){
 
+        const previousTime = this.clock()
+
+        this.aggregateModels.clock.content = time
+        this.updateAggregateModel("clock")
+
         time = clamp(time,0,animationEndTimeSeconds)
 
-        if (time < this.clock()){
+        if (time < previousTime){
             this.goBackwardToTime(time)
         } else{
             this.goForwardToTime(time)
         }
 
-        this.aggregateModels.clock.content = time
-        this.updateAggregateModel("clock")
+        this.updateOnionSkins()
     }
 
     addTweenToCurrentTweens(tween){
@@ -515,6 +541,67 @@ class controllerClass{
 
     removeTweenFromCurrentTweens(tween){
         this.currentTimelineTweens.delete(tween)
+    }
+
+    updateOnionSkins(){
+        if (!this.onionSkinsCurrentlyOn){
+            return
+        }
+
+        // no onion skin if would appear in negative time
+        if (this.clock()-onionSkinTimeGap < 0){
+            for (const onionSkinSubscriber of this.onionSkinSubscribers){
+                onionSkinSubscriber.hideOnionSkin()
+            }
+            return
+        }
+
+        // wouldn't want all our views to hear about onion skins as if they were real
+        const update = this.updateShape
+        this.updateShape = () => {}
+
+        this.goBackwardToTime(this.clock()-onionSkinTimeGap)
+
+        this.onionSkinGeometry = ""
+        for (const shape of this.displayShapes()){
+            shape.updateGeometry()
+            this.onionSkinGeometry += shape.geometry
+        }
+
+        for (const onionSkinSubscriber of this.onionSkinSubscribers){
+            onionSkinSubscriber.updateOnionSkin(this.onionSkinGeometry)
+        }
+
+        // cover our tracks so that rest of logic can proceed as usual
+        this.goForwardToTime(this.clock())
+        this.updateShape = update
+    }
+
+    onionSkinsOff(){
+        this.onionSkinsCurrentlyOn = false
+
+        for (const onionSkinSubscriber of this.onionSkinSubscribers){
+            onionSkinSubscriber.hideOnionSkin()
+        }
+    }
+
+    onionSkinsOn(){
+        if (!onionSkinsOn){
+            return
+        }
+
+        this.onionSkinsCurrentlyOn = true
+        this.updateOnionSkins()
+    }
+
+    subscribeToOnionSkins(subscriber){
+        this.onionSkinSubscribers.add(subscriber)
+
+        subscriber.updateOnionSkin(this.onionSkinGeometry)
+    }
+
+    unsubscribeFromOnionSkins(subscriber){
+        this.onionSkinSubscribers.delete(subscriber)
     }
 
     newSelectedDirectory(directory){
@@ -920,17 +1007,7 @@ class controllerClass{
 
 
         // resetting to initial state before new file loaded
-        this.aggregateModels = structuredClone(model)
-        this.inputSubscribersHierarchy = []
-        this.previousAction = new rootAction()
-        this.previousActionTimelineEventsSubscribers = new Set()
-        this.currentTimelineEvent = -1
-        this.currentTimelineTweens = new Set()
-        this.copiedShapes = []
-        this.animationPlayingSubscribers = new Set()
-        this.animationPlaying = false
-        this.selectedDirectorySubscribers = new Set()
-        this.selectedDirectory = null
+        this.resetViewVariables()
 
         this.newClockTime(file.aggregateModels.clock)
 
@@ -943,6 +1020,12 @@ class controllerClass{
         changeTimelineSnapLength(file.timelineSnapLength)
         changeDefaultTweenLength(file.defaultTweenLength)
         changeLineSimplificationEpsilon(file.lineSimplificationEpsilon)
+
+        if (onionSkinsOn){
+            this.onionSkinsOn()
+        } else {
+            this.onionSkinsOff()
+        }
 
         this.tweenReferenceToLoadedTween = new Map()
 

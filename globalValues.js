@@ -61,6 +61,16 @@ export function changeLineSimplificationEpsilon(newLineSimplificationEpsilon){
     lineSimplificationEpsilon = newLineSimplificationEpsilon
 }
 
+export let onionSkinTimeGap = 0.2
+export function changeOnionSkinTimeGap(newOnionSkinTimeGap){
+    onionSkinTimeGap = newOnionSkinTimeGap
+}
+
+export let onionSkinsOn = true
+export function changeOnionSkinsOn(newOnionSkinsOn){
+    onionSkinsOn = newOnionSkinsOn
+}
+
 // how large UI overlays (like rotate icons) on the canvas typically are
 export const canvasOverlayUISize = 50
 

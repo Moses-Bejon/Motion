@@ -267,6 +267,9 @@ export class createEditCanvas extends canvas{
             }
         }
 
+        this.onionSkin = document.createElementNS("http://www.w3.org/2000/svg","g")
+        this.onionSkin.style.opacity = 0.5
+        this.onionSkin.style.pointerEvents = "none"
 
         this.thicknessSlider = this.shadowRoot.getElementById("thicknessSlider")
 
@@ -570,12 +573,14 @@ export class createEditCanvas extends canvas{
         super.connectedCallback()
 
         controller.subscribeTo(this,"selectedShapes")
+        controller.subscribeToOnionSkins(this)
     }
 
     disconnectedCallback() {
         super.disconnectedCallback()
 
         controller.unsubscribeTo(this,"selectedShapes")
+        controller.unsubscribeFromOnionSkins(this)
     }
 
     save(){
@@ -926,6 +931,16 @@ export class createEditCanvas extends canvas{
 
         this.updateShapeSelection()
         this.currentMode.removeModel?.(aggregateModel, model)
+    }
+
+    updateOnionSkin(onionSkinGeometry){
+        this.onionSkin.innerHTML = onionSkinGeometry
+
+        this.canvas.appendChild(this.onionSkin)
+    }
+
+    hideOnionSkin(){
+        this.onionSkin.remove()
     }
 }
 window.customElements.define("create-edit-canvas",createEditCanvas)
