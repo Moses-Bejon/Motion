@@ -6,7 +6,8 @@ export class shapeGroup extends shape{
 
         super(appearanceTime,disappearanceTime)
 
-        this.innerShapes = innerShapes
+        // this sort retains the z-index of the shapes initially before they were merged
+        this.innerShapes = innerShapes.sort((shape1,shape2) => {return shape1.ZIndex-shape2.ZIndex})
 
         this.updateGeometry()
     }
