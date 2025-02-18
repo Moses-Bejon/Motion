@@ -144,6 +144,9 @@ export class renderer extends canvas{
             await this.captureFrame(timePerTimestamp*i,timePerTimestamp)
         }
 
+        // telling the clock it is now at the end of the animation
+        controller.aggregateModels.clock.content = (numberOfFrames-1)*timePerFrame
+
         if (!this.renderCancelled) {
 
             await this.videoEncoder.flush()
