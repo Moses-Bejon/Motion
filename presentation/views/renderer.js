@@ -131,12 +131,15 @@ export class renderer extends canvas{
 
         const numberOfFrames = Math.trunc(animationEndTimeSeconds*fps)
 
+        // go to start of animation
+        controller.goBackwardToTime(0)
+
         for (let i = 0; i<numberOfFrames;i++){
             if (this.renderCancelled){
                 break
             }
 
-            controller.newClockTime(i*timePerFrame)
+            controller.goForwardToTime(i*timePerFrame)
 
             await this.captureFrame(timePerTimestamp*i,timePerTimestamp)
         }
