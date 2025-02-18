@@ -433,10 +433,6 @@ class controllerClass{
         this.aggregateModels.clock.content = time
         this.updateAggregateModel("clock")
 
-        for (const tween of this.currentTimelineTweens){
-            tween.goToTime(time)
-        }
-
         this.previousTime = currentTime
 
         this.animationFrame = requestAnimationFrame(this.nextFrame.bind(this))
@@ -461,6 +457,11 @@ class controllerClass{
 
                 // we are just before the place where the time is greater than us
                 this.currentTimelineEvent = i-1
+
+                for (const tween of this.currentTimelineTweens){
+                    tween.goToTime(time)
+                }
+
                 return
             }
 
@@ -480,6 +481,11 @@ class controllerClass{
             if (previousEvent.time <= time){
 
                 this.currentTimelineEvent = i
+
+                for (const tween of this.currentTimelineTweens){
+                    tween.goToTime(time)
+                }
+
                 return
             }
 
@@ -501,11 +507,6 @@ class controllerClass{
 
         this.aggregateModels.clock.content = time
         this.updateAggregateModel("clock")
-
-        for (const tween of this.currentTimelineTweens){
-            tween.goToTime(time)
-        }
-
     }
 
     addTweenToCurrentTweens(tween){
