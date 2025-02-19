@@ -226,8 +226,8 @@ export class timeline extends abstractView{
 
     // position with respect to the right part of the window, filled by the timeline
     timeToTimelinePosition(timeSeconds){
-        if (timeSeconds > animationEndTimeSeconds){
-            console.error("Not implemented")
+        if (timeSeconds > animationEndTimeSeconds || timeSeconds < 0){
+            console.error("Time is out of bounds. Time is ",timeSeconds)
         } else {
             return timeSeconds/animationEndTimeSeconds
         }

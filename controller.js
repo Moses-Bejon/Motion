@@ -530,12 +530,12 @@ class controllerClass{
 
     newClockTime(time){
 
+        time = clamp(time,0,animationEndTimeSeconds)
+
         const previousTime = this.clock()
 
         this.aggregateModels.clock.content = time
         this.updateAggregateModel("clock")
-
-        time = clamp(time,0,animationEndTimeSeconds)
 
         if (time < previousTime){
             this.goBackwardToTime(time)
