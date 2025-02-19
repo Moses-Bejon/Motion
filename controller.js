@@ -618,7 +618,9 @@ class controllerClass{
     subscribeToOnionSkins(subscriber){
         this.onionSkinSubscribers.add(subscriber)
 
-        subscriber.updateOnionSkin(this.onionSkinGeometry)
+        if (this.onionSkinsCurrentlyOn){
+            subscriber.updateOnionSkin(this.onionSkinGeometry)
+        }
     }
 
     unsubscribeFromOnionSkins(subscriber){

@@ -177,7 +177,7 @@ export class settings extends abstractView{
 
         this.onionSkinsOnInput.checked = onionSkinsOn
         if (!onionSkinsOn){
-            this.onionSkinsTimeGap.display = "none"
+            this.onionSkinsTimeGap.style.display = "none"
         }
         this.onionSkinsOnInput.onchange = () => {
             const value = validateBoolean(this.onionSkinsOnInput.checked)
@@ -190,10 +190,10 @@ export class settings extends abstractView{
 
             changeOnionSkinsOn(value)
             if (onionSkinsOn){
-                this.onionSkinsTimeGap.display = "block"
+                this.onionSkinsTimeGap.style.display = "block"
                 controller.onionSkinsOn()
             } else {
-                this.onionSkinsTimeGap.display = "none"
+                this.onionSkinsTimeGap.style.display = "none"
                 controller.onionSkinsOff()
             }
         }
