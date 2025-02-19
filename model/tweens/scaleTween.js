@@ -56,24 +56,24 @@ export class scaleTween extends tween{
 
         this.scaleBy(amountToScale)
 
-        controller.updateShapeWithoutOnionSkins(this.shape)
-
         this.previousScale = currentScale
+
+        controller.updateShapeWithoutOnionSkins(this.shape)
     }
 
     finish(){
         this.scaleBy(this.totalScale/this.previousScale)
 
-        controller.updateShape(this.shape)
-
         this.previousScale = this.totalScale
+
+        controller.updateShape(this.shape)
     }
 
     beforeStart(){
         this.scaleBy(1/this.previousScale)
 
-        controller.updateShape(this.shape)
-
         this.previousScale = 1
+
+        controller.updateShape(this.shape)
     }
 }

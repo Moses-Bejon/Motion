@@ -592,9 +592,10 @@ class controllerClass{
         }
 
         // cover our tracks so that rest of logic can proceed as usual
+        this.updateShape = updateShapeWithoutOnionSkins
+        this.updateShapeWithoutOnionSkins = updateShapeWithoutOnionSkins
         this.goForwardToTime(this.clock())
         this.updateShape = update
-        this.updateShapeWithoutOnionSkins = updateShapeWithoutOnionSkins
     }
 
     onionSkinsOff(){

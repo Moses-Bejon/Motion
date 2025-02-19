@@ -76,7 +76,6 @@ export class overview extends abstractView{
         this.shadowRoot.getElementById("newDirectoryButton").onpointerdown = (pointerEvent) => {
 
             pointerEvent.stopPropagation()
-            pointerEvent.preventDefault()
 
             if (controller.selectedShapes().size === 0){
                 alert("Please select the shapes you want to put into this directory before you create it")
@@ -102,7 +101,6 @@ export class overview extends abstractView{
         this.shadowRoot.getElementById("moveToDirectoryButton").onpointerdown = (pointerEvent) => {
 
             pointerEvent.stopPropagation()
-            pointerEvent.preventDefault()
 
             if (controller.selectedShapes().size === 0){
                 alert("Please select the shapes you want to put into this directory")
@@ -187,7 +185,6 @@ export class overview extends abstractView{
 
             // prevents shape from deselecting
             pointerEvent.stopPropagation()
-            pointerEvent.preventDefault()
 
             if (pointerEvent.ctrlKey){
 
@@ -285,7 +282,6 @@ export class overview extends abstractView{
         directoryListing.onpointerdown = (pointerEvent) => {
 
             pointerEvent.stopPropagation()
-            pointerEvent.preventDefault()
 
             controller.newSelectedDirectory(directoryName)
         }
@@ -321,7 +317,6 @@ export class overview extends abstractView{
             }
 
             pointerEvent.stopPropagation()
-            pointerEvent.preventDefault()
         }
 
         directoryIconLabelContainer.appendChild(directoryIcon)
