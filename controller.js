@@ -728,8 +728,8 @@ class controllerClass{
             activeElement = activeElement.shadowRoot.activeElement
         }
 
-        // if the active element is an input it gets priority
-        if (activeElement.tagName === "INPUT"){
+        // if the active element is a text input it gets priority
+        if (activeElement.tagName === "INPUT" && activeElement.type === "text"){
             return
         }
 
