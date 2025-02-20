@@ -105,7 +105,9 @@ export function acuteAngleBetweenThreePoints(A, B, C){
     const BA = subtract2dVectors(A,B)
     const BC = subtract2dVectors(C,B)
 
-    return Math.acos(dotProduct2d(BA,BC)/(Math.hypot(...BA)*Math.hypot(...BC)))
+    // the clamp is used because, even though the vectors are such that it is guaranteed to be between -1 and 1,
+    // floating point errors mean the calculation, in practice, might come to something slightly out of this range
+    return Math.acos(clamp(dotProduct2d(BA,BC)/(Math.hypot(...BA)*Math.hypot(...BC)),-1,1))
 }
 
 export function angleBetweenThreePoints(A, B, C){
