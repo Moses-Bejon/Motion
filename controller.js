@@ -4,7 +4,7 @@ import {randomBrightColour} from "./random.js"
 import {action} from "./model/action.js";
 import {rootAction} from "./model/rootAction.js";
 import {
-    animationEndTimeSeconds,
+    animationEndTimeSeconds, autoAddToTimeline,
     canvasHeight,
     canvasWidth,
     changeAnimationEndTimeSeconds,
@@ -122,6 +122,11 @@ class controllerClass{
         newAction.appendToUndoRedoStack(this.previousAction)
 
         this.previousAction = newAction
+
+        // if we automatically add timeline events and there are timeline events automatically add them
+        if (autoAddToTimeline && timelineEvents.length !== 0){
+            this.addPreviousActionTimelineEventToTimeline()
+        }
     }
 
     undoAction(){

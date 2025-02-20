@@ -71,6 +71,11 @@ export function changeOnionSkinsOn(newOnionSkinsOn){
     onionSkinsOn = newOnionSkinsOn
 }
 
+export let autoAddToTimeline = false
+export function changeAutoAddToTimeline(newAutoAddToTimeline){
+    autoAddToTimeline = newAutoAddToTimeline
+}
+
 // how large UI overlays (like rotate icons) on the canvas typically are
 export const canvasOverlayUISize = 50
 
