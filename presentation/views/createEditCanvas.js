@@ -9,7 +9,8 @@ import {
     typicalIconSize,
     thicknessLevel,
     timelineSnapLength,
-    buttonSelectedColour
+    buttonSelectedColour,
+    timeEpsilon
 } from "../../globalValues.js";
 import {canvas} from "./canvas.js";
 import {drawMode} from "./createModes/drawMode.js";
@@ -257,7 +258,8 @@ export class createEditCanvas extends canvas{
 
         this.persistentTemporarySwitch.onCallback = () => {
             this.timeToShapeAppearanceDisappearanceTime = (time) => {
-                return [time-timelineSnapLength/2,time+timelineSnapLength/2]
+                // + epsilon to ensure there are no flashes of white when something disappears and another appears
+                return [time-timelineSnapLength/2,time+timelineSnapLength/2+timeEpsilon]
             }
         }
 

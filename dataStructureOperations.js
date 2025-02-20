@@ -1,5 +1,5 @@
 import { isGreater } from "./maths.js";
-import {epsilon} from "./globalValues.js";
+import {canvasEpsilon} from "./globalValues.js";
 
 // may be optimised by reduce function if performance becomes concern:
 export function maximumOfArray(array,key,comparison=isGreater){
@@ -90,7 +90,7 @@ export function validatePositiveReal(possibleNumber){
         return null
     }
 
-    return Math.max(value,epsilon)
+    return Math.max(value,canvasEpsilon)
 }
 
 export function validateBoolean(possibleBoolean){

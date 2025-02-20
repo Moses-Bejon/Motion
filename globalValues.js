@@ -1,7 +1,8 @@
 // global constants are defined here
 
-// global epsilon
-export const epsilon = 1e-2
+// global epsilons
+export const canvasEpsilon = 1e-2
+export const timeEpsilon = 1e-4
 
 export const fontFamily = "Arial"
 export const fontSizeInt = 12

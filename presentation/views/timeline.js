@@ -228,9 +228,8 @@ export class timeline extends abstractView{
     timeToTimelinePosition(timeSeconds){
         if (timeSeconds > animationEndTimeSeconds || timeSeconds < 0){
             console.error("Time is out of bounds. Time is ",timeSeconds)
-        } else {
-            return timeSeconds/animationEndTimeSeconds
         }
+        return timeSeconds/animationEndTimeSeconds
     }
 
     // position with respect to whole window
