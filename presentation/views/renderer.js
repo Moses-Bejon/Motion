@@ -1,6 +1,13 @@
 import {controller} from "../../controller.js";
 import {canvas} from "./canvas.js";
-import {animationEndTimeSeconds, canvasHeight, canvasWidth, typicalIconSizeInt} from "../../globalValues.js";
+import {
+    animationEndTimeSeconds,
+    canvasHeight,
+    canvasWidth,
+    typicalIconSizeInt,
+    fontSize,
+    fontFamily
+}from "../../globalValues.js";
 import {fontsCSS} from "../../fontsCSS.js";
 import {ArrayBufferTarget,Muxer} from "../../mp4-muxer.mjs";
 
@@ -16,7 +23,10 @@ template.innerHTML = `
             left: ${typicalIconSizeInt * 2}px;
             height: ${typicalIconSizeInt}px;
             display: flex;
+            gap: 10px;
             align-items: center;
+            font-family: ${fontFamily};
+            font-size: ${fontSize};
         }
         #renderAnimationButton,#renderFrameButton{
             cursor: pointer;
