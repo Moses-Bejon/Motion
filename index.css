@@ -11,12 +11,19 @@
     left: var(--margin);
     height: var(--banner-height);
     display: flex;
+    width: calc(100% - 2*var(--margin));
 
     user-select: none;
 }
 
 .bannerButton{
     height: 100%;
+}
+.bannerLink{
+    line-height: var(--banner-height);
+    margin-left: auto;
+    font-family: arial;
+    font-size: 25px;
 }
 
 .realFakeButtonContainer{
