@@ -29,6 +29,14 @@ template.innerHTML = `
             background: linear-gradient(to right, darkgray ${timelineLeftMenuSizePercentage}%, lightgray ${timelineLeftMenuSizePercentage}%);
             
             overflow-y: auto;
+            
+            /* remove scroll bar on firefox */
+            scrollbar-width: none;
+        }
+        #timeline::-webkit-scrollbar {
+        
+            /* remove scroll bar on not firefox */
+            display: none
         }
         #timelineList{
             position: relative;
