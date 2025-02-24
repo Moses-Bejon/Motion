@@ -271,7 +271,7 @@ export class settings extends abstractView{
         this.defaultTweenLengthInput.onchange = () => {
             // validation
 
-            const value = validatePositiveReal(this.defaultTweenLengthInput.value)
+            const value = Math.max(validateReal(this.defaultTweenLengthInput.value),0)
 
             if (value === null){
                 alert("Please enter a valid time in seconds")
