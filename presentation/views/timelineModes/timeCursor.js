@@ -18,6 +18,7 @@ export class timeCursor{
         this.currentTime.inputMode = "numeric"
         this.currentTime.id = "currentTimeInput"
 
+        // removes non-numeric characters from input
         this.currentTime.oninput = () => {
             if (isNaN(parseFloat(this.currentTime.value))){
                 this.currentTime.value = this.currentTime.value.slice(0,this.currentTime.value.length-1)

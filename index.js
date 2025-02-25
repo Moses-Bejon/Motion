@@ -22,6 +22,9 @@ loadButton.oninput = (input) => {
                     replaceRootWindowWithSave(savedRootWindow)
             }
         )
+
+        // clears input so the user can input the same file multiple times
+        input.target.value = ""
 }
 
 document.getElementById("saveButton").onpointerdown = () => {

@@ -300,6 +300,9 @@ export class createEditCanvas extends canvas{
         graphic.oninput = (input) => {
             this.currentMode.switchMode()
             this.currentMode = new graphicMode(input.target.files[0])
+
+            // clears input so the user can input the same file multiple times
+            input.target.value = ""
         }
 
         const fakeGraphic = this.shadowRoot.getElementById("fakeGraphic")
