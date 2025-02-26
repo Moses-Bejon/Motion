@@ -477,6 +477,14 @@ export class createEditCanvas extends canvas{
 
             const shapesToMove = new Set(this.selectedShapes)
 
+            // shapes already at the back cannot move back, they are removed from the set.
+            let indexOfTopShape = this.shapesInOrderOfZIndex.length-1
+
+            while (shapesToMove.has(this.shapesInOrderOfZIndex[indexOfTopShape])){
+                shapesToMove.delete(this.shapesInOrderOfZIndex[indexOfTopShape])
+                indexOfTopShape --
+            }
+
             controller.newAction(() => {
                     this.moveShapesOneAbove(shapesToMove)
                 },
@@ -491,6 +499,14 @@ export class createEditCanvas extends canvas{
         this.shadowRoot.getElementById("moveBehind").onpointerdown = (pointerEvent) => {
 
             const shapesToMove = new Set(this.selectedShapes)
+
+            // shapes already at the back cannot move back, they are removed from the set.
+            let indexOfBottomShape = 0
+
+            while (shapesToMove.has(this.shapesInOrderOfZIndex[indexOfBottomShape])){
+                shapesToMove.delete(this.shapesInOrderOfZIndex[indexOfBottomShape])
+                indexOfBottomShape ++
+            }
 
             controller.newAction(() => {
                     this.moveShapesOneBelow(shapesToMove)
