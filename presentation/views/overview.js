@@ -260,7 +260,11 @@ export class overview extends abstractView{
         deleteButton.alt = "Delete shape button"
 
         deleteButton.onpointerdown = (pointerEvent) => {
-            controller.removeShape(model)
+            controller.newAction(
+                () => {controller.removeShape(model)},
+                () => {controller.newShape(model)},
+                []
+            )
 
             // prevents the shape from then being selected after being removed
             pointerEvent.stopPropagation()
