@@ -477,7 +477,7 @@ export class createEditCanvas extends canvas{
 
             const shapesToMove = new Set(this.selectedShapes)
 
-            // shapes already at the back cannot move back, they are removed from the set.
+            // shapes already at the top cannot move above, they are removed from the set.
             let indexOfTopShape = this.shapesInOrderOfZIndex.length-1
 
             while (shapesToMove.has(this.shapesInOrderOfZIndex[indexOfTopShape])){
