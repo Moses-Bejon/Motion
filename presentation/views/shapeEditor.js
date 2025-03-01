@@ -152,7 +152,7 @@ const nameToGetFunction = {
 }
 
 const nameToValidation =   {
-    "Appearance time": (value,shape) => {
+    "Appearance time": (value,shapes) => {
 
         value = validateReal(value)
 
@@ -160,18 +160,22 @@ const nameToValidation =   {
             return null
         }
 
-        value = clamp(value,0,shape.disappearanceTime)
+        for (const shape of shapes){
+            value = clamp(value,0,shape.disappearanceTime)
+        }
 
         return value
     },
-    "Disappearance time": (value,shape) => {
+    "Disappearance time": (value,shapes) => {
         value = validateReal(value)
 
         if (value === null){
             return null
         }
 
-        value = clamp(value,shape.appearanceTime,animationEndTimeSeconds)
+        for (const shape of shapes){
+            value = clamp(value,shape.appearanceTime,animationEndTimeSeconds)
+        }
 
         return value
     },
@@ -383,7 +387,7 @@ export class shapeEditor extends abstractView{
 
     updateProperty(propertyName,newValue){
 
-        newValue = nameToValidation[propertyName](newValue)
+        newValue = nameToValidation[propertyName](newValue,this.selectedShapesOrdered)
 
         // validated to null
         if (newValue === null){
