@@ -25,6 +25,7 @@ import {
 import {validateNatural, validatePositiveReal, validateReal, validateBoolean} from "../../dataStructureOperations.js";
 import {controller} from "../../controller.js";
 import {refreshViews} from "../../index.js";
+import {clamp} from "../../maths.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -149,13 +150,19 @@ export class settings extends abstractView{
 
             // validation
 
-            const value = validateNatural(this.canvasWidthInput.value)
+            let value = validateNatural(this.canvasWidthInput.value)
 
             if (value === null){
                 alert("Please enter a valid width in pixels")
                 this.canvasWidthInput.value = canvasWidth
                 return
             }
+
+            // codec supports maximum resolution of 900
+            value = clamp(value,16,900)
+
+            // codec only supports frames with even dimensions
+            value = Math.trunc(value/2)*2
 
             changeCanvasWidth(value)
             refreshViews()
