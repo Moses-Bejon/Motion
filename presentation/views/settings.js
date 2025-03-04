@@ -173,13 +173,19 @@ export class settings extends abstractView{
 
             // validation
 
-            const value = validateNatural(this.canvasHeightInput.value)
+            let value = validateNatural(this.canvasHeightInput.value)
 
             if (value === null){
                 alert("Please enter a valid width in pixels")
                 this.canvasHeightInput.value = canvasHeight
                 return
             }
+
+            // codec supports maximum resolution of 900
+            value = clamp(value,16,900)
+
+            // codec only supports frames with even dimensions
+            value = Math.trunc(value/2)*2
 
             changeCanvasHeight(value)
             refreshViews()
