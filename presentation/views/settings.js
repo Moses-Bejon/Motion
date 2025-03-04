@@ -26,10 +26,6 @@ import {validateNatural, validatePositiveReal, validateReal, validateBoolean} fr
 import {controller} from "../../controller.js";
 import {refreshViews} from "../../index.js";
 
-export const settingValues = {
-    animationEndTimeSeconds:10
-}
-
 const template = document.createElement("template")
 template.innerHTML = `
 <style>
