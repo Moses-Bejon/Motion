@@ -100,6 +100,19 @@ export class renderer extends canvas{
     }
 
     async renderAnimation(){
+
+        // only really properly tested on chromium based browsers
+        if (window.chrome === undefined){
+            alert(`Apologies. 
+            
+At current time of development, the renderer is only stable on chromium-based browsers. 
+
+You can still try on other browsers, but may encounter unexpected behaviour. 
+(unexpected behaviour observed on tests in Firefox (resizes video strangely and adds black region) and Safari (errors))
+
+Saving is still fully supported on all browsers and so I would advise you switch over for just a second to render it.`)
+        }
+
         const fps = parseFloat(this.fps.value)
 
         if (isNaN(fps) || fps < 1 || fps > 120){
