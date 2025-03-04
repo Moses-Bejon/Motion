@@ -697,7 +697,8 @@ export class createEditCanvas extends canvas{
         // if any selected shape accepts the input, we have accepted the input
         // I cannot break early as the operation should apply to all selected shapes
         for (const shape of this.selectedShapes){
-            acceptedBySelectedShape = acceptedBySelectedShape || this.shapeToMode(shape).acceptKeyDownOnShape(keyboardEvent,shape)
+            const acceptedByCurrentShape = this.shapeToMode(shape).acceptKeyDownOnShape(keyboardEvent,shape)
+            acceptedBySelectedShape = acceptedBySelectedShape || acceptedByCurrentShape
         }
 
         if (acceptedBySelectedShape){
