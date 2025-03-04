@@ -193,7 +193,7 @@ export class settings extends abstractView{
 
             changeOnionSkinsOn(value)
             if (onionSkinsOn){
-                this.onionSkinsTimeGap.style.display = "block"
+                this.onionSkinsTimeGap.style.display = "flex"
                 controller.onionSkinsOn()
             } else {
                 this.onionSkinsTimeGap.style.display = "none"
