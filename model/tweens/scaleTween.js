@@ -13,7 +13,7 @@ export class scaleTween extends tween{
         // we need to ensure we don't get confused by our own translations
         this.translationCausedByUs = [0,0]
 
-        this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getPosition())
+        this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getOffsetPoint())
     }
 
     save(){
@@ -35,18 +35,22 @@ export class scaleTween extends tween{
 
     scaleBy(scaleFactor){
         const centre = add2dVectors(
-            this.shape.getPosition(),
+            this.shape.getOffsetPoint(),
             subtract2dVectors(
                 this.relativeCentre,
                 this.translationCausedByUs
             )
         )
 
-        const positionBeforeScale = this.shape.getPosition()
+        console.log("scaling about",centre)
+
+        const positionBeforeScale = this.shape.getOffsetPoint()
 
         this.shape.scale(scaleFactor,centre)
 
-        increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getPosition(),positionBeforeScale))
+        console.log("translation caused by us before scale",this.translationCausedByUs)
+        increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getOffsetPoint(),positionBeforeScale))
+        console.log("translation caused by us after scale",this.translationCausedByUs)
     }
 
     goToTime(time){
