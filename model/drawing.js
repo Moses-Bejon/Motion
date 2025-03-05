@@ -12,6 +12,8 @@ export class drawing extends shape{
         this.points = points
 
         this.updateGeometry()
+
+        super.setupOffset()
     }
 
     static lineBetween(x1,y1,x2,y2,thickness,colour){
