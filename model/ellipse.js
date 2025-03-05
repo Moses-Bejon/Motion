@@ -19,6 +19,8 @@ export class ellipse extends shape{
         this.thickness = thickness
 
         this.updateGeometry()
+
+        super.setupOffset()
     }
 
     save(){
@@ -113,6 +115,7 @@ export class ellipse extends shape{
         increment2dVectorBy(this.centre,translationVector)
 
         this.updateGeometry()
+        this.translateOffsetPointBy(translationVector)
     }
 
     scale(scaleFactor,aboutCentre){
@@ -122,6 +125,7 @@ export class ellipse extends shape{
         this.thickness *= Math.abs(scaleFactor)
 
         this.updateGeometry()
+        this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
     rotate(angle,aboutCentre){
@@ -131,6 +135,7 @@ export class ellipse extends shape{
 
         this.rotation += angle
         this.updateGeometry()
+        this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 
     copy(){

@@ -23,6 +23,7 @@ export class text extends shape{
 
         this.updateGeometry()
 
+        super.setupOffset()
     }
 
     save(){
@@ -128,6 +129,7 @@ export class text extends shape{
         increment2dVectorBy(this.bottomLeft,translationVector)
 
         this.updateGeometry()
+        this.translateOffsetPointBy(translationVector)
     }
 
     scale(scaleFactor,aboutCentre){
@@ -136,6 +138,7 @@ export class text extends shape{
         this.fontSize *= Math.abs(scaleFactor)
 
         this.updateGeometry()
+        this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
     rotate(angle,aboutCentre){
@@ -145,6 +148,7 @@ export class text extends shape{
 
         this.rotation += angle
         this.updateGeometry()
+        this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 
     copy(){
