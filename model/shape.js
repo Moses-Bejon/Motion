@@ -1,4 +1,4 @@
-import {getRotateByAngle, increment2dVectorBy, scale2dVectorAboutPoint} from "../maths.js";
+import {midPoint2d} from "../maths.js";
 import {controller} from "../controller.js";
 
 export class shape{
@@ -10,9 +10,6 @@ export class shape{
         this.timelineEvents = new Set()
 
         this.modelConstructed = false
-
-        // the offset point is used to determine how much overall translation has happened to the shape
-        this.offset = [0,0]
     }
 
     // The model needs to also construct shapes to ensure shapes have attributes which
@@ -94,22 +91,9 @@ export class shape{
         controller.changeTimeOfEvent(this.disappearanceEvent,newTime)
     }
 
-    getOffsetPoint(){
-        return this.offset
+    getPosition(){
+        return midPoint2d([this.left,this.top],[this.right,this.bottom])
     }
-
-    rotateOffsetPointAbout(centreOfRotation,angle){
-        getRotateByAngle(angle,centreOfRotation)(this.offset)
-    }
-
-    scaleOffsetPointAbout(centreOfScale,scaleFactor){
-        scale2dVectorAboutPoint(this.offset,centreOfScale,scaleFactor)
-    }
-
-    translateOffsetPointBy(translationVector){
-        increment2dVectorBy(this.offset,translationVector)
-    }
-
 
     geometryAttributeUpdate(attribute, newValue){
         this[attribute] = newValue

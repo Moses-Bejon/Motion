@@ -76,7 +76,6 @@ export class shapeGroup extends shape{
         }
 
         this.updateGeometry()
-        this.translateOffsetPointBy(translationVector)
     }
 
     scale(scaleFactor,aboutCentre){
@@ -85,7 +84,6 @@ export class shapeGroup extends shape{
         }
 
         this.updateGeometry()
-        this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
     rotate(angle,aboutCentre){
@@ -94,7 +92,6 @@ export class shapeGroup extends shape{
         }
 
         this.updateGeometry()
-        this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 
     copy(){

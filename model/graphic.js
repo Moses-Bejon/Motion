@@ -125,7 +125,6 @@ export class graphic extends shape{
         increment2dVectorBy(this.topLeft,translationVector)
 
         this.updateGeometry()
-        this.translateOffsetPointBy(translationVector)
     }
 
     scale(scaleFactor,aboutCentre){
@@ -134,7 +133,6 @@ export class graphic extends shape{
         this.height *= Math.abs(scaleFactor)
 
         this.updateGeometry()
-        this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
     rotate(angle,aboutCentre){
@@ -144,7 +142,6 @@ export class graphic extends shape{
 
         this.rotation += angle
         this.updateGeometry()
-        this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 
     copy(){
