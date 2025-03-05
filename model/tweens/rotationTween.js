@@ -13,7 +13,7 @@ export class rotationTween extends tween{
         // we need to ensure we don't get confused by our own translations
         this.translationCausedByUs = [0,0]
 
-        this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getPosition())
+        this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getOffsetPoint())
     }
 
     save(){
@@ -35,18 +35,18 @@ export class rotationTween extends tween{
 
     rotateByAngle(angle){
         const centre = add2dVectors(
-            this.shape.getPosition(),
+            this.shape.getOffsetPoint(),
             subtract2dVectors(
                 this.relativeCentre,
                 this.translationCausedByUs
             )
         )
 
-        const positionBeforeRotation = this.shape.getPosition()
+        const positionBeforeRotation = this.shape.getOffsetPoint()
 
         this.shape.rotate(angle,centre)
 
-        increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getPosition(),positionBeforeRotation))
+        increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getOffsetPoint(),positionBeforeRotation))
     }
 
     goToTime(time){
