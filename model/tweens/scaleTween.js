@@ -42,15 +42,11 @@ export class scaleTween extends tween{
             )
         )
 
-        console.log("scaling about",centre)
-
         const positionBeforeScale = this.shape.getOffsetPoint()
 
         this.shape.scale(scaleFactor,centre)
 
-        console.log("translation caused by us before scale",this.translationCausedByUs)
         increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getOffsetPoint(),positionBeforeScale))
-        console.log("translation caused by us after scale",this.translationCausedByUs)
     }
 
     goToTime(time){

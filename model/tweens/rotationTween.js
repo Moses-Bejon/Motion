@@ -42,8 +42,6 @@ export class rotationTween extends tween{
             )
         )
 
-        console.log("rotating about",centre)
-
         const positionBeforeRotation = this.shape.getOffsetPoint()
 
         this.shape.rotate(angle,centre)

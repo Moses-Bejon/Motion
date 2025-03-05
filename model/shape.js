@@ -102,20 +102,15 @@ export class shape{
     }
 
     rotateOffsetPointAbout(centreOfRotation,angle){
-        console.log(centreOfRotation,angle,this.offset)
         this.offset = getRotateByAngle(angle,centreOfRotation)(this.offset)
-        console.log(this.offset)
     }
 
     scaleOffsetPointAbout(centreOfScale,scaleFactor){
-        console.log(centreOfScale,scaleFactor,this.offset,"ahoo")
         scale2dVectorAboutPoint(this.offset,centreOfScale,scaleFactor)
-        console.log(this.offset)
     }
 
     translateOffsetPointBy(translationVector){
         increment2dVectorBy(this.offset,translationVector)
-        console.log(this.offset)
     }
 
 
