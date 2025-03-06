@@ -404,6 +404,8 @@ class controllerClass{
                     this.currentTimelineEvent --
                 }
 
+                this.currentTimelineTweens.delete(timeLineEvent.tween)
+
             } else {
                 remainingEvents.push(timeLineEvent)
             }
@@ -422,6 +424,8 @@ class controllerClass{
                 if (timeLineEvent.time <= this.clock()){
                     this.currentTimelineEvent --
                 }
+
+                this.currentTimelineTweens.delete(timeLineEvent.tween)
 
             } else {
                 remainingEvents.push(timeLineEvent)
@@ -1125,3 +1129,5 @@ class controllerClass{
 }
 
 export const controller = new controllerClass()
+
+console.log(controller)
