@@ -855,6 +855,8 @@ class controllerClass{
 
     saveFile(rootWindowSaved){
 
+        this.pauseAnimation()
+
         const fileName = window.prompt("Enter file name:","untitled")
 
         // if user clicks cancel
@@ -1032,6 +1034,8 @@ class controllerClass{
     }
 
     async loadFile(file){
+
+        this.pauseAnimation()
 
         try {
             file = await this.readJSONFile(file)
