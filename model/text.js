@@ -52,6 +52,7 @@ export class text extends shape{
         this.fontFamily = save.fontFamily
 
         this.updateGeometry()
+        this.setupOffset()
     }
 
     updateWidthAndHeightFromText(){

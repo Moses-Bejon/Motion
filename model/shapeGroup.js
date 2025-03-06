@@ -40,6 +40,7 @@ export class shapeGroup extends shape{
         }
 
         this.updateGeometry()
+        this.setupOffset()
     }
 
     updateGeometry(){

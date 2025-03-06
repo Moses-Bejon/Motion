@@ -78,7 +78,6 @@ export class graphic extends shape{
                 this.height = htmlImage.height
 
                 this.updateGeometry()
-
                 super.setupOffset()
 
                 resolve()

@@ -51,6 +51,7 @@ export class ellipse extends shape{
         this.thickness = save.thickness
 
         this.updateGeometry()
+        this.setupOffset()
     }
 
     updateGeometry(){

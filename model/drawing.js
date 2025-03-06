@@ -59,7 +59,7 @@ export class drawing extends shape{
         this.points = save.points
 
         this.updateGeometry()
-
+        this.setupOffset()
     }
 
     getNewGeometryGroup(){
