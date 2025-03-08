@@ -226,6 +226,8 @@ export class settings extends abstractView{
 
             changeOnionSkinTimeGap(value)
             controller.updateOnionSkins()
+
+            this.onionSkinsTimeGapInput.value = value
         }
 
         this.autoAddToTimelineInput.checked = autoAddToTimeline
