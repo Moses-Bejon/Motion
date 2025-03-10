@@ -11,9 +11,8 @@ export function randomBrightColour(){
     const colourComponentTwoIndex = randomZeroToInteger(1)
     const colourComponentTwo = randomZeroToInteger(255)
     colour[colourComponents[colourComponentTwoIndex]] = colourComponentTwo
-    colourComponents.splice(colourComponentOneIndex,1)
-
-    colour[colourComponents[0]] = 510 - colourComponentOne - colourComponentTwo
+    colourComponents.splice(colourComponentTwoIndex,1)
+    colour[colourComponents[0]] = Math.min(510 - colourComponentOne - colourComponentTwo,255)
 
     return `rgb(${colour.R} ${colour.G} ${colour.B})`
 }
