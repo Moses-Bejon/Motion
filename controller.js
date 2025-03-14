@@ -740,7 +740,7 @@ class controllerClass{
         }
 
         // if the active element is a text input it gets priority
-        if (activeElement.tagName === "INPUT" && activeElement.type === "text"){
+        if (activeElement.tagName === "INPUT" && (activeElement.type === "text" || activeElement.type === "number")){
             return
         }
 
