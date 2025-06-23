@@ -9,7 +9,6 @@ import {
     fontFamily
 }from "../../globalValues.js";
 import {fontsCSS} from "../../fontsCSS.js";
-import {ArrayBufferTarget,Muxer} from "../../mp4-muxer.mjs";
 
 const serializer = new XMLSerializer()
 const DOMURL = self.URL || self.webkitURL || self
@@ -115,8 +114,8 @@ export class renderer extends canvas{
         this.renderCancelled = false
         const now = controller.clock()
 
-        let muxer = new Muxer({
-            target: new ArrayBufferTarget(),
+        let muxer = new Mp4Muxer.Muxer({
+            target: new Mp4Muxer.ArrayBufferTarget(),
             video: {
                 codec: 'avc',
                 width: canvasWidth,
