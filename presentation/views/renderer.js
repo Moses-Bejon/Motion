@@ -71,7 +71,7 @@ export class renderer extends canvas{
         // (rather than all of them every time)
         fontsCSS.then(css => {
             const fonts = document.createElementNS("http://www.w3.org/2000/svg","defs")
-            fonts.innerHTML = css
+            fonts.innerHTML = "<style>" + css + "</style>"
             this.canvas.prepend(fonts)
         })
     }
