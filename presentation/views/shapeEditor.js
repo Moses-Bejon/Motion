@@ -4,6 +4,7 @@ import {
     animationEndTimeSeconds,
     fontFamily,
     fontSize,
+    fontsList,
     fullScreenAndDropdownContainerWidth,
     minimumThickness,
     typicalIconSize,
@@ -21,13 +22,9 @@ floatInput.type = "number"
 const colourInput = document.createElement("input")
 colourInput.type = "color"
 
-const fonts = ["Arial","Roboto","Old Standard TT","Zilla Slab","Sofia","Coming Soon","Pangolin",
-    "Comic Neue", "Balsamiq Sans", "EB Garamond", "Playwrite NG Modern", "Modern Antiqua","Doto","Tiny5",
-    "Jolly Lodger", "Yellowtail"]
-
 const fontSelector = document.createElement("select")
 
-for (const font of fonts){
+for (const font of fontsList){
     const fontOption = document.createElement("option")
 
     fontOption.value = font
@@ -205,7 +202,7 @@ const nameToValidation =   {
     "Font size (pt)":validatePositiveReal,
     "Font":(font)=>{
 
-        if (fonts.includes(font)){
+        if (fontsList.includes(font)){
             return font
         }
 

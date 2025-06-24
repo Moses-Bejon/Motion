@@ -1,5 +1,9 @@
 // global constants are defined here
 
+export const fontsList = ["Arial","Roboto","Old Standard TT","Zilla Slab","Sofia","Coming Soon","Pangolin",
+    "Comic Neue", "Balsamiq Sans", "EB Garamond", "Playwrite NG Modern", "Modern Antiqua","Doto","Tiny5",
+    "Jolly Lodger", "Yellowtail"]
+
 // global epsilons
 export const canvasEpsilon = 1e-2
 export const timeEpsilon = 1e-4
