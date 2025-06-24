@@ -69,9 +69,11 @@ export class renderer extends canvas{
 
         // this could be optimised in the future by only loading fonts that are actually used
         // (rather than all of them every time)
-        const fonts = document.createElementNS("http://www.w3.org/2000/svg","defs")
-        fonts.innerHTML = fontsCSS
-        this.canvas.prepend(fonts)
+        fontsCSS.then(css => {
+            const fonts = document.createElementNS("http://www.w3.org/2000/svg","defs")
+            fonts.innerHTML = css
+            this.canvas.prepend(fonts)
+        })
     }
 
     disconnectedCallback(){
@@ -189,9 +191,6 @@ export class renderer extends canvas{
         return new Promise((resolve) => {
             frame.onload = () => {
                 ctx.drawImage(frame,0,0,canvasWidth,canvasHeight)
-                canvas.style.ZIndex = 10000
-                resolve()
-
                 const videoFrame = new VideoFrame(canvas, { timestamp: timeStamp, duration: duration, alpha: "keep"})
                 this.videoEncoder.encode(videoFrame)
                 videoFrame.close()
