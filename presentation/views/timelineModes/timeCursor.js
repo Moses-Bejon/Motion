@@ -1,6 +1,6 @@
 import {controller} from "../../../controller.js";
 import {clamp} from "../../../maths.js";
-import {validateReal} from "../../../dataStructureOperations.js";
+import {stringToReal} from "../../../dataStructureOperations.js";
 import {animationEndTimeSeconds, typicalIconSize} from "../../../globalValues.js";
 
 export class timeCursor{
@@ -21,13 +21,13 @@ export class timeCursor{
 
         // removes non-numeric characters from input
         this.currentTime.oninput = () => {
-            if (validateReal(this.currentTime.value) === null){
+            if (stringToReal(this.currentTime.value) === null){
                 this.currentTime.value = this.currentTime.value.slice(0,this.currentTime.value.length-1)
             }
         }
         this.currentTime.onchange = () => {
 
-            if (validateReal(this.currentTime.value) === null){
+            if (stringToReal(this.currentTime.value) === null){
                 this.currentTime.value = "0"
             }
 

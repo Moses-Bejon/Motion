@@ -1,5 +1,4 @@
 import {shape} from "./shape.js";
-import {fontSizeInt,fontFamily} from "../globalValues.js";
 import {
     add2dVectors,
     getEdgesOfBoxAfterRotation,
@@ -9,7 +8,7 @@ import {
 } from "../maths.js";
 
 export class text extends shape{
-    constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size=fontSizeInt,family=fontFamily){
+    constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size,family){
         super(appearanceTime,disappearanceTime)
 
         this.text = "Begin typing"

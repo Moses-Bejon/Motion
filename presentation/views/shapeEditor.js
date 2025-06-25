@@ -11,7 +11,7 @@ import {
     typicalIconSizeInt
 } from "../../globalValues.js";
 import {clamp, returnInput} from "../../maths.js";
-import {validateColour, validatePositiveReal, validateReal} from "../../dataStructureOperations.js";
+import {stringToPositiveReal, stringToReal, stringToColour} from "../../dataStructureOperations.js";
 
 const stringInput = document.createElement("input")
 stringInput.type = "text"
@@ -148,10 +148,10 @@ const nameToGetFunction = {
     }
 }
 
-const nameToValidation =   {
+const nameToStringToValue =   {
     "Appearance time": (value,shapes) => {
 
-        value = validateReal(value)
+        value = stringToReal(value)
 
         if (value === null){
             return null
@@ -164,7 +164,7 @@ const nameToValidation =   {
         return value
     },
     "Disappearance time": (value,shapes) => {
-        value = validateReal(value)
+        value = stringToReal(value)
 
         if (value === null){
             return null
@@ -176,9 +176,9 @@ const nameToValidation =   {
 
         return value
     },
-    "Colour":validateColour,
+    "Colour":stringToColour,
     "Thickness":(value) => {
-        value = validateReal(value)
+        value = stringToReal(value)
 
         if (value === null){
             return null
@@ -188,18 +188,13 @@ const nameToValidation =   {
 
         return value
     },
-    "Polygon fill":validateColour,
-    "Outline colour":validateColour,
-    "Width":validatePositiveReal,
-    "Height":validatePositiveReal,
-
-    // all values from html inputs are guaranteed to be strings
-    // validation for stuff like possible code insertion is done in text.js
-    // (not for security, but for client convenience and to prevent unexpected behaviour, as is client side anyway)
+    "Polygon fill":stringToColour,
+    "Outline colour":stringToColour,
+    "Width":stringToPositiveReal,
+    "Height":stringToPositiveReal,
     "Text":returnInput,
-
-    "Font colour":validateColour,
-    "Font size (pt)":validatePositiveReal,
+    "Font colour":stringToColour,
+    "Font size (pt)":stringToPositiveReal,
     "Font":(font)=>{
 
         if (fontsList.includes(font)){
@@ -384,9 +379,9 @@ export class shapeEditor extends abstractView{
 
     updateProperty(propertyName,newValue){
 
-        newValue = nameToValidation[propertyName](newValue,this.selectedShapesOrdered)
+        newValue = nameToStringToValue[propertyName](newValue,this.selectedShapesOrdered)
 
-        // validated to null
+        // if cannot be converted to a value
         if (newValue === null){
             // don't touch the controller and just rebuild everything from scratch
             this.updateAggregateModel("selectedShapes",controller.selectedShapes())

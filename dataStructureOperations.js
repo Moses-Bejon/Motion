@@ -1,5 +1,6 @@
 import { isGreater } from "./maths.js";
 import {canvasEpsilon} from "./globalValues.js";
+import {validateColour} from "./validator";
 
 // may be optimised by reduce function if performance becomes concern:
 export function maximumOfArray(array,key,comparison=isGreater){
@@ -63,7 +64,7 @@ export function binarySearch(list,value,listToValue=(value)=>{return value}){
     }
 }
 
-export function validateNatural(possibleNatural){
+export function stringToNatural(possibleNatural){
     possibleNatural = parseInt(possibleNatural)
 
     if (isNaN(possibleNatural)){
@@ -73,7 +74,7 @@ export function validateNatural(possibleNatural){
     return Math.max(1,possibleNatural)
 }
 
-export function validateReal(possibleNumber){
+export function stringToReal(possibleNumber){
     possibleNumber = parseFloat(possibleNumber)
 
     if (isNaN(possibleNumber)){
@@ -83,8 +84,8 @@ export function validateReal(possibleNumber){
     }
 }
 
-export function validatePositiveReal(possibleNumber){
-    const value = validateReal(possibleNumber)
+export function stringToPositiveReal(possibleNumber){
+    const value = stringToReal(possibleNumber)
 
     if (value === null){
         return null
@@ -93,19 +94,9 @@ export function validatePositiveReal(possibleNumber){
     return Math.max(value,canvasEpsilon)
 }
 
-export function validateBoolean(possibleBoolean){
-    if (possibleBoolean !== true && possibleBoolean !== false){
-        return null
+export function stringToColour(string){
+    if (validateColour(string)){
+        return string
     }
-    return possibleBoolean
-}
-
-export function validateColour(colour){
-    const regularExpression = /^#([0-9]|[A-F]|[a-f]){6}$/
-
-    if (regularExpression.test(colour)){
-        return colour
-    } else {
-        return null
-    }
+    return null
 }

@@ -22,7 +22,7 @@ import {
     autoAddToTimeline,
     changeAutoAddToTimeline
 } from "../../globalValues.js";
-import {validateNatural, validatePositiveReal, validateReal, validateBoolean} from "../../dataStructureOperations.js";
+import {stringToNatural, stringToPositiveReal, stringToReal} from "../../dataStructureOperations.js";
 import {controller} from "../../controller.js";
 import {refreshViews} from "../../index.js";
 import {clamp} from "../../maths.js";
@@ -120,7 +120,7 @@ export class settings extends abstractView{
 
             // validation
 
-            let value = validateReal(this.animationEndTimeInput.value)
+            let value = stringToReal(this.animationEndTimeInput.value)
 
             if (value === null){
                 alert(this.animationEndTimeInput.value + " is not a number")
@@ -150,7 +150,7 @@ export class settings extends abstractView{
 
             // validation
 
-            let value = validateNatural(this.canvasWidthInput.value)
+            let value = stringToNatural(this.canvasWidthInput.value)
 
             if (value === null){
                 alert("Please enter a valid width in pixels")
@@ -173,7 +173,7 @@ export class settings extends abstractView{
 
             // validation
 
-            let value = validateNatural(this.canvasHeightInput.value)
+            let value = stringToNatural(this.canvasHeightInput.value)
 
             if (value === null){
                 alert("Please enter a valid width in pixels")
@@ -196,7 +196,7 @@ export class settings extends abstractView{
             this.onionSkinsTimeGap.style.display = "none"
         }
         this.onionSkinsOnInput.onchange = () => {
-            const value = validateBoolean(this.onionSkinsOnInput.checked)
+            const value = this.onionSkinsOnInput.checked
 
             if (value === null){
                 alert("Please enter either true or false")
@@ -216,7 +216,7 @@ export class settings extends abstractView{
 
         this.onionSkinsTimeGapInput.value = onionSkinTimeGap
         this.onionSkinsTimeGapInput.onchange = () => {
-            const value = validatePositiveReal(this.onionSkinsTimeGapInput.value)
+            const value = stringToPositiveReal(this.onionSkinsTimeGapInput.value)
 
             if (value === null){
                 alert("Please enter a positive number for time")
@@ -232,7 +232,7 @@ export class settings extends abstractView{
 
         this.autoAddToTimelineInput.checked = autoAddToTimeline
         this.autoAddToTimelineInput.onchange = () => {
-            const value = validateBoolean(this.autoAddToTimelineInput.checked)
+            const value = this.autoAddToTimelineInput.checked
 
             if (value === null){
                     alert("Please enter either true or false")
@@ -248,7 +248,7 @@ export class settings extends abstractView{
 
             // validation
 
-            let value = validateReal(this.lineSimplififcationEpsilonInput.value)
+            let value = stringToReal(this.lineSimplififcationEpsilonInput.value)
 
             if (value === null){
                 alert("Please enter a valid number")
@@ -266,7 +266,7 @@ export class settings extends abstractView{
         this.timelineFPSInput.onchange = () => {
             // validation
 
-            const value = validatePositiveReal(this.timelineFPSInput.value)
+            const value = stringToPositiveReal(this.timelineFPSInput.value)
 
             if (value === null){
                 alert("Please enter a valid fps")
@@ -282,7 +282,7 @@ export class settings extends abstractView{
         this.defaultTweenLengthInput.onchange = () => {
             // validation
 
-            const value = Math.max(validateReal(this.defaultTweenLengthInput.value),0)
+            const value = Math.max(stringToReal(this.defaultTweenLengthInput.value),0)
 
             if (value === null){
                 alert("Please enter a valid time in seconds")
