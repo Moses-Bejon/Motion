@@ -1,7 +1,7 @@
-import {shape} from "./shape.js";
+import {Shape} from "./shape.js";
 import {controller} from "../controller.js";
 
-export class shapeGroup extends shape{
+export class ShapeGroup extends Shape{
     constructor(appearanceTime,disappearanceTime,innerShapes) {
 
         super(appearanceTime,disappearanceTime)
@@ -108,7 +108,7 @@ export class shapeGroup extends shape{
             innerShapesCopy.push(shape.copy())
         }
 
-        return new shapeGroup(
+        return new ShapeGroup(
             this.appearanceTime,
             this.disappearanceTime,
             innerShapesCopy

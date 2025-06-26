@@ -1,4 +1,4 @@
-import {abstractView} from "../view.js";
+import {AbstractView} from "../view.js";
 import {
     fontSize,
     fontFamily,
@@ -95,7 +95,7 @@ template.innerHTML = `
 </div>
 `
 
-export class settings extends abstractView{
+export class Settings extends AbstractView{
     constructor() {
         super()
 
@@ -344,4 +344,4 @@ export class settings extends abstractView{
     }
 }
 
-window.customElements.define("settings-window",settings)
+window.customElements.define("settings-window",Settings)

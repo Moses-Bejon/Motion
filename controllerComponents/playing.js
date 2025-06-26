@@ -1,6 +1,6 @@
-import {idleState} from "./idle.js";
+import {IdleState} from "./idle.js";
 
-export class playingState{
+export class PlayingState {
     constructor() {
     }
 
@@ -17,6 +17,6 @@ export class playingState{
     }
 
     play(){
-        return new idleState()
+        return new IdleState()
     }
 }

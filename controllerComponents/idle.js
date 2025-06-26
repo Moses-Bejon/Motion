@@ -1,12 +1,12 @@
-import {receivingActionState} from "./receivingAction.js";
-import {playingState} from "./playing.js";
+import {ReceivingActionState} from "./receivingAction.js";
+import {PlayingState} from "./playing.js";
 
-export class idleState{
+export class IdleState {
     constructor() {
     }
 
     beginAction(){
-        return new receivingActionState()
+        return new ReceivingActionState()
     }
 
     takeStep(){
@@ -18,6 +18,6 @@ export class idleState{
     }
 
     play(){
-        return new playingState()
+        return new PlayingState()
     }
 }

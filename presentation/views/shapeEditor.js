@@ -1,4 +1,4 @@
-import {abstractView} from "../view.js";
+import {AbstractView} from "../view.js";
 import {controller} from "../../controller.js";
 import {
     animationEndTimeSeconds,
@@ -263,7 +263,7 @@ template.innerHTML = `
     <div id="editableProperties"></div>
 `
 
-export class shapeEditor extends abstractView{
+export class ShapeEditor extends AbstractView{
     constructor() {
         super()
 
@@ -291,16 +291,16 @@ export class shapeEditor extends abstractView{
         // when am disconnected, need to unsubscribe so not taking up space in controller
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
-        controller.subscribeTo(this,"selectedShapes")
-        controller.subscribeTo(this,"timelineEvents")
+        controller.subscribeToSceneModel(this,"selectedShapes")
+        controller.subscribeToSceneModel(this,"timelineEvents")
     }
 
     disconnectedCallback(){
 
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
-        controller.unsubscribeTo(this,"selectedShapes")
-        controller.unsubscribeTo(this,"timelineEvents")
+        controller.unsubscribeToSceneModel(this,"selectedShapes")
+        controller.unsubscribeToSceneModel(this,"timelineEvents")
     }
 
     save(){
@@ -343,7 +343,7 @@ export class shapeEditor extends abstractView{
     }
 
     populateShapeProperties(shape){
-        const inputInformation = shapeEditor.shapeToInputInformation(shape)
+        const inputInformation = ShapeEditor.shapeToInputInformation(shape)
 
         for (const [name,element] of Object.entries(inputInformation)) {
 
@@ -392,7 +392,7 @@ export class shapeEditor extends abstractView{
 
         for (const shape of this.selectedShapesOrdered) {
 
-            const inputInformation = shapeEditor.shapeToInputInformation(shape)
+            const inputInformation = ShapeEditor.shapeToInputInformation(shape)
 
             // only change shapes with the property we aim to change
             if (propertyName in inputInformation){
@@ -498,4 +498,4 @@ export class shapeEditor extends abstractView{
     }
 }
 
-window.customElements.define("shape-editor",shapeEditor)
+window.customElements.define("shape-editor",ShapeEditor)

@@ -1,8 +1,8 @@
-import {text} from "../../../model/text.js";
+import {Text} from "../../../model/text.js";
 import {controller} from "../../../controller.js";
 import {buttonSelectedColour} from "../../../globalValues.js";
 
-export class textMode{
+export class TextMode {
     constructor(createCanvas) {
         this.createCanvas = createCanvas
 
@@ -60,7 +60,7 @@ export class textMode{
 
         const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
 
-        const textShape = new text(
+        const textShape = new Text(
             start,
             end,
             this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),

@@ -1,14 +1,14 @@
 import {controller} from "../../controller.js"
 import {increment2dVectorBy, decrement2dVectorBy, multiply2dVectorByScalar, subtract2dVectors} from "../../maths.js";
-import {binarySearch,binaryInsertion} from "../../dataStructureOperations.js";
-import {abstractView} from "../view.js"
+import {binaryInsertion} from "../../dataStructureOperations.js";
+import {AbstractView} from "../view.js"
 
 import {
     canvasOffsetX,
     canvasOffsetY,
     canvasWidth,
     canvasHeight,
-    sensitivity, maximumThickness
+    sensitivity
 } from "../../globalValues.js";
 
 // maps keys to their intended movement vectors
@@ -119,7 +119,7 @@ template.innerHTML = `
 <svg id="canvas" preserveAspectRatio="none"></svg>
 `
 
-export class canvas extends abstractView{
+export class Canvas extends AbstractView{
     constructor() {
         super()
 
@@ -178,7 +178,7 @@ export class canvas extends abstractView{
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
         controller.subscribeToInputs(this)
-        controller.subscribeTo(this,"displayShapes")
+        controller.subscribeToSceneModel(this,"displayShapes")
     }
 
     disconnectedCallback(){
@@ -186,7 +186,7 @@ export class canvas extends abstractView{
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
         controller.unsubscribeToInputs(this)
-        controller.unsubscribeTo(this,"displayShapes")
+        controller.unsubscribeToSceneModel(this,"displayShapes")
     }
 
     save(){

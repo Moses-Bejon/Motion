@@ -1,10 +1,10 @@
-import {manyPointsMode} from "./manyPointsMode.js";
+import {ManyPointsMode} from "./manyPointsMode.js";
 import {distanceBetween2dPoints} from "../../../maths.js";
 import {buttonSelectedColour, snappingDistance} from "../../../globalValues.js";
 import {controller} from "../../../controller.js";
-import {drawing} from "../../../model/drawing.js";
+import {Drawing} from "../../../model/drawing.js";
 
-export class polygonMode extends manyPointsMode{
+export class PolygonMode extends ManyPointsMode{
     constructor(createCanvas) {
         super()
 
@@ -38,7 +38,7 @@ export class polygonMode extends manyPointsMode{
 
             const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
 
-            const shape = new drawing(start,
+            const shape = new Drawing(start,
                 end,
                 this.drawingColour,
                 this.thickness,
@@ -96,7 +96,7 @@ export class polygonMode extends manyPointsMode{
     // called for every mouse movement so the user can see where their line would be if they clicked
     previewNextLine(pointerEvent){
         this.line?.remove()
-        this.line = drawing.lineBetween(
+        this.line = Drawing.lineBetween(
             ...this.previousPoint,
             ...this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
             this.thickness,

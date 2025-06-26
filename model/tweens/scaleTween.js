@@ -1,8 +1,8 @@
 import {add2dVectors, subtract2dVectors,increment2dVectorBy} from "../../maths.js";
 import {controller} from "../../controller.js";
-import {tween} from "./tween.js";
+import {Tween} from "./tween.js";
 
-export class scaleTween extends tween{
+export class ScaleTween extends Tween{
     constructor(scaleFactor,aboutCentre,shape) {
 
         super(shape)

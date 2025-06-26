@@ -1,4 +1,4 @@
-import {shape} from "./shape.js";
+import {Shape} from "./shape.js";
 import {
     add2dVectors,
     getEdgesOfBoxAfterRotation,
@@ -7,7 +7,7 @@ import {
     scale2dVectorAboutPoint
 } from "../maths.js";
 
-export class graphic extends shape{
+export class Graphic extends Shape{
     constructor(appearanceTime,disappearanceTime,topLeft,rotation){
         super(appearanceTime,disappearanceTime)
 
@@ -149,7 +149,7 @@ export class graphic extends shape{
     }
 
     copy(){
-        const copy = new graphic(this.appearanceTime,this.disappearanceTime,Array.from(this.topLeft),this.rotation)
+        const copy = new Graphic(this.appearanceTime,this.disappearanceTime,Array.from(this.topLeft),this.rotation)
 
         // it is too expensive to reload the image's source
         copy.source = this.source

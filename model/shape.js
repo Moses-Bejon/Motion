@@ -1,7 +1,7 @@
 import {getRotateByAngle, increment2dVectorBy, scale2dVectorAboutPoint, midPoint2d} from "../maths.js";
 import {controller} from "../controller.js";
 
-export class shape{
+export class Shape {
     constructor(appearanceTime,disappearanceTime) {
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime

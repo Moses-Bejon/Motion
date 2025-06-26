@@ -1,7 +1,7 @@
-import {idleState} from "./idle.js";
+import {IdleState} from "./idle.js";
 import {validateOperation} from "../validator.js";
 
-export class receivingActionState{
+export class ReceivingActionState {
     constructor() {
         this.steps = []
     }
@@ -21,7 +21,7 @@ export class receivingActionState{
     }
 
     endAction(){
-        return new idleState()
+        return new IdleState()
     }
 
     play(){

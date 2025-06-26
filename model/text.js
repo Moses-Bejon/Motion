@@ -1,4 +1,4 @@
-import {shape} from "./shape.js";
+import {Shape} from "./shape.js";
 import {
     add2dVectors,
     getEdgesOfBoxAfterRotation,
@@ -7,7 +7,7 @@ import {
     scale2dVectorAboutPoint
 } from "../maths.js";
 
-export class text extends shape{
+export class Text extends Shape{
     constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size,family){
         super(appearanceTime,disappearanceTime)
 
@@ -152,7 +152,7 @@ export class text extends shape{
     }
 
     copy(){
-        const copy = new text(
+        const copy = new Text(
             this.appearanceTime,
             this.disappearanceTime,
             Array.from(this.bottomLeft),

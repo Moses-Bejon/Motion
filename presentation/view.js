@@ -1,6 +1,6 @@
 // all views, like canvas, timeline etc. inherit from this class
 
-import {abstractWindow} from "./window.js"
+import {AbstractWindow} from "./window.js"
 import {fullScreenAndDropdownContainerWidth, typicalIconSize} from "../globalValues.js";
 
 // All types of window listed here can be switched to by a user
@@ -76,7 +76,7 @@ template.innerHTML = `
 </div>
 `
 
-export class abstractView extends abstractWindow{
+export class AbstractView extends AbstractWindow{
     constructor() {
         super()
 

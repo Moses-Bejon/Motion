@@ -2,7 +2,7 @@ import {controller} from "../../controller.js";
 import {returnInput} from "../../maths.js";
 import {defaultTweenLength} from "../../globalValues.js";
 
-export class tween{
+export class Tween {
     constructor(shape) {
         this.shape = shape
 

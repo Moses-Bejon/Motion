@@ -1,11 +1,23 @@
-import {idleState} from "./controllerComponents/idle.js";
-import {sceneController} from "./controllerComponents/sceneController.js";
+import {IdleState} from "./controllerComponents/idle.js";
+import {SceneController} from "./controllerComponents/sceneController.js";
+import {KeyboardInputsManager} from "./controllerComponents/keyboardInputsManager.js";
+import {OnionSkinsManager} from "./controllerComponents/onionSkinsManager.js";
+import {HistoryManager} from "./controllerComponents/historyManager.js";
 
-class controllerClass {
+class ControllerClass {
     constructor() {
-        this.currentState = new idleState()
-        this.currentScene = new sceneController()
+
+        this.currentState = new IdleState()
+        // views we have to tell about changes in state
+        this.stateSubscribers = new Set()
+
+        this.currentScene = new SceneController()
+        this.keyboardManager = new KeyboardInputsManager()
+        this.onionSkinsManager = new OnionSkinsManager()
+        this.historyManager = new HistoryManager()
     }
+
+    // the following methods may be used by absolutely anyone
 
     // makes it so data can be easily read
     allShapes(){
@@ -27,24 +39,26 @@ class controllerClass {
         return this.currentScene.animationEndTimeSeconds
     }
 
+    // the following methods may only be used by views
+
     beginAction(){
         try {
-            this.currentState = this.currentState.beginAction()
+            this.#newState(this.currentState.beginAction())
             return true
         } catch (e){
             console.error(e)
-            this.currentState = new idleState()
+            this.#newState(new IdleState())
             return false
         }
     }
 
     takeStep(operation,operands){
         try {
-            this.currentState = this.currentState.takeStep(operation,operands)
+            this.#newState(this.currentState.takeStep(operation,operands))
             return true
         } catch (e){
             console.error(e)
-            this.currentState = new idleState()
+            this.#newState(new IdleState())
             return false
         }
 
@@ -52,11 +66,11 @@ class controllerClass {
 
     endAction(){
         try {
-            this.currentState = this.currentState.endAction()
+            this.#newState(this.currentState.endAction())
             return true
         } catch (e){
             console.error(e)
-            this.currentState = new idleState()
+            this.#newState(new IdleState())
             return false
         }
 
@@ -64,16 +78,80 @@ class controllerClass {
 
     play(){
         try {
-            this.currentState = this.currentState.play()
+            this.#newState(this.currentState.play())
             return true
         } catch (e){
             console.error(e)
-            this.currentState = new idleState()
+            this.#newState(new IdleState())
             return false
+        }
+    }
+
+    subscribeToSceneModel(subscriber,aggregateModel){
+        this.currentScene.subscribeTo(subscriber,aggregateModel)
+    }
+
+    unsubscribeToSceneModel(subscriber,aggregateModel){
+        this.currentScene.unsubscribeTo(subscriber,aggregateModel)
+    }
+
+    subscribeToInputs(subscriber){
+        this.keyboardManager.subscribeToInputs(subscriber)
+    }
+
+    unsubscribeToInputs(subscriber){
+        this.keyboardManager.unsubscribeToInputs(subscriber)
+    }
+
+    subscribeToOnionSkins(subscriber){
+        this.onionSkinsManager.subscribeToOnionSkins(subscriber)
+    }
+
+    unsubscribeToOnionSkins(subscriber) {
+        this.onionSkinsManager.unsubscribeFromOnionSkins(subscriber)
+    }
+
+    subscribeToControllerState(subscriber){
+        subscriber.newControllerState(this.currentState)
+
+        this.stateSubscribers.add(subscriber)
+    }
+
+    unsubscribeToControllerState(subscriber){
+        this.stateSubscribers.delete(subscriber)
+    }
+
+    subscribeToPreviousAction(subscriber){
+        this.historyManager.subscribeToPreviousAction(subscriber)
+    }
+
+    unsubscribeToPreviousAction(subscriber){
+        this.historyManager.unsubscribeToPreviousAction(subscriber)
+    }
+
+    // the following methods may only be used by index.js
+
+    undoAction(){
+    }
+
+    redoAction(){
+    }
+
+    // the following methods are private, only to be used by us
+
+    #newState(state){
+        this.currentState = state
+
+        for (const subscriber of this.stateSubscribers){
+            try {
+                subscriber.newControllerState(state)
+            } catch (e) {
+                console.error(e)
+            }
         }
     }
 }
 
-export const controller = new controllerClass()
+export const controller = new ControllerClass()
 
 console.log(controller)

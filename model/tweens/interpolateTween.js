@@ -1,7 +1,7 @@
 import {controller} from "../../controller.js";
-import {tween} from "./tween.js";
+import {Tween} from "./tween.js";
 
-export class interpolateTween extends tween{
+export class InterpolateTween extends Tween{
     constructor(startState,endState,operation,inverseOperation,shape) {
 
         super(shape)

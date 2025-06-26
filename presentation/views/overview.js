@@ -1,4 +1,4 @@
-import {abstractView} from "../view.js";
+import {AbstractView} from "../view.js";
 import {controller} from "../../controller.js";
 import {typicalIconSizeInt,typicalIconSize} from "../../globalValues.js";
 
@@ -65,7 +65,7 @@ template.innerHTML = `
     <div id="shapesList"></div>
 `
 
-export class overview extends abstractView{
+export class Overview extends AbstractView{
     constructor() {
         super()
 
@@ -135,18 +135,16 @@ export class overview extends abstractView{
         // when am disconnected, need to unsubscribe so not taking up space in controller
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
-        controller.subscribeTo(this,"allShapes")
-        controller.subscribeTo(this,"selectedShapes")
-        controller.subscribeToSelectedDirectory(this)
+        controller.subscribeToSceneModel(this,"allShapes")
+        controller.subscribeToSceneModel(this,"selectedShapes")
     }
 
     disconnectedCallback(){
 
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
-        controller.unsubscribeTo(this,"allShapes")
-        controller.unsubscribeTo(this,"selectedShapes")
-        controller.unsubscribeFromSelectedDirectory(this)
+        controller.unsubscribeToSceneModel(this,"allShapes")
+        controller.unsubscribeToSceneModel(this,"selectedShapes")
     }
 
     save(){
@@ -530,4 +528,4 @@ export class overview extends abstractView{
     }
 }
 
-window.customElements.define("over-view",overview)
+window.customElements.define("over-view",Overview)

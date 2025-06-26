@@ -1,11 +1,11 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {distanceBetween2dPoints,decimateLine} from "../../../maths.js";
-import {manyPointsMode} from "./manyPointsMode.js";
-import {drawing} from "../../../model/drawing.js";
+import {ManyPointsMode} from "./manyPointsMode.js";
+import {Drawing} from "../../../model/drawing.js";
 import {controller} from "../../../controller.js";
 import {buttonSelectedColour, lineSimplificationEpsilon, snappingDistance} from "../../../globalValues.js";
 
-export class drawMode extends manyPointsMode{
+export class DrawMode extends ManyPointsMode{
     constructor(createCanvas) {
         super()
         
@@ -45,7 +45,7 @@ export class drawMode extends manyPointsMode{
 
             const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
 
-            const shape = new drawing(
+            const shape = new Drawing(
                 start,
                 end,
                 this.drawingColour,

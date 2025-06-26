@@ -1,7 +1,7 @@
 // main javascript file for the project
 
 import {controller} from "./controller.js";
-import {abstractWindow} from "./presentation/window.js";
+import {AbstractWindow} from "./presentation/window.js";
 
 document.getElementById("undoButton").onpointerdown = controller.undoAction.bind(controller)
 document.getElementById("redoButton").onpointerdown = controller.redoAction.bind(controller)
@@ -65,7 +65,7 @@ function replaceRootWindowWithSave(save){
                 }
         }
 
-        rootWindow.switchWindowTo(abstractWindow.loadWindow(save))
+        rootWindow.switchWindowTo(AbstractWindow.loadWindow(save))
         rootWindow.load(save)
 }
 

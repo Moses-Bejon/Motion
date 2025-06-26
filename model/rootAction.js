@@ -1,4 +1,4 @@
-export class rootAction{
+export class RootAction{
     constructor() {
         this.forwardAction = () => {}
         this.backwardAction = () => {}

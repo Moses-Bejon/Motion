@@ -1,13 +1,12 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {
-    angleTracker,
+    AngleTracker,
     getDistanceToStraightLineThrough,
-    multiply2dVectorByScalar,
     subtract2dVectors
 } from "../../../maths.js";
 import {canvasOverlayUISize} from "../../../globalValues.js";
 
-export class selectionBox{
+export class SelectionBox {
     constructor(editCanvas) {
         this.editCanvas = editCanvas
 
@@ -160,7 +159,7 @@ export class selectionBox{
 
         const initialPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
-        this.angleTracker = new angleTracker(initialPosition,this.centre)
+        this.angleTracker = new AngleTracker(initialPosition,this.centre)
 
         pointerEvent.stopPropagation()
     }

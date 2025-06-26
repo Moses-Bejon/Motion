@@ -1,4 +1,4 @@
-import {shape} from "./shape.js";
+import {Shape} from "./shape.js";
 import {
     getEdgesOfEllipseAfterRotation,
     getRotateByAngle,
@@ -6,7 +6,7 @@ import {
     scale2dVectorAboutPoint
 } from "../maths.js";
 
-export class ellipse extends shape{
+export class Ellipse extends Shape{
     constructor(appearanceTime,disappearanceTime,centre,height,width,outlineColour,colour,rotation,thickness){
         super(appearanceTime,disappearanceTime)
 
@@ -140,7 +140,7 @@ export class ellipse extends shape{
     }
 
     copy(){
-        return new ellipse(
+        return new Ellipse(
             this.appearanceTime,
             this.disappearanceTime,
             Array.from(this.centre),

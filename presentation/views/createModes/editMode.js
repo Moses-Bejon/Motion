@@ -1,7 +1,7 @@
 import {controller} from "../../../controller.js";
 import {addDragLogicTo} from "../../../dragLogic.js";
 
-export class editMode{
+export class EditMode {
     constructor(editCanvas) {
         this.editCanvas = editCanvas
 

@@ -1,6 +1,6 @@
-import {drawing} from "./drawing.js"
+import {Drawing} from "./drawing.js"
 
-export class polygon extends drawing{
+export class Polygon extends Drawing{
     constructor(appearanceTime,disappearanceTime,colour,fillColour,thickness,points){
         super(appearanceTime,disappearanceTime,colour,thickness,points)
 
@@ -50,19 +50,19 @@ export class polygon extends drawing{
         const extraGeometry = document.createElementNS("http://www.w3.org/2000/svg","g")
 
         extraGeometry.appendChild(
-            drawing.lineBetween(...this.points[this.points.length-1],...this.points[0],this.thickness,this.colour)
+            Drawing.lineBetween(...this.points[this.points.length-1],...this.points[0],this.thickness,this.colour)
         )
 
         this.geometry += extraGeometry.innerHTML
 
         extraGeometry.replaceChildren()
 
-        extraGeometry.appendChild(polygon.fillArea(this.points,this.fillColour))
+        extraGeometry.appendChild(Polygon.fillArea(this.points,this.fillColour))
         this.geometry = extraGeometry.innerHTML + this.geometry
     }
 
     copy(){
-        return new polygon(
+        return new Polygon(
             this.appearanceTime,
             this.disappearanceTime,
             this.colour,

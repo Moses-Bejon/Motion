@@ -122,7 +122,7 @@ export function angleBetweenThreePoints(A, B, C){
 }
 
 // used to ensure the mouse angle takes into account how many full revolutions the user has made
-export class angleTracker{
+export class AngleTracker {
     constructor(initialPosition,centre) {
         this.initialPosition = initialPosition
         this.centre = centre

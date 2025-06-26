@@ -2,7 +2,7 @@
 
 import {fontsList} from "./globalValues.js";
 import {controller} from "./controller.js";
-import {shapeGroup} from "./model/shapeGroup.js";
+import {ShapeGroup} from "./model/shapeGroup.js";
 
 export function validateReal(possibleNumber){
     return typeof possibleNumber === "number"
@@ -64,7 +64,7 @@ export function validateShape(possibleShape){
 }
 
 export function validateShapeGroup(possibleShapeGroup){
-    return validateShape(possibleShapeGroup) && possibleShapeGroup instanceof shapeGroup
+    return validateShape(possibleShapeGroup) && possibleShapeGroup instanceof ShapeGroup
 }
 
 export function validateShapeList(possibleShapeList){

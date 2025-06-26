@@ -31,7 +31,7 @@ template.innerHTML = `
 </div>
 `
 
-export class switchElement extends HTMLElement{
+export class SwitchElement extends HTMLElement{
     static observedAttributes = ["off-text","on-text"]
 
     constructor(){
@@ -84,4 +84,4 @@ export class switchElement extends HTMLElement{
     }
 }
 
-window.customElements.define("switch-element",switchElement)
+window.customElements.define("switch-element",SwitchElement)

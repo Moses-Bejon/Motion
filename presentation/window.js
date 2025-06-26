@@ -1,5 +1,5 @@
 // The base window class that all types of window are inherited from
-export class abstractWindow extends HTMLElement{
+export class AbstractWindow extends HTMLElement{
     constructor() {
         super()
 

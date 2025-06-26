@@ -1,12 +1,12 @@
 // A window with a vertical edge splitting it horizontally
 
-import {abstractWindow} from "./window.js"
+import {AbstractWindow} from "./window.js"
 import {addDragLogicTo} from "../dragLogic.js"
 import {clamp} from "../maths.js"
 import {innerEdgeThickness, innerEdgeThicknessInt, defaultEdgePosition} from "../globalValues.js"
 
 
-class horizontallySplitWindow extends abstractWindow{
+class HorizontallySplitWindow extends AbstractWindow{
     constructor() {
         super()
 
@@ -52,9 +52,9 @@ class horizontallySplitWindow extends abstractWindow{
     load(save){
         this.edgePosition = save.edgePosition
 
-        this.leftWindow.switchWindowTo(abstractWindow.loadWindow(save.leftWindow))
+        this.leftWindow.switchWindowTo(AbstractWindow.loadWindow(save.leftWindow))
         this.leftWindow.load(save.leftWindow)
-        this.rightWindow.switchWindowTo(abstractWindow.loadWindow(save.rightWindow))
+        this.rightWindow.switchWindowTo(AbstractWindow.loadWindow(save.rightWindow))
         this.rightWindow.load(save.rightWindow)
     }
 
@@ -305,4 +305,4 @@ class horizontallySplitWindow extends abstractWindow{
     }
 }
 
-window.customElements.define("horizontally-split-window",horizontallySplitWindow)
+window.customElements.define("horizontally-split-window",HorizontallySplitWindow)

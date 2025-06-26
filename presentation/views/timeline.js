@@ -1,4 +1,4 @@
-import {abstractView} from "../view.js"
+import {AbstractView} from "../view.js"
 import {shapeTimeline} from "./timelineModes/shapeTimeline.js";
 import {timeCursor} from "./timelineModes/timeCursor.js";
 import {controller} from "../../controller.js";
@@ -174,7 +174,7 @@ template.innerHTML = `
     </div>
 `
 
-export class timeline extends abstractView{
+export class Timeline extends AbstractView{
     constructor() {
         super()
 
@@ -205,11 +205,11 @@ export class timeline extends abstractView{
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
         controller.subscribeToInputs(this)
-        controller.subscribeToAnimationPlaying(this)
-        controller.subscribeToPreviousActionTimelineEvents(this)
-        controller.subscribeTo(this,"selectedShapes")
-        controller.subscribeTo(this,"timelineEvents")
-        controller.subscribeTo(this,"clock")
+        controller.subscribeToControllerState(this)
+        controller.subscribeToPreviousAction(this)
+        controller.subscribeToSceneModel(this,"selectedShapes")
+        controller.subscribeToSceneModel(this,"timelineEvents")
+        controller.subscribeToSceneModel(this,"clock")
     }
 
     disconnectedCallback(){
@@ -217,11 +217,11 @@ export class timeline extends abstractView{
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
         controller.unsubscribeToInputs(this)
-        controller.unsubscribeToAnimationPlaying(this)
-        controller.unsubscribeToPreviousActionTimelineEvents(this)
-        controller.unsubscribeTo(this,"selectedShapes")
-        controller.unsubscribeTo(this,"timelineEvents")
-        controller.unsubscribeTo(this,"clock")
+        controller.unsubscribeToControllerState(this)
+        controller.unsubscribeToPreviousAction(this)
+        controller.unsubscribeToSceneModel(this,"selectedShapes")
+        controller.unsubscribeToSceneModel(this,"timelineEvents")
+        controller.unsubscribeToSceneModel(this,"clock")
     }
 
     save(){
@@ -341,31 +341,31 @@ export class timeline extends abstractView{
         }
     }
 
-    animationStarted(){
-        this.playButton.onpointerdown = (pointerEvent) => {
-            controller.pauseAnimation()
-            this.snapTimeToCell()
-            pointerEvent.stopPropagation()
+    newControllerState(state){
+        if (state === "PlayingState"){
+            this.playButton.onpointerdown = (pointerEvent) => {
+                controller.pauseAnimation()
+                this.snapTimeToCell()
+                pointerEvent.stopPropagation()
+            }
+
+            this.playButton.src = "assets/pause.svg"
+        } else {
+            this.playButton.onpointerdown = (pointerEvent) => {
+                controller.playAnimation()
+                pointerEvent.stopPropagation()
+            }
+
+            this.playButton.src = "assets/play.svg"
         }
-
-        this.playButton.src = "assets/pause.svg"
     }
 
-    animationPaused(){
-        this.playButton.onpointerdown = (pointerEvent) => {
-            controller.playAnimation()
-            pointerEvent.stopPropagation()
+    newPreviousAction(previousAction){
+        if (previousAction.addableToTimeline){
+            this.cursor.previousActionTimelineEventsReady()
+        } else {
+            this.cursor.previousActionTimelineEventsGone()
         }
-
-        this.playButton.src = "assets/play.svg"
-    }
-
-    previousActionTimelineEventsReady(){
-        this.cursor.previousActionTimelineEventsReady()
-    }
-
-    previousActionTimelineEventsGone(){
-        this.cursor.previousActionTimelineEventsGone()
     }
 
     snapValueToCellBorder(value){
@@ -429,4 +429,4 @@ export class timeline extends abstractView{
     }
 }
 
-window.customElements.define("time-line",timeline)
+window.customElements.define("time-line",Timeline)

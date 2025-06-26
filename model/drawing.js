@@ -1,8 +1,8 @@
-import {shape} from "./shape.js";
+import {Shape} from "./shape.js";
 import {isLess, increment2dVectorBy, scale2dVectorAboutPoint, getRotateByAngle} from "../maths.js";
 import {maximumOfArray} from "../dataStructureOperations.js";
 
-export class drawing extends shape{
+export class Drawing extends Shape{
     constructor(appearanceTime,disappearanceTime,colour,thickness,points) {
 
         super(appearanceTime,disappearanceTime)
@@ -66,11 +66,11 @@ export class drawing extends shape{
         const newGeometry = document.createElementNS("http://www.w3.org/2000/svg","g")
 
         for (let i = 0;i<this.points.length-1;i++){
-            newGeometry.appendChild(drawing.circleAt(...this.points[i],this.thickness/2,this.colour))
-            newGeometry.appendChild(drawing.lineBetween(...this.points[i],...this.points[i+1],this.thickness,this.colour))
+            newGeometry.appendChild(Drawing.circleAt(...this.points[i],this.thickness/2,this.colour))
+            newGeometry.appendChild(Drawing.lineBetween(...this.points[i],...this.points[i+1],this.thickness,this.colour))
         }
 
-        newGeometry.appendChild(drawing.circleAt(...this.points[this.points.length-1],this.thickness/2,this.colour))
+        newGeometry.appendChild(Drawing.circleAt(...this.points[this.points.length-1],this.thickness/2,this.colour))
 
         return newGeometry
     }
@@ -115,7 +115,7 @@ export class drawing extends shape{
     }
 
     copy(){
-        return new drawing(
+        return new Drawing(
             this.appearanceTime,
             this.disappearanceTime,
             this.colour,

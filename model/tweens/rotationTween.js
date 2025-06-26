@@ -1,8 +1,8 @@
 import {add2dVectors, subtract2dVectors,increment2dVectorBy} from "../../maths.js";
 import {controller} from "../../controller.js";
-import {tween} from "./tween.js";
+import {Tween} from "./tween.js";
 
-export class rotationTween extends tween{
+export class RotationTween extends Tween{
     constructor(angle,aboutCentre,shape) {
 
         super(shape)

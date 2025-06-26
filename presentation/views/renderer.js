@@ -1,5 +1,5 @@
 import {controller} from "../../controller.js";
-import {canvas} from "./canvas.js";
+import {Canvas} from "./canvas.js";
 import {
     animationEndTimeSeconds,
     canvasHeight,
@@ -39,7 +39,7 @@ template.innerHTML = `
     </div>
 `
 
-export class renderer extends canvas{
+export class Renderer extends Canvas{
     constructor() {
         super()
 
@@ -213,4 +213,4 @@ export class renderer extends canvas{
     }
 }
 
-window.customElements.define("renderer-window",renderer)
+window.customElements.define("renderer-window",Renderer)
