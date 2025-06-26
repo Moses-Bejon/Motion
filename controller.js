@@ -28,19 +28,49 @@ class controllerClass {
     }
 
     beginAction(){
-        this.currentState = this.currentState.beginAction()
+        try {
+            this.currentState = this.currentState.beginAction()
+            return true
+        } catch (e){
+            console.error(e)
+            this.currentState = new idleState()
+            return false
+        }
     }
 
     takeStep(operation,operands){
-        this.currentState = this.currentState.takeStep(operation,operands)
+        try {
+            this.currentState = this.currentState.takeStep(operation,operands)
+            return true
+        } catch (e){
+            console.error(e)
+            this.currentState = new idleState()
+            return false
+        }
+
     }
 
     endAction(){
-        this.currentState = this.currentState.endAction()
+        try {
+            this.currentState = this.currentState.endAction()
+            return true
+        } catch (e){
+            console.error(e)
+            this.currentState = new idleState()
+            return false
+        }
+
     }
 
     play(){
-        this.currentState = this.currentState.play()
+        try {
+            this.currentState = this.currentState.play()
+            return true
+        } catch (e){
+            console.error(e)
+            this.currentState = new idleState()
+            return false
+        }
     }
 }
 

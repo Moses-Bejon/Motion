@@ -1,7 +1,5 @@
 import {idleState} from "./idle";
-import {
-    operationToValidation
-} from "../validator.js";
+import {validateOperation} from "../validator.js";
 
 export class receivingActionState{
     constructor() {
@@ -9,21 +7,12 @@ export class receivingActionState{
     }
 
     beginAction(){
-        console.error("can't begin an action before ending current one")
-        return new idleState()
+        throw new Error("can't begin an action before ending current one")
     }
 
     takeStep(operation,operands){
-        const validation = operationToValidation[operation]
-
-        if (validation === undefined){
-            console.error("unrecognised operation",operation)
-            return new idleState()
-        }
-
-        if (validation(...operands)){
-            console.error("invalid operands")
-            return new idleState()
+        if (!validateOperation(operation,operands)){
+            throw new Error("invalid step sent to controller")
         }
 
         this.steps.push([operation,operands])
@@ -36,7 +25,6 @@ export class receivingActionState{
     }
 
     play(){
-        console.error("can't play while still receiving an action")
-        return new idleState()
+        throw new Error("can't play while still receiving an action")
     }
 }

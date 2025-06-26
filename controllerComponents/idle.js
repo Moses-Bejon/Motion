@@ -10,13 +10,11 @@ export class idleState{
     }
 
     takeStep(){
-        console.error("can't take a step without starting an action")
-        return this
+        throw new Error("can't take a step without starting an action")
     }
 
     endAction(){
-        console.error("can't end an action if haven't started one")
-        return this
+        throw new Error("can't end an action if haven't started one")
     }
 
     play(){
