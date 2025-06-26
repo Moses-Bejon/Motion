@@ -1,4 +1,4 @@
-import {idleState} from "./idle";
+import {idleState} from "./idle.js";
 
 export class playingState{
     constructor() {

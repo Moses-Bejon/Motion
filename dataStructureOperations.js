@@ -1,6 +1,6 @@
 import { isGreater } from "./maths.js";
 import {canvasEpsilon} from "./globalValues.js";
-import {validateColour} from "./validator";
+import {validateColour} from "./validator.js";
 
 // may be optimised by reduce function if performance becomes concern:
 export function maximumOfArray(array,key,comparison=isGreater){
