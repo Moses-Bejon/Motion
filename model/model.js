@@ -19,9 +19,5 @@ export const model = {
     "displayShapes": {
         "content": new Set(), // of shape objects
         "subscribers": new Set()
-    },
-    "selectedShapes": {
-        "content": new Set(), // of shape objects
-        "subscribers": new Set()
     }
 }

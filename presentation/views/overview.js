@@ -116,7 +116,7 @@ export class Overview extends AbstractView{
 
         // deselect all when clicking outside shape list
         this.addFunctionToPerformOnClick(() => {
-            controller.newAggregateModel("selectedShapes",new Set())
+            controller.getSelectedShapesManager().selectNewShapes(new Set())
             controller.deselectSelectedDirectory()
         })
 
@@ -136,7 +136,7 @@ export class Overview extends AbstractView{
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
         controller.subscribeToSceneModel(this,"allShapes")
-        controller.subscribeToSceneModel(this,"selectedShapes")
+        controller.subscribeToSelectedShapes(this)
     }
 
     disconnectedCallback(){
@@ -144,7 +144,7 @@ export class Overview extends AbstractView{
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
         controller.unsubscribeToSceneModel(this,"allShapes")
-        controller.unsubscribeToSceneModel(this,"selectedShapes")
+        controller.unsubscribeToSelectedShapes(this)
     }
 
     save(){
@@ -165,7 +165,7 @@ export class Overview extends AbstractView{
         while (element1.nextSibling !== element2){
             element1 = element1.nextSibling
             if (element1.classList.contains("shapeListing")){
-                controller.selectShape(this.shapeListingToShape.get(element1))
+                controller.getSelectedShapesManager().selectShape(this.shapeListingToShape.get(element1))
             }
         }
     }
@@ -187,10 +187,10 @@ export class Overview extends AbstractView{
             if (pointerEvent.ctrlKey){
 
                 // if it's selected, deselect it instead
-                if (controller.isSelected(model)){
-                    controller.deselectShape(model)
+                if (controller.getSelectedShapesManager().isSelected(model)){
+                    controller.getSelectedShapesManager().deselectShape(model)
                 } else {
-                    controller.selectShape(model)
+                    controller.getSelectedShapesManager().selectShape(model)
                 }
             } else if (pointerEvent.shiftKey){
 
@@ -198,8 +198,8 @@ export class Overview extends AbstractView{
 
                 // if it's not selected, select it. This means we now only have to select the shapes between it
                 // and a selected shape
-                if (!controller.isSelected(model)){
-                    controller.selectShape(model)
+                if (!controller.getSelectedShapesManager().isSelected(model)){
+                    controller.getSelectedShapesManager().selectShape(model)
                 }
 
                 let listing = shapeListing
@@ -225,7 +225,7 @@ export class Overview extends AbstractView{
                 }
 
             } else {
-                controller.newAggregateModel("selectedShapes",new Set([model]))
+                controller.getSelectedShapesManager().selectNewShapes(new Set([model]))
             }
         }
 

@@ -75,10 +75,10 @@ export class EditMode {
 
         if (pointerEvent.shiftKey){
             for (const shape of newlySelectedShapes){
-                controller.selectShape(shape)
+                controller.getSelectedShapesManager().selectShape(shape)
             }
         } else {
-            controller.newAggregateModel("selectedShapes",newlySelectedShapes)
+            controller.getSelectedShapesManager().selectNewShapes(newlySelectedShapes)
         }
 
         this.editCanvas.selectionBoxGeometry.remove()
@@ -111,9 +111,9 @@ export class EditMode {
             event.stopPropagation()
 
             if (event.shiftKey || event.ctrlKey){
-                controller.selectShape(model)
+                controller.getSelectedShapesManager().selectShape(model)
             } else {
-                controller.newAggregateModel("selectedShapes",new Set([model]))
+                controller.getSelectedShapesManager().selectNewShapes(new Set([model]))
             }
         }
     }
@@ -129,6 +129,6 @@ export class EditMode {
     }
 
     deselectAll(){
-        controller.newAggregateModel("selectedShapes",new Set())
+        controller.getSelectedShapesManager().selectNewShapes(new Set())
     }
 }

@@ -343,7 +343,7 @@ export class CreateEditCanvas extends Canvas{
             )
 
             // the duplicate becomes selected after it is made
-            controller.newAggregateModel("selectedShapes",duplicates)
+            controller.getSelectedShapesManager().selectNewShapes(duplicates)
 
             // prevents the click on the canvas from deselecting the selected shapes
             pointerEvent.stopPropagation()
@@ -378,7 +378,7 @@ export class CreateEditCanvas extends Canvas{
                 []
             )
 
-            controller.newAggregateModel("selectedShapes",copiedShapes)
+            controller.getSelectedShapesManager().selectNewShapes(copiedShapes)
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("merge").onpointerdown = () => {
@@ -565,14 +565,14 @@ export class CreateEditCanvas extends Canvas{
     connectedCallback() {
         super.connectedCallback()
 
-        controller.subscribeToSceneModel(this,"selectedShapes")
+        controller.subscribeToSelectedShapes(this)
         controller.subscribeToOnionSkins(this)
     }
 
     disconnectedCallback() {
         super.disconnectedCallback()
 
-        controller.unsubscribeToSceneModel(this,"selectedShapes")
+        controller.unsubscribeToSelectedShapes(this)
         controller.unsubscribeToOnionSkins(this)
     }
 

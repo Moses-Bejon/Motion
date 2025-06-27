@@ -20,6 +20,6 @@ export class GraphicMode {
     switchMode(){
 
         // deselects shape once done
-        controller.newAggregateModel("selectedShapes", new Set([]))
+        controller.getSelectedShapesManager().selectNewShapes(new Set())
     }
 }

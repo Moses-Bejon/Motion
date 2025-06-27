@@ -230,25 +230,4 @@ export class SceneController {
     unsubscribeTo(subscriber,aggregateModel){
         this.aggregateModels[aggregateModel].subscribers.delete(subscriber)
     }
-
-    selectShape(shape){
-
-        if (this.isSelected(shape)){
-            throw new Error("attempt to select already selected shape")
-        }
-
-        this.aggregateModels.selectedShapes.content.add(shape)
-    }
-
-    deselectShape(shape){
-        if (!this.isSelected(shape)){
-            throw new Error("attempt to deselect unselected shape")
-        }
-
-        this.aggregateModels.selectedShapes.content.delete(shape)
-    }
-
-    isSelected(shape){
-        return this.selectedShapes().has(shape)
-    }
 }

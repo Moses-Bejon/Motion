@@ -3,6 +3,7 @@ import {SceneController} from "./controllerComponents/sceneController.js";
 import {KeyboardInputsManager} from "./controllerComponents/keyboardInputsManager.js";
 import {OnionSkinsManager} from "./controllerComponents/onionSkinsManager.js";
 import {HistoryManager} from "./controllerComponents/historyManager.js";
+import {SelectedShapesManager} from "./controllerComponents/selectedShapesManager.js"
 
 class ControllerClass {
     constructor() {
@@ -12,6 +13,7 @@ class ControllerClass {
         this.stateSubscribers = new Set()
 
         this.currentScene = new SceneController()
+        this.selectedShapesManager = new SelectedShapesManager()
         this.keyboardManager = new KeyboardInputsManager()
         this.onionSkinsManager = new OnionSkinsManager()
         this.historyManager = new HistoryManager()
@@ -33,10 +35,13 @@ class ControllerClass {
         return this.currentScene.aggregateModels.displayShapes.content
     }
     selectedShapes(){
-        return this.currentScene.aggregateModels.selectedShapes.content
+        return this.selectedShapesManager.selectedShapes
     }
     animationEndTime(){
         return this.currentScene.animationEndTimeSeconds
+    }
+    getSelectedShapesManager(){
+        return this.selectedShapesManager
     }
 
     // the following methods may only be used by views
@@ -132,6 +137,14 @@ class ControllerClass {
 
     unsubscribeToPreviousAction(subscriber){
         this.historyManager.unsubscribeToPreviousAction(subscriber)
+    }
+
+    subscribeToSelectedShapes(subscriber){
+        this.selectedShapesManager.subscribeToSelectedShapes(subscriber)
+    }
+
+    unsubscribeToSelectedShapes(subscriber){
+        this.selectedShapesManager.unsubscribeToSelectedShapes(subscriber)
     }
 
     // the following methods may only be used by index.js

@@ -207,7 +207,7 @@ export class Timeline extends AbstractView{
         controller.subscribeToInputs(this)
         controller.subscribeToControllerState(this)
         controller.subscribeToPreviousAction(this)
-        controller.subscribeToSceneModel(this,"selectedShapes")
+        controller.subscribeToSelectedShapes(this)
         controller.subscribeToSceneModel(this,"timelineEvents")
         controller.subscribeToSceneModel(this,"clock")
     }
@@ -219,7 +219,7 @@ export class Timeline extends AbstractView{
         controller.unsubscribeToInputs(this)
         controller.unsubscribeToControllerState(this)
         controller.unsubscribeToPreviousAction(this)
-        controller.unsubscribeToSceneModel(this,"selectedShapes")
+        controller.unsubscribeToSelectedShapes(this)
         controller.unsubscribeToSceneModel(this,"timelineEvents")
         controller.unsubscribeToSceneModel(this,"clock")
     }

@@ -291,7 +291,7 @@ export class ShapeEditor extends AbstractView{
         // when am disconnected, need to unsubscribe so not taking up space in controller
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
-        controller.subscribeToSceneModel(this,"selectedShapes")
+        controller.subscribeToSelectedShapes(this)
         controller.subscribeToSceneModel(this,"timelineEvents")
     }
 
@@ -299,7 +299,7 @@ export class ShapeEditor extends AbstractView{
 
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
-        controller.unsubscribeToSceneModel(this,"selectedShapes")
+        controller.unsubscribeToSelectedShapes(this)
         controller.unsubscribeToSceneModel(this,"timelineEvents")
     }
 
@@ -384,7 +384,7 @@ export class ShapeEditor extends AbstractView{
         // if cannot be converted to a value
         if (newValue === null){
             // don't touch the controller and just rebuild everything from scratch
-            this.updateAggregateModel("selectedShapes",controller.selectedShapes())
+            controller.getSelectedShapesManager().selectNewShapes(controller.selectedShapes())
             return
         }
 

@@ -259,3 +259,14 @@ export function getEdgesOfEllipseAfterRotation(width,height,angle,centre){
         centreX+horizontalEdgeToCentre
     ]
 }
+
+export function subtractSets(set1,set2){
+
+    const outputSet = new Set(set1)
+
+    for (const element of set2){
+        outputSet.delete(element)
+    }
+
+    return outputSet
+}
