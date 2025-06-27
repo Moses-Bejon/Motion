@@ -1,7 +1,6 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {distanceBetween2dPoints,decimateLine} from "../../../maths.js";
 import {ManyPointsMode} from "./manyPointsMode.js";
-import {Drawing} from "../../../model/drawing.js";
 import {controller} from "../../../controller.js";
 import {buttonSelectedColour, lineSimplificationEpsilon, snappingDistance} from "../../../globalValues.js";
 
@@ -45,21 +44,11 @@ export class DrawMode extends ManyPointsMode{
 
             const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
 
-            const shape = new Drawing(
-                start,
-                end,
-                this.drawingColour,
-                this.thickness,
-                this.pointArray)
+            controller.beginAction()
+            controller.takeStep("createDrawing",
+                [start, end, this.drawingColour, this.thickness, this.pointArray])
+            controller.endAction()
 
-            controller.newAction(() => {
-                controller.newShape(shape)
-            },
-                () => {
-                controller.removeShape(shape)
-            },
-                []
-            )
         } else {
 
             /* If they are, connect up the shape, make a polygon, and fill the polygon with the fill colour */

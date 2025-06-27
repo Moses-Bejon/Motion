@@ -72,22 +72,10 @@ export class ManyPointsMode {
 
         const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
 
-        const shape = new Polygon(
-            start,
-            end,
-            this.drawingColour,
-            fillColour,
-            this.thickness,
-            this.pointArray)
-
-        controller.newAction(() => {
-                controller.newShape(shape)
-            },
-            () => {
-                controller.removeShape(shape)
-            },
-            []
-        )
+        controller.beginAction()
+        controller.takeStep("createPolygon",
+            [start,end,this.drawingColour,fillColour,this.thickness,this.pointArray])
+        controller.endAction()
 
         this.currentShape.remove()
     }

@@ -2,9 +2,9 @@ import {Shape} from "./shape.js";
 import {controller} from "../controller.js";
 
 export class ShapeGroup extends Shape{
-    constructor(appearanceTime,disappearanceTime,innerShapes) {
+    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,innerShapes) {
 
-        super(appearanceTime,disappearanceTime)
+        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
 
         // this sort retains the z-index of the shapes initially before they were merged
         this.innerShapes = innerShapes.sort((shape1,shape2) => {return shape1.ZIndex-shape2.ZIndex})

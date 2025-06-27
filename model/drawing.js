@@ -3,9 +3,9 @@ import {isLess, increment2dVectorBy, scale2dVectorAboutPoint, getRotateByAngle} 
 import {maximumOfArray} from "../dataStructureOperations.js";
 
 export class Drawing extends Shape{
-    constructor(appearanceTime,disappearanceTime,colour,thickness,points) {
+    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,colour,thickness,points) {
 
-        super(appearanceTime,disappearanceTime)
+        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
 
         this.colour = colour
         this.thickness = thickness

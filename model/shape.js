@@ -2,53 +2,22 @@ import {getRotateByAngle, increment2dVectorBy, scale2dVectorAboutPoint, midPoint
 import {controller} from "../controller.js";
 
 export class Shape {
-    constructor(appearanceTime,disappearanceTime) {
+    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory) {
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
 
         // all the things that occur to the shape throughout the animation
         this.timelineEvents = new Set()
 
-        this.modelConstructed = false
-    }
-
-    setupOffset(){
-        this.offset = midPoint2d([this.left,this.top],[this.right,this.bottom])
-    }
-
-    // The model needs to also construct shapes to ensure shapes have attributes which
-    // are necessary for their proper functionality, such as setting a unique name or
-    // initializing the z-index. This function assigns these attributes to the shapes.
-
-    // the function should only be called once
-    // the modelConstructed boolean is used to ensure the controller doesn't do this twice
-    modelConstruct(newZIndex,name,directory){
-        this.ZIndex = newZIndex
+        this.ZIndex = ZIndex
         this.name = name
 
         // indicates which directory I am a part of
         this.directory = directory
+    }
 
-        // once the controller knows about us we create our appearance and disappearance events
-        this.appearanceEvent = {
-            "type": "appearance",
-            "shape": this,
-            "time": this.appearanceTime,
-            "forward": () => {controller.showShape(this)},
-            "backward": () => {controller.hideShape(this)}
-        }
-        this.disappearanceEvent = {
-            "type": "disappearance",
-            "shape": this,
-            "time": this.disappearanceTime,
-            "forward": () => {controller.hideShape(this)},
-            "backward": () => {controller.showShape(this)}
-        }
-
-        controller.addTimeLineEvent(this.appearanceEvent)
-        controller.addTimeLineEvent(this.disappearanceEvent)
-
-        this.modelConstructed = true
+    setupOffset(){
+        this.offset = midPoint2d([this.left,this.top],[this.right,this.bottom])
     }
 
     save(){
@@ -81,8 +50,6 @@ export class Shape {
         for (const timelineEvent of save.timelineEvents){
             this.timelineEvents.add(controller.loadTimelineEvent(this,timelineEvent))
         }
-
-        this.modelConstructed = true
     }
 
     newAppearanceTime(newTime){
@@ -112,7 +79,6 @@ export class Shape {
     translateOffsetPointBy(translationVector){
         increment2dVectorBy(this.offset,translationVector)
     }
-
 
     geometryAttributeUpdate(attribute, newValue){
         this[attribute] = newValue

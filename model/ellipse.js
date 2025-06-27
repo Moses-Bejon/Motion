@@ -7,8 +7,8 @@ import {
 } from "../maths.js";
 
 export class Ellipse extends Shape{
-    constructor(appearanceTime,disappearanceTime,centre,height,width,outlineColour,colour,rotation,thickness){
-        super(appearanceTime,disappearanceTime)
+    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,centre,height,width,outlineColour,colour,rotation,thickness){
+        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
 
         this.centre = centre
         this.height = height

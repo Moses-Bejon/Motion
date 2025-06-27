@@ -66,7 +66,12 @@ class ControllerClass {
 
     endAction(){
         try {
+
+            // SAVE HERE BEFORE YOU GET TO HASTY EXECUTING STEPS NOT KNOWING WHAT TO DO IF IT FAILS HALF WAY THROUGH
+            this.currentScene.executeSteps(this.currentState.steps)
+
             this.#newState(this.currentState.endAction())
+
             return true
         } catch (e){
             console.error(e)

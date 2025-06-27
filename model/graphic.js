@@ -8,8 +8,8 @@ import {
 } from "../maths.js";
 
 export class Graphic extends Shape{
-    constructor(appearanceTime,disappearanceTime,topLeft,rotation){
-        super(appearanceTime,disappearanceTime)
+    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,topLeft,rotation){
+        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
 
         this.topLeft = topLeft
         this.rotation = rotation

@@ -1,6 +1,5 @@
-import {Text} from "../../../model/text.js";
 import {controller} from "../../../controller.js";
-import {buttonSelectedColour} from "../../../globalValues.js";
+import {buttonSelectedColour, fontFamily, fontSizeInt} from "../../../globalValues.js";
 
 export class TextMode {
     constructor(createCanvas) {
@@ -60,22 +59,12 @@ export class TextMode {
 
         const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
 
-        const textShape = new Text(
-            start,
-            end,
-            this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
-            0,
-            "black"
-        )
-
-        controller.newAction(() => {
-                controller.newShape(textShape)
-            },
-            () => {
-                controller.removeShape(textShape)
-            },
-            []
-        )
+        controller.beginAction()
+        controller.takeStep("createText",
+            [start, end,
+                this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
+                0, "#000000",fontSizeInt,fontFamily])
+        controller.endAction()
 
         // select the text box by default at creation (to allow the user to type in it)
         controller.newAggregateModel("selectedShapes",new Set([textShape]))

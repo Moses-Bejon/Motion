@@ -8,8 +8,8 @@ import {
 } from "../maths.js";
 
 export class Text extends Shape{
-    constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size,family){
-        super(appearanceTime,disappearanceTime)
+    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,bottomLeft,rotation,colour,size,family){
+        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
 
         this.text = "Begin typing"
         this.defaultTextReplaced = false

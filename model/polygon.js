@@ -1,8 +1,8 @@
 import {Drawing} from "./drawing.js"
 
 export class Polygon extends Drawing{
-    constructor(appearanceTime,disappearanceTime,colour,fillColour,thickness,points){
-        super(appearanceTime,disappearanceTime,colour,thickness,points)
+    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,colour,fillColour,thickness,points){
+        super(appearanceTime,disappearanceTime,ZIndex,name,directory,colour,thickness,points)
 
         this.fillColour = fillColour
 

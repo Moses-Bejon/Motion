@@ -33,7 +33,7 @@ export function validateDirectory(directory){
 }
 
 export function validateColour(colour) {
-    const regularExpression = /^#[0-9a-f]{6}$/i
+    const regularExpression = /^#[0-9a-f]{6}$|^transparent$/i
 
     return validateString(colour) && regularExpression.test(colour)
 }
@@ -75,14 +75,18 @@ export function validateFont(possibleFont){
     return validateString(possibleFont) && fontsList.includes(possibleFont)
 }
 
-const shapeValidation = [validateTime,validateTime,validateInteger,validateString,validateDirectory]
+export function validateFile(file){
+    return file instanceof File
+}
+
+const shapeValidation = [validateTime,validateTime]
 
 export const operationToValidation = {
     "goToTime":[validateTime],
     "createDrawing":shapeValidation.concat([validateColour,validatePositiveReal,validateLine]),
     "createEllipse":shapeValidation.concat([validatePoint,validatePositiveReal,validatePositiveReal,
         validateColour,validateColour,validateReal,validatePositiveReal]),
-    "createGraphic":shapeValidation.concat([validatePoint,validateReal]),
+    "createGraphic":shapeValidation.concat([validateFile,validatePoint,validateReal]),
     "createPolygon":shapeValidation.concat([validateColour,validateColour,validatePositiveReal,validateLine]),
     "createShapeGroup":shapeValidation.concat([validateShapeList]),
     "createText":shapeValidation.concat([validatePoint,validateReal,validateColour,validatePositiveReal,validateFont]),
@@ -122,8 +126,11 @@ export function validateOperation(operation,operands){
     }
 
     // are the operands valid
-    if (!validation(...operands)){
-        return false
+    for (let i = 0; i<validation.length; i++){
+        if (!validation[i](operands[i])){
+            console.log(validation[i],operands[i])
+            return false
+        }
     }
 
     // if a shape is being created, is its appearance before its disappearance
