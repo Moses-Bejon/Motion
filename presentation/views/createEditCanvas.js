@@ -447,20 +447,11 @@ export class CreateEditCanvas extends Canvas{
 
             const toRemove = new Set(this.selectedShapes)
 
-            controller.newAction(
-                () => {
-                    for (const shape of toRemove) {
-                        controller.removeShape(shape)
-                    }
-                },
-                () => {
-                    for (const shape of toRemove) {
-                        controller.newShape(shape)
-                    }
-                },
-                []
-            )
-
+            controller.beginAction()
+            for (const shape of toRemove) {
+                controller.takeStep("deleteShape",[shape])
+            }
+            controller.endAction()
         }
         this.shadowRoot.getElementById("transform").onpointerdown = (pointerEvent) => {
 

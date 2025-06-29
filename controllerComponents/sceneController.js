@@ -1,4 +1,5 @@
 import {model} from "../model/model.js";
+import {controller} from "../controller.js";
 import {Drawing} from "../model/drawing.js";
 import {binaryInsertion} from "../dataStructureOperations.js";
 import {Ellipse} from "../model/ellipse.js";
@@ -108,6 +109,9 @@ export class SceneController {
             case "createText":
                 this.#newShape(Text,operand)
                 break
+            case "deleteShape":
+                this.#deleteShape(operand[0])
+                break
         }
     }
 
@@ -152,6 +156,20 @@ export class SceneController {
         return shapeInstance
     }
 
+    #deleteShape(shape){
+        this.#removeModel("allShapes",shape)
+
+        this.#removeShapeFromTimeline(shape)
+
+        if (shape.appearanceTime <= controller.clock() && controller.clock() <= shape.disappearanceTime){
+            this.#hideShape(shape)
+        }
+
+        if (controller.selectedShapes().has(shape)) {
+            controller.selectedShapesManager.deselectShape(shape)
+        }
+    }
+
     #showShape(shape){
         this.#addModel("displayShapes",shape)
     }
@@ -163,11 +181,19 @@ export class SceneController {
     #addTimelineEvent(event){
         event.shape.addTimelineEvent(event)
 
-        if (event.time <= this.aggregateModels.clock.content){
+        if (event.time <= controller.clock()){
             event.forward()
         }
 
         this.#addModel("timelineEvents",event)
+    }
+
+    #removeShapeFromTimeline(shape){
+        for (const timeLineEvent of controller.timelineEvents()) {
+            if (timeLineEvent.shape === shape) {
+                this.#removeModel("timelineEvents",timeLineEvent)
+            }
+        }
     }
 
     #addModel(aggregateModelName,model){
@@ -182,7 +208,7 @@ export class SceneController {
 
             this.aggregateModels.timelineEvents.content.splice(placeToInsert,0,model)
 
-            if (model.time <= this.aggregateModels.clock.content){
+            if (model.time <= controller.clock()){
                 this.currentTimelineEvent ++
             }
         } else {
@@ -204,11 +230,32 @@ export class SceneController {
     #removeModel(aggregateModelName,model){
         const aggregateModel = this.aggregateModels[aggregateModelName]
 
-        if (!aggregateModel.content.has(model)){
-            console.error("attempted to remove a non-existing model")
-        }
+        if (aggregateModelName === "timelineEvents"){
+            if (model.time <= controller.clock()){
+                this.currentTimelineEvent --
+            }
 
-        aggregateModel.content.delete(model)
+            this.currentTimelineTweens.delete(model.tween)
+
+            const indexToRemove = aggregateModel.content.indexOf(model)
+
+            if (indexToRemove > -1) {
+                aggregateModel.content.splice(indexToRemove, 1)
+            } else {
+                // indexOf outputs -1 if not in list
+                console.error("attempted to remove a non-existing model")
+                return
+            }
+        }
+        else
+        {
+            if (!aggregateModel.content.has(model)) {
+                console.error("attempted to remove a non-existing model")
+                return
+            }
+
+            aggregateModel.content.delete(model)
+        }
 
         // if it was going to be added, just forget about adding it
         if (aggregateModel.modelsToAdd.has(model)){

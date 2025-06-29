@@ -60,7 +60,7 @@ export function validateLine(line){
 }
 
 export function validateShape(possibleShape){
-    return controller.allShapes().includes(possibleShape)
+    return controller.allShapes().has(possibleShape)
 }
 
 export function validateShapeGroup(possibleShapeGroup){
