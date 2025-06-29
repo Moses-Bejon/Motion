@@ -49,22 +49,18 @@ class ControllerClass {
     beginAction(){
         try {
             this.#newState(this.currentState.beginAction())
-            return true
         } catch (e){
             console.error(e)
             this.#newState(new IdleState())
-            return false
         }
     }
 
     takeStep(operation,operands){
         try {
             this.#newState(this.currentState.takeStep(operation,operands))
-            return true
         } catch (e){
             console.error(e)
             this.#newState(new IdleState())
-            return false
         }
 
     }
@@ -73,15 +69,14 @@ class ControllerClass {
         try {
 
             // SAVE HERE BEFORE YOU GET TOO HASTY EXECUTING STEPS NOT KNOWING WHAT TO DO IF IT FAILS HALF-WAY THROUGH
-            await this.currentScene.executeSteps(this.currentState.steps)
+            const returnValues = await this.currentScene.executeSteps(this.currentState.steps)
 
             this.#newState(this.currentState.endAction())
 
-            return true
+            return returnValues
         } catch (e){
             console.error(e)
             this.#newState(new IdleState())
-            return false
         }
 
     }
@@ -89,11 +84,9 @@ class ControllerClass {
     play(){
         try {
             this.#newState(this.currentState.play())
-            return true
         } catch (e){
             console.error(e)
             this.#newState(new IdleState())
-            return false
         }
     }
 
@@ -145,14 +138,6 @@ class ControllerClass {
 
     unsubscribeToSelectedShapes(subscriber){
         this.selectedShapesManager.unsubscribeToSelectedShapes(subscriber)
-    }
-
-    // the following methods may only be used by index.js
-
-    undoAction(){
-    }
-
-    redoAction(){
     }
 
     // the following methods are private, only to be used by us

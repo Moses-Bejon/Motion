@@ -1,6 +1,5 @@
 import {controller} from "../../../controller.js";
 import {buttonSelectedColour, fontFamily, fontSizeInt} from "../../../globalValues.js";
-import {subtractSets} from "../../../maths.js";
 
 export class TextMode {
     constructor(createCanvas) {
@@ -60,22 +59,15 @@ export class TextMode {
 
         const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
 
-        const previousShapes = new Set(controller.allShapes())
-
         controller.beginAction()
         controller.takeStep("createText",
             [start, end,
                 this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
                 0, "#000000",fontSizeInt,fontFamily])
-        controller.endAction()
 
-        const newShapes = subtractSets(previousShapes,controller.allShapes())
-
-        for (const shape of newShapes){
-            // select the text box by default at creation (to allow the user to type in it)
+        // controller returns the textShape it created
+        controller.endAction().then(([textShape]) => {
             controller.getSelectedShapesManager().selectNewShapes(new Set([textShape]))
-        }
-
-        // this is the price we pay for not having the view create the model
+        })
     }
 }

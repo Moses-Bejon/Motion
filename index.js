@@ -3,8 +3,8 @@
 import {controller} from "./controller.js";
 import {AbstractWindow} from "./presentation/window.js";
 
-document.getElementById("undoButton").onpointerdown = controller.undoAction.bind(controller)
-document.getElementById("redoButton").onpointerdown = controller.redoAction.bind(controller)
+document.getElementById("undoButton").onpointerdown = controller.historyManager.undoAction.bind(controller.historyManager)
+document.getElementById("redoButton").onpointerdown = controller.historyManager.redoAction.bind(controller.historyManager)
 
 const loadButton = document.getElementById("loadButton")
 const fakeLoadButton = document.getElementById("fakeLoadButton")

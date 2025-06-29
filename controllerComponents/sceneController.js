@@ -41,6 +41,9 @@ export class SceneController {
 
         // keeps track of any async steps that need to be completed before we tell the views
         this.asyncStepPromises = []
+
+        // keeps track of any return values steps send
+        this.returnValues = []
     }
 
     async finishSteps(){
@@ -86,28 +89,34 @@ export class SceneController {
 
         // caller handles any errors that occur here:
         await this.finishSteps()
+
+        // these are populated while steps are executed
+        return this.returnValues
     }
 
     #executeStep([operation,operand]){
         switch (operation){
             case "createDrawing":
-                this.#newShape(Drawing,operand)
+                this.returnValues.push(this.#newShape(Drawing,operand))
                 break
             case "createEllipse":
-                this.#newShape(Ellipse,operand)
+                this.returnValues.push(this.#newShape(Ellipse,operand))
                 break
             case "createGraphic":
                 const newGraphic = this.#newShape(Graphic,operand)
                 this.asyncStepPromises.push(newGraphic.loadImageSource())
+
+                this.returnValues.push(newGraphic)
+
                 break
             case "createPolygon":
-                this.#newShape(Polygon,operand)
+                this.returnValues.push(this.#newShape(Polygon,operand))
                 break
             case "createShapeGroup":
-                this.#newShape(ShapeGroup,operand)
+                this.returnValues.push(this.#newShape(ShapeGroup,operand))
                 break
             case "createText":
-                this.#newShape(Text,operand)
+                this.returnValues.push(this.#newShape(Text,operand))
                 break
             case "deleteShape":
                 this.#deleteShape(operand[0])
