@@ -8,9 +8,10 @@ import {
 } from "../maths.js";
 
 export class Graphic extends Shape{
-    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,topLeft,rotation){
+    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,source,topLeft,rotation){
         super(appearanceTime,disappearanceTime,ZIndex,name,directory)
 
+        this.source = source
         this.topLeft = topLeft
         this.rotation = rotation
     }
@@ -46,9 +47,9 @@ export class Graphic extends Shape{
     }
 
     // as loading up a new image source can take a while, it is separate from the update geometry and constructor logic
-    loadImageSource(source){
+    loadImageSource(){
         const fileReader = new FileReader()
-        fileReader.readAsDataURL(source)
+        fileReader.readAsDataURL(this.source)
 
         return new Promise((resolve,reject) => {
             fileReader.onload = () => {

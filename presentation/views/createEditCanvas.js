@@ -670,19 +670,19 @@ export class CreateEditCanvas extends Canvas{
 
     shapeToMode(shape){
         switch (shape.constructor.name){
-            case "drawing":
+            case "Drawing":
                 return ManyPointsMode
-            case "polygon":
+            case "Polygon":
                 return ManyPointsMode
-            case "shapeGroup":
+            case "ShapeGroup":
                 // for the purposes of a mode, a shape group can be considered to be a group of points
                 // each point being a shape
                 return ManyPointsMode
-            case "ellipse":
+            case "Ellipse":
                 return EllipseMode
-            case "text":
+            case "Text":
                 return TextMode
-            case "graphic":
+            case "Graphic":
                 return GraphicMode
         }
     }

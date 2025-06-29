@@ -1,6 +1,11 @@
 import {model} from "../model/model.js";
 import {Drawing} from "../model/drawing.js";
 import {binaryInsertion} from "../dataStructureOperations.js";
+import {Ellipse} from "../model/ellipse.js";
+import {Graphic} from "../model/graphic.js";
+import {Polygon} from "../model/polygon.js";
+import {ShapeGroup} from "../model/shapeGroup.js";
+import {Text} from "../model/text.js";
 
 export class SceneController {
     constructor() {
@@ -32,9 +37,16 @@ export class SceneController {
             model.modelsToUpdate = new Set()
             model.updateModel = false
         }
+
+        // keeps track of any async steps that need to be completed before we tell the views
+        this.asyncStepPromises = []
     }
 
-    finishSteps(){
+    async finishSteps(){
+
+        // caller handles any errors that occur here:
+        await Promise.all(this.asyncStepPromises)
+
         for (const [modelName,aggregateModel] of Object.entries(this.aggregateModels)){
 
             if (aggregateModel.updateModel){
@@ -64,20 +76,37 @@ export class SceneController {
         }
     }
 
-    executeSteps(steps){
+    async executeSteps(steps){
         this.beginSteps()
 
         for (const step of steps){
             this.#executeStep(step)
         }
 
-        this.finishSteps()
+        // caller handles any errors that occur here:
+        await this.finishSteps()
     }
 
     #executeStep([operation,operand]){
         switch (operation){
             case "createDrawing":
                 this.#newShape(Drawing,operand)
+                break
+            case "createEllipse":
+                this.#newShape(Ellipse,operand)
+                break
+            case "createGraphic":
+                const newGraphic = this.#newShape(Graphic,operand)
+                this.asyncStepPromises.push(newGraphic.loadImageSource())
+                break
+            case "createPolygon":
+                this.#newShape(Polygon,operand)
+                break
+            case "createShapeGroup":
+                this.#newShape(ShapeGroup,operand)
+                break
+            case "createText":
+                this.#newShape(Text,operand)
                 break
         }
     }
@@ -87,7 +116,7 @@ export class SceneController {
         const appearance = operands[0]
         const disappearance = operands[1]
 
-        const shapeTypeString = shape.name.charAt(0).toUpperCase() + shape.constructor.name.slice(1)
+        const shapeTypeString = shape.name.charAt(0).toUpperCase() + shape.name.slice(1)
         if (Object.hasOwn(this.numberOfEachTypeOfShape, shapeTypeString)) {
             this.numberOfEachTypeOfShape[shapeTypeString]++
         } else {
@@ -119,6 +148,8 @@ export class SceneController {
 
         this.#addTimelineEvent(shapeInstance.appearanceEvent)
         this.#addTimelineEvent(shapeInstance.disappearanceEvent)
+
+        return shapeInstance
     }
 
     #showShape(shape){
@@ -149,7 +180,7 @@ export class SceneController {
                 (timeLineEvent)=>{return timeLineEvent.time}
             )
 
-            this.aggregateModels.timelineEvents.content.splice(placeToInsert,0,event)
+            this.aggregateModels.timelineEvents.content.splice(placeToInsert,0,model)
 
             if (model.time <= this.aggregateModels.clock.content){
                 this.currentTimelineEvent ++

@@ -128,7 +128,6 @@ export function validateOperation(operation,operands){
     // are the operands valid
     for (let i = 0; i<validation.length; i++){
         if (!validation[i](operands[i])){
-            console.log(validation[i],operands[i])
             return false
         }
     }

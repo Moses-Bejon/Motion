@@ -69,11 +69,11 @@ class ControllerClass {
 
     }
 
-    endAction(){
+    async endAction(){
         try {
 
-            // SAVE HERE BEFORE YOU GET TO HASTY EXECUTING STEPS NOT KNOWING WHAT TO DO IF IT FAILS HALF WAY THROUGH
-            this.currentScene.executeSteps(this.currentState.steps)
+            // SAVE HERE BEFORE YOU GET TOO HASTY EXECUTING STEPS NOT KNOWING WHAT TO DO IF IT FAILS HALF-WAY THROUGH
+            await this.currentScene.executeSteps(this.currentState.steps)
 
             this.#newState(this.currentState.endAction())
 
