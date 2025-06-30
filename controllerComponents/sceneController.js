@@ -127,6 +127,10 @@ export class SceneController {
             case "deleteShape":
                 this.#deleteShape(operand[0])
                 break
+            case "translate":
+                operand[0].translate(operand[1])
+                this.#updateShape(operand[0])
+                break
 
             // controller level operations:
             case "showShape":
@@ -201,6 +205,14 @@ export class SceneController {
 
         if (controller.selectedShapes().has(shape)) {
             controller.selectedShapesManager.deselectShape(shape)
+        }
+    }
+
+    #updateShape(shape){
+        this.#updateModel("allShapes",shape)
+
+        if (controller.displayShapes().has(shape)){
+            this.#updateModel("displayShapes",shape)
         }
     }
 

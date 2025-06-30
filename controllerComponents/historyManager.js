@@ -2,13 +2,27 @@ import {RootAction} from "../model/rootAction.js";
 import {Action} from "../model/action.js";
 import {autoAddToTimeline} from "../globalValues.js";
 import {shapeCreation} from "../validator.js";
-import {returnInput} from "../maths.js";
+import {returnInput,multiply2dVectorByScalar} from "../maths.js";
 import {controller} from "../controller.js";
+import {TranslationTween} from "../model/tweens/translateTween.js";
 
 const operationToInverse = {
     // 0 is inverse operation, 1 is function to run on operands to reverse them
     "deleteShape":["restoreShape",returnInput],
     "restoreShape":["deleteShape",returnInput],
+    "translate":["translate",
+        (operands) => {
+        return [operands[0],multiply2dVectorByScalar(-1,operands[1])]
+    }
+    ]
+}
+
+const stepToTimelineEvents = {
+    "translate":(operands) => {
+        const shapeTween = new TranslationTween(operands[1], operands[0])
+
+        return [...shapeTween.getTimelineEvents()]
+    },
 }
 
 export class HistoryManager{
@@ -25,16 +39,12 @@ export class HistoryManager{
     // (but if you undo and redo its creation, you don't want it to jump to the top but retain its position)
     static forwardSteps(steps,returnValues){
 
-        let canBeAddedToTimeline = true
-
         const forwardSteps = []
 
         for (const step of Array.from(steps)){
+
+            // if step involves creating a shape
             if (shapeCreation.includes(step[0])){
-
-                // if a shape is created, the operation cannot be added to the timeline
-                canBeAddedToTimeline = false
-
                 forwardSteps.push(["restoreShape",[returnValues[0]]])
                 returnValues.shift()
             } else {
@@ -42,7 +52,7 @@ export class HistoryManager{
             }
         }
 
-        return [forwardSteps,canBeAddedToTimeline]
+        return forwardSteps
     }
 
     static reverseSteps(steps){
@@ -66,6 +76,17 @@ export class HistoryManager{
         return reversedSteps
     }
 
+    static canBeAddedToTimeline(steps){
+        for (const step of steps){
+            // if there is no way to turn this into a timeline event
+            if (stepToTimelineEvents[step[0]] === undefined){
+                return false
+            }
+        }
+
+        return true
+    }
+
     #updatePreviousAction(newAction){
         for (const subscriber of this.previousActionSubscribers){
             subscriber.newPreviousAction(newAction)
@@ -77,8 +98,10 @@ export class HistoryManager{
     newAction(steps,returnValues){
 
         // copy of returnValues made as returnValues is used again down the line and forwardSteps is destructive
-        const [forwardSteps,addable] = HistoryManager.forwardSteps(steps,Array.from(returnValues))
+        const forwardSteps = HistoryManager.forwardSteps(steps,Array.from(returnValues))
         const backwardSteps = HistoryManager.reverseSteps(forwardSteps)
+
+        const addable = HistoryManager.canBeAddedToTimeline(forwardSteps)
 
         const newAction = new Action(forwardSteps,backwardSteps,addable)
 

@@ -21,14 +21,13 @@ import {controller} from "../../controller.js";
 import {ManyPointsMode} from "./createModes/manyPointsMode.js";
 import {GraphicMode} from "./createModes/graphicMode.js";
 import {SelectionBox} from "./createModes/selectionBox.js";
-import {isLess, multiply2dVectorByScalar} from "../../maths.js";
+import {isLess} from "../../maths.js";
 import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
 import {EditMode} from "./createModes/editMode.js";
 import {ShapeGroup} from "../../model/shapeGroup.js";
 import {TransformMode} from "./createModes/transformMode.js";
 import {RotationTween} from "../../model/tweens/rotationTween.js";
 import {ScaleTween} from "../../model/tweens/scaleTween.js";
-import {TranslationTween} from "../../model/tweens/translateTween.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -877,36 +876,11 @@ export class CreateEditCanvas extends Canvas{
     }
 
     userTranslate(translationVector){
-        // a new set is used because, as this loop may run after geometry is updated, the set is changing
-
-        const selectedCopy = new Set(this.selectedShapes)
-
-        const timelineEvents = []
-
-        for (const shape of selectedCopy){
-
-            const shapeTween = new TranslationTween(translationVector, shape)
-
-            timelineEvents.push(...shapeTween.getTimelineEvents())
+        controller.beginAction()
+        for (const shape of this.selectedShapes){
+            controller.takeStep("translate",[shape,translationVector])
         }
-
-        controller.newAction(
-            () => {
-                for (const shape of selectedCopy){
-                    shape.translate(translationVector)
-
-                    controller.updateShape(shape)
-                }
-            },
-            () => {
-                for (const shape of selectedCopy){
-                    shape.translate(multiply2dVectorByScalar(-1,translationVector))
-
-                    controller.updateShape(shape)
-                }
-            },
-            timelineEvents
-        )
+        controller.endAction()
     }
 
     updateShapeSelection(){

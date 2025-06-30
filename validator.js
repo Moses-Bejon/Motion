@@ -42,8 +42,8 @@ export function validateTime(time){
     return time >= 0 && time <= controller.animationEndTime()
 }
 
-export function validatePoint(point){
-    return point.length === 2 && validateReal(point[0]) && validateReal(point[1])
+export function validateVector2d(vector){
+    return vector.length === 2 && validateReal(vector[0]) && validateReal(vector[1])
 }
 
 export function validateList(list,validation){
@@ -56,7 +56,7 @@ export function validateList(list,validation){
 }
 
 export function validateLine(line){
-    return validateList(line,validatePoint)
+    return validateList(line,validateVector2d)
 }
 
 export function validateShape(possibleShape){
@@ -84,12 +84,13 @@ const shapeValidation = [validateTime,validateTime]
 export const operationToValidation = {
     "goToTime":[validateTime],
     "createDrawing":shapeValidation.concat([validateColour,validatePositiveReal,validateLine]),
-    "createEllipse":shapeValidation.concat([validatePoint,validatePositiveReal,validatePositiveReal,
+    "createEllipse":shapeValidation.concat([validateVector2d,validatePositiveReal,validatePositiveReal,
         validateColour,validateColour,validateReal,validatePositiveReal]),
-    "createGraphic":shapeValidation.concat([validateFile,validatePoint,validateReal]),
+    "createGraphic":shapeValidation.concat([validateFile,validateVector2d,validateReal]),
     "createPolygon":shapeValidation.concat([validateColour,validateColour,validatePositiveReal,validateLine]),
     "createShapeGroup":shapeValidation.concat([validateShapeList]),
-    "createText":shapeValidation.concat([validatePoint,validateReal,validateColour,validatePositiveReal,validateFont]),
+    "createText":shapeValidation.concat([validateVector2d,validateReal,validateColour,validatePositiveReal,validateFont]),
+    "translate":[validateShape,validateVector2d],
     "mergeShapes":[validateShapeList],
     "splitShape":[validateShapeGroup],
     "deleteShape":[validateShape],
