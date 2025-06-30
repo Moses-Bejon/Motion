@@ -1,7 +1,7 @@
 export class RootAction{
     constructor() {
-        this.forwardAction = () => {}
-        this.backwardAction = () => {}
+        this.forwardAction = []
+        this.backwardAction = []
 
         // you can't go before the root action
         this.previousAction = this

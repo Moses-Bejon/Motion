@@ -71,6 +71,8 @@ class ControllerClass {
             // SAVE HERE BEFORE YOU GET TOO HASTY EXECUTING STEPS NOT KNOWING WHAT TO DO IF IT FAILS HALF-WAY THROUGH
             const returnValues = await this.currentScene.executeSteps(this.currentState.steps)
 
+            this.historyManager.newAction(this.currentState.steps,returnValues)
+
             this.#newState(this.currentState.endAction())
 
             return returnValues

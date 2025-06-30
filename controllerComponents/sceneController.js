@@ -83,9 +83,7 @@ export class SceneController {
     async executeSteps(steps){
         this.beginSteps()
 
-        for (const step of steps){
-            this.#executeStep(step)
-        }
+        this.#executeSubSteps(steps)
 
         // caller handles any errors that occur here:
         await this.finishSteps()
@@ -94,8 +92,16 @@ export class SceneController {
         return this.returnValues
     }
 
+    // should only be used after beginSteps has run and before finishSteps is run
+    #executeSubSteps(steps){
+        for (const step of steps){
+            this.#executeStep(step)
+        }
+    }
+
     #executeStep([operation,operand]){
         switch (operation){
+            // view level operations:
             case "createDrawing":
                 this.returnValues.push(this.#newShape(Drawing,operand))
                 break
@@ -121,6 +127,17 @@ export class SceneController {
             case "deleteShape":
                 this.#deleteShape(operand[0])
                 break
+
+            // controller level operations:
+            case "showShape":
+                this.#showShape(operand[0])
+                break
+            case "hideShape":
+                this.#hideShape(operand[0])
+                break
+            case "restoreShape":
+                this.#restoreShape(operand[0])
+                break
         }
     }
 
@@ -129,7 +146,7 @@ export class SceneController {
         const appearance = operands[0]
         const disappearance = operands[1]
 
-        const shapeTypeString = shape.name.charAt(0).toUpperCase() + shape.name.slice(1)
+        const shapeTypeString = shape.name
         if (Object.hasOwn(this.numberOfEachTypeOfShape, shapeTypeString)) {
             this.numberOfEachTypeOfShape[shapeTypeString]++
         } else {
@@ -148,21 +165,29 @@ export class SceneController {
             "type": "appearance",
             "shape": shapeInstance,
             "time": appearance,
-            "forward": () => {this.#showShape(shapeInstance)},
-            "backward": () => {this.#hideShape(shapeInstance)}
+            "forward": [["showShape",[shapeInstance]]],
+            "backward": [["hideShape",[shapeInstance]]]
         }
         shapeInstance.disappearanceEvent = {
             "type": "disappearance",
             "shape": shapeInstance,
             "time": shapeInstance.disappearanceTime,
-            "forward": () => {this.#hideShape(shapeInstance)},
-            "backward": () => {this.#showShape(shapeInstance)}
+            "forward": [["hideShape",[shapeInstance]]],
+            "backward": [["showShape",[shapeInstance]]]
         }
 
-        this.#addTimelineEvent(shapeInstance.appearanceEvent)
-        this.#addTimelineEvent(shapeInstance.disappearanceEvent)
+        this.#newTimelineEvent(shapeInstance.appearanceEvent)
+        this.#newTimelineEvent(shapeInstance.disappearanceEvent)
 
         return shapeInstance
+    }
+
+    #restoreShape(shape){
+        this.#addModel("allShapes",shape)
+
+        for (const timelineEvent of shape.timelineEvents){
+            this.#addModel("timelineEvents",timelineEvent)
+        }
     }
 
     #deleteShape(shape){
@@ -187,12 +212,8 @@ export class SceneController {
         this.#removeModel("displayShapes",shape)
     }
 
-    #addTimelineEvent(event){
+    #newTimelineEvent(event){
         event.shape.addTimelineEvent(event)
-
-        if (event.time <= controller.clock()){
-            event.forward()
-        }
 
         this.#addModel("timelineEvents",event)
     }
@@ -220,6 +241,11 @@ export class SceneController {
             if (model.time <= controller.clock()){
                 this.currentTimelineEvent ++
             }
+
+            if (model.time <= controller.clock()){
+                this.#executeSubSteps(model.forward)
+            }
+
         } else {
             if (aggregateModel.content.has(model)){
                 console.error("attempted to add an existing model")
