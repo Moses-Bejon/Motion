@@ -4,6 +4,7 @@ import {KeyboardInputsManager} from "./controllerComponents/keyboardInputsManage
 import {OnionSkinsManager} from "./controllerComponents/onionSkinsManager.js";
 import {HistoryManager} from "./controllerComponents/historyManager.js";
 import {SelectedShapesManager} from "./controllerComponents/selectedShapesManager.js"
+import {FileSerializer} from "./controllerComponents/fileSerializer.js";
 
 class ControllerClass {
     constructor() {
@@ -17,22 +18,23 @@ class ControllerClass {
         this.keyboardManager = new KeyboardInputsManager()
         this.onionSkinsManager = new OnionSkinsManager()
         this.historyManager = new HistoryManager()
+        this.fileSerializer = new FileSerializer()
     }
 
     // the following methods may be used by absolutely anyone
 
     // makes it so data can be easily read
     allShapes(){
-        return this.currentScene.aggregateModels.allShapes.content
+        return this.currentScene.allShapes()
     }
     timelineEvents(){
-        return this.currentScene.aggregateModels.timelineEvents.content
+        return this.currentScene.timelineEvents()
     }
     clock(){
-        return this.currentScene.aggregateModels.clock.content
+        return this.currentScene.clock()
     }
     displayShapes(){
-        return this.currentScene.aggregateModels.displayShapes.content
+        return this.currentScene.displayShapes()
     }
     selectedShapes(){
         return this.selectedShapesManager.selectedShapes
@@ -66,18 +68,23 @@ class ControllerClass {
     }
 
     async endAction(){
-        try {
 
-            // SAVE HERE BEFORE YOU GET TOO HASTY EXECUTING STEPS NOT KNOWING WHAT TO DO IF IT FAILS HALF-WAY THROUGH
+        // if the steps fail this is a backup (history manager also gleans some info from this)
+        const beforeSteps = JSON.parse(this.fileSerializer.serializeScene(this.currentScene))
+
+        try {
             const returnValues = await this.currentScene.executeSteps(this.currentState.steps)
 
-            this.historyManager.newAction(this.currentState.steps,returnValues)
+            this.historyManager.newAction(this.currentState.steps,returnValues,beforeSteps)
 
             this.#newState(this.currentState.endAction())
 
             return returnValues
         } catch (e){
             console.error(e)
+
+            this.currentScene = await this.fileSerializer.loadScene(beforeSteps)
+
             this.#newState(new IdleState())
         }
 

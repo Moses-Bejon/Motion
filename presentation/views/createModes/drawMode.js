@@ -43,7 +43,6 @@ export class DrawMode extends ManyPointsMode{
             /* If they're not close together or there is no fill make a drawing*/
 
             const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
-
             controller.beginAction()
             controller.takeStep("createDrawing",
                 [start, end, this.drawingColour, this.thickness, this.pointArray])

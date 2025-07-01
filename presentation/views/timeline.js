@@ -188,8 +188,12 @@ export class Timeline extends AbstractView{
         this.timelineDiv.appendChild(this.cursor.cursor)
 
         this.timelineDiv.onpointerdown = (pointerEvent) => {
-            controller.newClockTime(this.pointerPositionToTimelinePosition(pointerEvent)*animationEndTimeSeconds)
-            this.snapTimeToCell()
+
+            controller.beginAction()
+            controller.takeStep("goToTime",
+                [this.snapValueToCell(this.pointerPositionToTimelinePosition(pointerEvent)*animationEndTimeSeconds)]
+            )
+            controller.endAction()
         }
 
         this.playButton = this.shadowRoot.getElementById("playButton")
@@ -379,13 +383,6 @@ export class Timeline extends AbstractView{
         }
 
         return Math.round((value - timelineSnapLength/2)/timelineSnapLength)*timelineSnapLength + timelineSnapLength/2
-    }
-
-    snapTimeToCell(){
-        const gridValue = this.snapValueToCell(controller.clock())
-
-        controller.newClockTime(gridValue)
-
     }
 
     deselectAll(){

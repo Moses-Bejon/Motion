@@ -40,8 +40,8 @@ export class Drawing extends Shape{
         return circle
     }
 
-    save(){
-        const shapeSave = super.save()
+    save(fileSerializer){
+        const shapeSave = super.save(fileSerializer)
 
         shapeSave.colour = this.colour
         shapeSave.thickness = this.thickness

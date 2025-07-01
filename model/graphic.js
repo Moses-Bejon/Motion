@@ -16,8 +16,8 @@ export class Graphic extends Shape{
         this.rotation = rotation
     }
 
-    save(){
-        const shapeSave = super.save()
+    save(fileSerializer){
+        const shapeSave = super.save(fileSerializer)
 
         shapeSave.topLeft = this.topLeft
         shapeSave.rotation = this.rotation

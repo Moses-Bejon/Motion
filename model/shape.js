@@ -20,14 +20,13 @@ export class Shape {
         this.offset = midPoint2d([this.left,this.top],[this.right,this.bottom])
     }
 
-    save(){
+    save(fileSerializer){
 
         const savedTimelineEvents = []
 
         for (const timelineEvent of this.timelineEvents){
-            savedTimelineEvents.push(controller.saveTimelineEvent(timelineEvent))
+            savedTimelineEvents.push(fileSerializer.serializeTimelineEvent(timelineEvent))
         }
-
         return {
             "name":this.name,
             "directory":this.directory,
@@ -46,10 +45,6 @@ export class Shape {
         this.ZIndex = save.ZIndex
 
         this.timelineEvents = new Set()
-
-        for (const timelineEvent of save.timelineEvents){
-            this.timelineEvents.add(controller.loadTimelineEvent(this,timelineEvent))
-        }
     }
 
     newAppearanceTime(newTime){

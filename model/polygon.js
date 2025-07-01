@@ -25,8 +25,8 @@ export class Polygon extends Drawing{
         return polygon
     }
 
-    save(){
-        const shapeSave = super.save()
+    save(fileSerializer){
+        const shapeSave = super.save(fileSerializer)
 
         shapeSave.fillColour = this.fillColour
 

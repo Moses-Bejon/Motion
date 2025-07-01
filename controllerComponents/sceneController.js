@@ -28,6 +28,25 @@ export class SceneController {
         this.currentTimelineTweens = new Set()
 
         this.animationEndTimeSeconds = 10
+
+        // called here to allow for steps to be carried out silently
+        this.beginSteps()
+    }
+
+    clock(){
+        return this.aggregateModels.clock.content
+    }
+
+    allShapes(){
+        return this.aggregateModels.allShapes.content
+    }
+
+    timelineEvents(){
+        return this.aggregateModels.timelineEvents.content
+    }
+
+    displayShapes(){
+        return this.aggregateModels.displayShapes.content
     }
 
     beginSteps(){
@@ -83,7 +102,7 @@ export class SceneController {
     async executeSteps(steps){
         this.beginSteps()
 
-        this.#executeSubSteps(steps)
+        this.executeInvisibleSteps(steps)
 
         // caller handles any errors that occur here:
         await this.finishSteps()
@@ -92,8 +111,11 @@ export class SceneController {
         return this.returnValues
     }
 
-    // should only be used after beginSteps has run and before finishSteps is run
-    #executeSubSteps(steps){
+    // should only be used either:
+    // after beginSteps has run and before finishSteps is run
+    // state is restored after executeInvisibleSteps has finished running
+    // if both of these is not true views will go out of sync with controller
+    executeInvisibleSteps(steps){
         for (const step of steps){
             this.#executeStep(step)
         }
@@ -102,6 +124,9 @@ export class SceneController {
     #executeStep([operation,operand]){
         switch (operation){
             // view level operations:
+            case "goToTime":
+                this.#goToTime(operand[0])
+                break
             case "createDrawing":
                 this.returnValues.push(this.#newShape(Drawing,operand))
                 break
@@ -143,6 +168,66 @@ export class SceneController {
                 this.#restoreShape(operand[0])
                 break
         }
+    }
+
+    #goForwardToTime(time){
+
+        // for every event between now and last event
+        for (let i = this.currentTimelineEvent+1;i<this.timelineEvents().length;i++){
+            const nextEvent = this.timelineEvents()[i]
+
+            if (nextEvent.time > time){
+
+                // we are just before the place where the time is greater than us
+                this.currentTimelineEvent = i-1
+
+                for (const tween of this.currentTimelineTweens){
+                    tween.goToTime(time)
+                }
+
+                return
+            }
+
+            this.executeInvisibleSteps(nextEvent.forward)
+        }
+
+        this.currentTimelineEvent = this.timelineEvents().length-1
+    }
+
+    #goBackwardToTime(time){
+
+        // for every event between now and first event
+        for (let i = this.currentTimelineEvent;i>=0;i--){
+
+            const previousEvent = this.timelineEvents()[i]
+
+            if (previousEvent.time <= time){
+
+                this.currentTimelineEvent = i
+
+                for (const tween of this.currentTimelineTweens){
+                    tween.goToTime(time)
+                }
+
+                return
+            }
+
+            this.executeInvisibleSteps(previousEvent.backward)
+        }
+
+        this.currentTimelineEvent = -1
+    }
+
+    #goToTime(time){
+        if (time < this.clock()){
+            this.#goBackwardToTime(time)
+        } else{
+            this.#goForwardToTime(time)
+        }
+
+        this.aggregateModels.clock.content = time
+
+        this.aggregateModels.clock.updateModel = true
     }
 
     #newShape(shape,operands){
@@ -199,11 +284,11 @@ export class SceneController {
 
         this.#removeShapeFromTimeline(shape)
 
-        if (shape.appearanceTime <= controller.clock() && controller.clock() <= shape.disappearanceTime){
+        if (shape.appearanceTime <= this.clock() && this.clock() <= shape.disappearanceTime){
             this.#hideShape(shape)
         }
 
-        if (controller.selectedShapes().has(shape)) {
+        if (controller.selectedShapesManager.isSelected(shape)) {
             controller.selectedShapesManager.deselectShape(shape)
         }
     }
@@ -211,7 +296,7 @@ export class SceneController {
     #updateShape(shape){
         this.#updateModel("allShapes",shape)
 
-        if (controller.displayShapes().has(shape)){
+        if (this.displayShapes().has(shape)){
             this.#updateModel("displayShapes",shape)
         }
     }
@@ -231,7 +316,7 @@ export class SceneController {
     }
 
     #removeShapeFromTimeline(shape){
-        for (const timeLineEvent of controller.timelineEvents()) {
+        for (const timeLineEvent of Array.from(this.timelineEvents())) {
             if (timeLineEvent.shape === shape) {
                 this.#removeModel("timelineEvents",timeLineEvent)
             }
@@ -242,6 +327,7 @@ export class SceneController {
         const aggregateModel = this.aggregateModels[aggregateModelName]
 
         if (aggregateModelName === "timelineEvents"){
+
             const placeToInsert = binaryInsertion(
                 this.aggregateModels.timelineEvents.content,
                 model.time,
@@ -250,12 +336,12 @@ export class SceneController {
 
             this.aggregateModels.timelineEvents.content.splice(placeToInsert,0,model)
 
-            if (model.time <= controller.clock()){
+            if (model.time <= this.clock()){
                 this.currentTimelineEvent ++
             }
 
-            if (model.time <= controller.clock()){
-                this.#executeSubSteps(model.forward)
+            if (model.time <= this.clock()){
+                this.executeInvisibleSteps(model.forward)
             }
 
         } else {
@@ -278,7 +364,7 @@ export class SceneController {
         const aggregateModel = this.aggregateModels[aggregateModelName]
 
         if (aggregateModelName === "timelineEvents"){
-            if (model.time <= controller.clock()){
+            if (model.time <= this.clock()){
                 this.currentTimelineEvent --
             }
 

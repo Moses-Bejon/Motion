@@ -14,8 +14,8 @@ export class ShapeGroup extends Shape{
         super.setupOffset()
     }
 
-    save(){
-        const shapeSave = super.save()
+    save(fileSerializer){
+        const shapeSave = super.save(fileSerializer)
 
         const serialisedInnerShapes = []
 

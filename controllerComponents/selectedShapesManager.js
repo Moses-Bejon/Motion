@@ -30,7 +30,7 @@ export class SelectedShapesManager{
 
         this.selectedShapes.add(shape)
 
-        for (const subscriber of this.selectedShapes){
+        for (const subscriber of this.selectedShapesSubscribers){
             subscriber.addModel("selectedShapes",shape)
         }
     }
@@ -42,7 +42,7 @@ export class SelectedShapesManager{
 
         this.selectedShapes.delete(shape)
 
-        for (const subscriber of this.selectedShapes){
+        for (const subscriber of this.selectedShapesSubscribers){
             subscriber.removeModel("selectedShapes",shape)
         }
     }

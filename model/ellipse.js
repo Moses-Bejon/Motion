@@ -23,8 +23,8 @@ export class Ellipse extends Shape{
         super.setupOffset()
     }
 
-    save(){
-        const shapeSave = super.save()
+    save(fileSerializer){
+        const shapeSave = super.save(fileSerializer)
 
         shapeSave.centre = this.centre
         shapeSave.height = this.height

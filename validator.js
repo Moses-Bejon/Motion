@@ -39,7 +39,7 @@ export function validateColour(colour) {
 }
 
 export function validateTime(time){
-    return time >= 0 && time <= controller.animationEndTime()
+    return validateReal(time) && time >= 0 && time <= controller.animationEndTime()
 }
 
 export function validateVector2d(vector){

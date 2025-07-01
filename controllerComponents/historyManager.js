@@ -7,13 +7,23 @@ import {controller} from "../controller.js";
 import {TranslationTween} from "../model/tweens/translateTween.js";
 
 const operationToInverse = {
-    // 0 is inverse operation, 1 is function to run on operands to reverse them
+    // 0 is inverse operation, 1 is function to run on operands and save to reverse them
+    "goToTime":["goToTime",
+        (operands,save) => {
+            const toReturn = save.aggregateModels.clock
+
+            // this means the next step to be reversed has the right clock value
+            save.aggregateModels.clock = operands[0]
+
+            return [toReturn]
+        }
+    ],
     "deleteShape":["restoreShape",returnInput],
     "restoreShape":["deleteShape",returnInput],
     "translate":["translate",
         (operands) => {
         return [operands[0],multiply2dVectorByScalar(-1,operands[1])]
-    }
+        }
     ]
 }
 
@@ -55,12 +65,12 @@ export class HistoryManager{
         return forwardSteps
     }
 
-    static reverseSteps(steps){
+    static reverseSteps(steps,beforeSteps){
 
         const reversedSteps = []
 
         // steps is copied to ensure the original steps aren't replaced with the reversed ones
-        for (const step of Array.from(steps).reverse()){
+        for (const step of steps){
             const reverseApproach = operationToInverse[step[0]]
             const reversedStep = []
 
@@ -68,12 +78,11 @@ export class HistoryManager{
             reversedStep.push(reverseApproach[0])
 
             // new operand
-            reversedStep.push(reverseApproach[1](step[1]))
+            reversedStep.push(reverseApproach[1](step[1],beforeSteps))
 
             reversedSteps.push(reversedStep)
         }
-
-        return reversedSteps
+        return reversedSteps.reverse()
     }
 
     static canBeAddedToTimeline(steps){
@@ -95,11 +104,12 @@ export class HistoryManager{
         this.previousAction = newAction
     }
 
-    newAction(steps,returnValues){
+    newAction(steps,returnValues,beforeSteps){
 
         // copy of returnValues made as returnValues is used again down the line and forwardSteps is destructive
         const forwardSteps = HistoryManager.forwardSteps(steps,Array.from(returnValues))
-        const backwardSteps = HistoryManager.reverseSteps(forwardSteps)
+        // copy of forwardSteps and beforeSteps for same reason
+        const backwardSteps = HistoryManager.reverseSteps(Array.from(forwardSteps),structuredClone(beforeSteps))
 
         const addable = HistoryManager.canBeAddedToTimeline(forwardSteps)
 

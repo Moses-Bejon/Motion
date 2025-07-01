@@ -31,7 +31,10 @@ export class timeCursor{
                 this.currentTime.value = "0"
             }
 
-            controller.newClockTime(clamp(parseFloat(this.currentTime.value),0,animationEndTimeSeconds))
+            controller.beginAction()
+            controller.takeStep("goToTime",
+                [clamp(parseFloat(this.currentTime.value),0,animationEndTimeSeconds)])
+            controller.endAction()
         }
         this.currentTime.onpointerdown = (pointerEvent) => {
             pointerEvent.stopPropagation()
