@@ -5,6 +5,7 @@ import {shapeCreation} from "../validator.js";
 import {returnInput,multiply2dVectorByScalar} from "../maths.js";
 import {controller} from "../controller.js";
 import {TranslationTween} from "../model/tweens/translateTween.js";
+import {RotationTween} from "../model/tweens/rotationTween.js";
 
 const operationToInverse = {
     // 0 is inverse operation, 1 is function to run on operands and save to reverse them
@@ -24,7 +25,10 @@ const operationToInverse = {
         (operands) => {
         return [operands[0],multiply2dVectorByScalar(-1,operands[1])]
         }
-    ]
+    ],
+    "rotate":["rotate",(operands) => {
+        return [operands[0],-operands[1],operands[2]]
+    }]
 }
 
 const stepToTimelineEvents = {
@@ -33,6 +37,11 @@ const stepToTimelineEvents = {
 
         return [...shapeTween.getTimelineEvents()]
     },
+    "rotate": (operands) => {
+        const shapeTween = new RotationTween(operands[1],operands[2],operands[0])
+
+        return [...shapeTween.getTimelineEvents()]
+    }
 }
 
 export class HistoryManager{

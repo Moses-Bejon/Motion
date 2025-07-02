@@ -156,6 +156,10 @@ export class SceneController {
                 operand[0].translate(operand[1])
                 this.#updateShape(operand[0])
                 break
+            case "rotate":
+                operand[0].rotate(operand[1],operand[2])
+                this.#updateShape(operand[0])
+                break
 
             // controller level operations:
             case "showShape":

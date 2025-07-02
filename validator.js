@@ -91,6 +91,7 @@ export const operationToValidation = {
     "createShapeGroup":shapeValidation.concat([validateShapeList]),
     "createText":shapeValidation.concat([validateVector2d,validateReal,validateColour,validatePositiveReal,validateFont]),
     "translate":[validateShape,validateVector2d],
+    "rotate":[validateShape,validateReal,validateVector2d],
     "mergeShapes":[validateShapeList],
     "splitShape":[validateShapeGroup],
     "deleteShape":[validateShape],
