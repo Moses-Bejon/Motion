@@ -8,6 +8,10 @@ export function validateReal(possibleNumber){
     return typeof possibleNumber === "number"
 }
 
+export function validateNonZeroReal(possibleNonZeroReal){
+    return validateReal(possibleNonZeroReal) && possibleNonZeroReal !== 0
+}
+
 export function validateInteger(possibleInteger){
     return validateReal(possibleInteger) && possibleInteger%1 === 0
 }
@@ -92,6 +96,7 @@ export const operationToValidation = {
     "createText":shapeValidation.concat([validateVector2d,validateReal,validateColour,validatePositiveReal,validateFont]),
     "translate":[validateShape,validateVector2d],
     "rotate":[validateShape,validateReal,validateVector2d],
+    "scale":[validateShape,validateNonZeroReal,validateVector2d],
     "mergeShapes":[validateShapeList],
     "splitShape":[validateShapeGroup],
     "deleteShape":[validateShape],

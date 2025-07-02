@@ -26,7 +26,6 @@ import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructure
 import {EditMode} from "./createModes/editMode.js";
 import {ShapeGroup} from "../../model/shapeGroup.js";
 import {TransformMode} from "./createModes/transformMode.js";
-import {ScaleTween} from "../../model/tweens/scaleTween.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -817,36 +816,11 @@ export class CreateEditCanvas extends Canvas{
     }
 
     userScale(scaleFactor,aboutCentre){
-        // a new set is used because, as this loop may run after geometry is updated, the set is changing
-
-        const selectedCopy = new Set(this.selectedShapes)
-
-        const timelineEvents = []
-
-        for (const shape of selectedCopy){
-
-            const shapeTween = new ScaleTween(scaleFactor, aboutCentre, shape)
-
-            timelineEvents.push(...shapeTween.getTimelineEvents())
+        controller.beginAction()
+        for (const shape of this.selectedShapes){
+            controller.takeStep("scale",[shape,scaleFactor,aboutCentre])
         }
-
-        controller.newAction(
-            () => {
-                for (const shape of selectedCopy){
-                    shape.scale(scaleFactor,aboutCentre)
-
-                    controller.updateShape(shape)
-                }
-            },
-            () => {
-                for (const shape of selectedCopy){
-                    shape.scale(1/scaleFactor,aboutCentre)
-
-                    controller.updateShape(shape)
-                }
-            },
-            timelineEvents
-        )
+        controller.endAction()
     }
 
     userTranslate(translationVector){
