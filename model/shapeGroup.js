@@ -108,10 +108,17 @@ export class ShapeGroup extends Shape{
             innerShapesCopy.push(shape.copy())
         }
 
-        return new ShapeGroup(
+        const copy = new ShapeGroup(
             this.appearanceTime,
             this.disappearanceTime,
+            this.ZIndex,
+            this.name,
+            this.directory,
             innerShapesCopy
         )
+
+        Shape.copyTimelineEvents(this,copy)
+
+        return copy
     }
 }

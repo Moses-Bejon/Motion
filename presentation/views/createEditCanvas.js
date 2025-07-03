@@ -314,33 +314,24 @@ export class CreateEditCanvas extends Canvas{
 
         this.shadowRoot.getElementById("duplicate").onpointerdown = (pointerEvent) => {
 
-            const duplicates = new Set()
-
-            for (const shape of this.selectedShapes) {
-                const duplicate = shape.copy()
-
-                // if the duplicate is right on top of the previous shape users may not realise
-                duplicate.translate([50,50])
-
-                duplicates.add(duplicate)
+            controller.beginAction()
+            for (const shape of this.selectedShapes){
+                controller.takeStep("duplicate",[shape])
             }
 
-            controller.newAction(
-                () => {
-                    for (const duplicate of duplicates) {
-                        controller.newShape(duplicate)
-                    }
-                },
-                () => {
-                    for (const duplicate of duplicates) {
-                        controller.removeShape(duplicate)
-                    }
-                },
-                []
-            )
+            controller.endAction().then((duplicates) => {
+                controller.beginAction()
 
-            // the duplicate becomes selected after it is made
-            controller.getSelectedShapesManager().selectNewShapes(duplicates)
+                // the duplicates become translated after they are made so they are not on top of each other
+                for (const duplicate of duplicates){
+                    controller.takeStep("translate",[duplicate,[50,50]])
+                }
+
+                // the duplicates become selected after they are made
+                controller.endAction().then(() => {
+                    controller.getSelectedShapesManager().selectNewShapes(duplicates)
+                })
+            })
 
             // prevents the click on the canvas from deselecting the selected shapes
             pointerEvent.stopPropagation()

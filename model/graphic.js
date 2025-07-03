@@ -93,7 +93,6 @@ export class Graphic extends Shape{
     }
 
     updateGeometry(){
-
         [this.top,this.bottom,this.left,this.right] = getEdgesOfBoxAfterRotation(
             [
                 this.topLeft,
@@ -150,15 +149,25 @@ export class Graphic extends Shape{
     }
 
     copy(){
-        const copy = new Graphic(this.appearanceTime,this.disappearanceTime,Array.from(this.topLeft),this.rotation)
+        const copy = new Graphic(
+            this.appearanceTime,
+            this.disappearanceTime,
+            this.ZIndex,
+            this.name,
+            this.directory,
+            this.source,
+            Array.from(this.topLeft),
+            this.rotation
+        )
 
-        // it is too expensive to reload the image's source
-        copy.source = this.source
         copy.image = this.image
         copy.width = this.width
         copy.height = this.height
+        copy.rotation = this.rotation
 
+        Shape.copyTimelineEvents(this,copy)
         copy.updateGeometry()
+        copy.setupOffset()
 
         return copy
     }

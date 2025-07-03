@@ -90,4 +90,15 @@ export class Shape {
     removeTimelineEvent(event){
         this.timelineEvents.delete(event)
     }
+
+    static copyTimelineEvents(fromShape,toShape){
+        const fileSerializer = controller.fileSerializer
+
+        // copies timeline events over
+        for (const timelineEvent of fromShape.timelineEvents){
+            toShape.addTimelineEvent(
+                fileSerializer.loadTimelineEvent(toShape,fileSerializer.serializeTimelineEvent(timelineEvent))
+            )
+        }
+    }
 }

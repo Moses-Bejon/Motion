@@ -97,6 +97,7 @@ export const operationToValidation = {
     "translate":[validateShape,validateVector2d],
     "rotate":[validateShape,validateReal,validateVector2d],
     "scale":[validateShape,validateNonZeroReal,validateVector2d],
+    "duplicate":[validateShape],
     "mergeShapes":[validateShapeList],
     "splitShape":[validateShapeGroup],
     "deleteShape":[validateShape],
@@ -110,19 +111,7 @@ export const operationToValidation = {
 
 // list of operations that involve creating a shape
 export const shapeCreation = ["createDrawing","createEllipse","createGraphic","createPolygon",
-    "createShapeGroup","createText"]
-
-export function validateAppearanceDisappearance(appearanceTime,disappearanceTime){
-    return appearanceTime < disappearanceTime
-}
-
-export function validateAppearanceShape(shape,newAppearance){
-    return validateAppearanceDisappearance(newAppearance,shape.disappearanceTime)
-}
-
-export function validateDisappearanceShape(shape,newDisappearance){
-    return validateAppearanceDisappearance(shape.appearanceTime,newDisappearance)
-}
+    "createShapeGroup","createText","duplicate"]
 
 export function validateOperation(operation,operands){
     const validation = operationToValidation[operation]
@@ -137,21 +126,6 @@ export function validateOperation(operation,operands){
         if (!validation[i](operands[i])){
             return false
         }
-    }
-
-    // if a shape is being created, is its appearance before its disappearance
-    if (shapeCreation.includes(operation) && !validateAppearanceDisappearance(operands[0],operands[1])){
-        return false
-    }
-
-    // if a shape's appearance time is changed, is it before its disappearance time
-    if (operation === "newAppearanceTime" && !validateAppearanceShape(...operands)){
-        return false
-    }
-
-    // if a shape's disappearance time is changed, is it before its appearance time
-    if (operation === "newDisappearanceTime" && !validateDisappearanceShape(...operands)){
-        return false
     }
 
     // if all validation checks pass, it is valid

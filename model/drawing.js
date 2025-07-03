@@ -115,12 +115,20 @@ export class Drawing extends Shape{
     }
 
     copy(){
-        return new Drawing(
+
+        const copy = new Drawing(
             this.appearanceTime,
             this.disappearanceTime,
+            this.ZIndex,
+            this.name,
+            this.directory,
             this.colour,
             this.thickness,
             structuredClone(this.points)
         )
+
+        Shape.copyTimelineEvents(this,copy)
+
+        return copy
     }
 }

@@ -155,6 +155,9 @@ export class Text extends Shape{
         const copy = new Text(
             this.appearanceTime,
             this.disappearanceTime,
+            this.ZIndex,
+            this.name,
+            this.directory,
             Array.from(this.bottomLeft),
             this.rotation,
             this.fontColour,
@@ -165,6 +168,7 @@ export class Text extends Shape{
         copy.text = this.text
         copy.defaultTextReplaced = this.defaultTextReplaced
 
+        Shape.copyTimelineEvents(this,copy)
         copy.updateGeometry()
 
         return copy

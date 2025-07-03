@@ -206,7 +206,7 @@ export class FileSerializer{
             const newOperands = []
 
             for (const operand of step[1]){
-                if (operand === {}){
+                if (operand.constructor === Object){
                     newOperands.push(shape)
                 } else{
                     newOperands.push(operand)

@@ -75,7 +75,7 @@ export class HistoryManager{
             if (shapeCreation.includes(step[0])){
                 forwardSteps.push(["restoreShape",[returnValues[0]]])
                 returnValues.shift()
-            } else {
+            } else{
                 forwardSteps.push(step)
             }
         }

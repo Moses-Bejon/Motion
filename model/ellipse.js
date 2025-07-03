@@ -140,14 +140,22 @@ export class Ellipse extends Shape{
     }
 
     copy(){
-        return new Ellipse(
+
+        const copy = new Ellipse(
             this.appearanceTime,
             this.disappearanceTime,
+            this.ZIndex,
+            this.name,
+            this.directory,
             Array.from(this.centre),
             this.height,this.width,
             this.outlineColour,
             this.colour,
             this.rotation,
             this.thickness)
+
+        Shape.copyTimelineEvents(this,copy)
+
+        return copy
     }
 }

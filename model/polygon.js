@@ -1,4 +1,5 @@
 import {Drawing} from "./drawing.js"
+import {Shape} from "./shape.js";
 
 export class Polygon extends Drawing{
     constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,colour,fillColour,thickness,points){
@@ -62,13 +63,21 @@ export class Polygon extends Drawing{
     }
 
     copy(){
-        return new Polygon(
+
+        const copy = new Polygon(
             this.appearanceTime,
             this.disappearanceTime,
+            this.ZIndex,
+            this.name,
+            this.directory,
             this.colour,
             this.fillColour,
             this.thickness,
             structuredClone(this.points)
         )
+
+        Shape.copyTimelineEvents(this,copy)
+
+        return copy
     }
 }

@@ -164,6 +164,20 @@ export class SceneController {
                 operand[0].scale(operand[1],operand[2])
                 this.#updateShape(operand[0])
                 break
+            case "duplicate":
+                const duplicate = operand[0].copy()
+
+                duplicate.name = operand[0].name + " copy"
+
+                duplicate.ZIndex = this.ZIndexOfHighestShape
+                this.ZIndexOfHighestShape ++
+
+                duplicate.directory = this.selectedDirectory
+
+                this.#restoreShape(duplicate)
+                this.returnValues.push(duplicate)
+
+                break
 
             // controller level operations:
             case "showShape":
@@ -280,6 +294,10 @@ export class SceneController {
     }
 
     #restoreShape(shape){
+
+        // ensures the shape has a unique name
+        shape.name = this.#findNameWithPrefix(shape.name)
+
         this.#addModel("allShapes",shape)
 
         for (const timelineEvent of shape.timelineEvents){
@@ -355,6 +373,7 @@ export class SceneController {
         } else {
             if (aggregateModel.content.has(model)){
                 console.error("attempted to add an existing model")
+                return
             }
 
             aggregateModel.content.add(model)
@@ -410,6 +429,26 @@ export class SceneController {
         const aggregateModel = this.aggregateModels[aggregateModelName]
 
         aggregateModel.modelsToUpdate.add(model)
+    }
+
+    #checkIfShapeWithName(name){
+        for (const shape of this.allShapes()){
+            if (shape.name === name){
+                return true
+            }
+        }
+        return false
+    }
+
+    #findNameWithPrefix(namePrefix){
+        let name = namePrefix
+
+        let attempt = 1
+        while (this.#checkIfShapeWithName(name)){
+            name = `${namePrefix} (${attempt})`
+        }
+
+        return name
     }
 
     #addModelToSubscribers(aggregateModel,model){
