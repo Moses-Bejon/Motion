@@ -5,6 +5,7 @@ import {OnionSkinsManager} from "./controllerComponents/onionSkinsManager.js";
 import {HistoryManager} from "./controllerComponents/historyManager.js";
 import {SelectedShapesManager} from "./controllerComponents/selectedShapesManager.js"
 import {FileSerializer} from "./controllerComponents/fileSerializer.js";
+import {validateShape} from "./validator.js";
 
 class ControllerClass {
     constructor() {
@@ -19,6 +20,7 @@ class ControllerClass {
         this.onionSkinsManager = new OnionSkinsManager()
         this.historyManager = new HistoryManager()
         this.fileSerializer = new FileSerializer()
+        this.clipboard = new Set()
     }
 
     // the following methods may be used by absolutely anyone
@@ -44,6 +46,9 @@ class ControllerClass {
     }
     getSelectedShapesManager(){
         return this.selectedShapesManager
+    }
+    paste(){
+        return this.clipboard
     }
 
     // the following methods may only be used by views
@@ -96,6 +101,23 @@ class ControllerClass {
         } catch (e){
             console.error(e)
             this.#newState(new IdleState())
+        }
+    }
+
+    copy(shapes){
+
+        // validation
+        for (const shape of shapes){
+            if (!validateShape(shape)){
+                console.error("invalid shape copy occurred")
+                return
+            }
+        }
+
+        this.clipboard = new Set()
+
+        for (const shape of shapes){
+            this.clipboard.add(shape.copy())
         }
     }
 

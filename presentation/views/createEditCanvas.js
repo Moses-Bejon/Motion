@@ -337,36 +337,24 @@ export class CreateEditCanvas extends Canvas{
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("copy").onpointerdown = (pointerEvent) => {
-            controller.copiedShapes = []
-
-            for (const shape of this.selectedShapes) {
-                controller.copiedShapes.push(shape.copy())
-            }
+            controller.copy(this.selectedShapes)
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("paste").onpointerdown = (pointerEvent) => {
-            const copiedShapes = new Set()
-
-            for (const shape of controller.copiedShapes){
-                shape.translate([50,50])
-                copiedShapes.add(shape.copy())
+            controller.beginAction()
+            for (const shape of controller.paste()){
+                controller.takeStep("duplicate",[shape])
             }
+            controller.endAction().then((duplicates) => {
+                controller.beginAction()
+                for (const duplicate of duplicates){
+                    controller.takeStep("translate",[duplicate,[50,50]])
+                }
+                controller.endAction().then(() => {
+                    controller.getSelectedShapesManager().selectNewShapes(duplicates)
+                })
+            })
 
-            controller.newAction(
-                () => {
-                    for (const shape of copiedShapes){
-                        controller.newShape(shape)
-                    }
-                },
-                () => {
-                    for (const shape of copiedShapes){
-                        controller.removeShape(shape)
-                    }
-                },
-                []
-            )
-
-            controller.getSelectedShapesManager().selectNewShapes(copiedShapes)
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("merge").onpointerdown = () => {
