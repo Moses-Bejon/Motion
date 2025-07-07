@@ -40,28 +40,28 @@ const shapePropertyToInput = {
 }
 
 const shapeToShapeProperties = {
-    "drawing":{
+    "Drawing":{
         "Colour":colourInput,
         "Thickness":floatInput
     },
-    "polygon":{
+    "Polygon":{
         "Colour":colourInput,
         "Thickness":floatInput,
         "Polygon fill":colourInput
     },
-    "ellipse":{
+    "Ellipse":{
         "Outline colour":colourInput,
         "Width":floatInput,
         "Height":floatInput,
         "Colour":colourInput,
         "Thickness":floatInput
     },
-    "graphic":{
+    "Graphic":{
         "Width":floatInput,
         "Height":floatInput
     },
-    "shapeGroup":{},
-    "text":{
+    "ShapeGroup":{},
+    "Text":{
         "Text":stringInput,
         "Font colour":colourInput,
         "Font size (pt)":floatInput,

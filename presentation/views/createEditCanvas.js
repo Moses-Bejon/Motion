@@ -364,58 +364,20 @@ export class CreateEditCanvas extends Canvas{
                 return
             }
 
-            const mergedShapes = new Set(this.selectedShapes)
-
-            const [start,end] = this.timeToShapeAppearanceDisappearanceTime(controller.clock())
-
-            const mergedShape = new ShapeGroup(
-                start,
-                end,
-                Array.from(mergedShapes)
-            )
-
-            controller.newAction(()=>{
-                    controller.newShape(mergedShape)
-
-                    for (const shape of mergedShapes) {
-                        controller.removeShape(shape)
-                    }
-                },
-                () => {
-                    controller.removeShape(mergedShape)
-
-                    for (const shape of mergedShapes){
-                        controller.newShape(shape)
-                    }
-                },
-                []
-            )
-
+            controller.beginAction()
+            controller.takeStep("merge",[Array.from(this.selectedShapes)])
+            controller.endAction()
         }
         this.shadowRoot.getElementById("split").onpointerdown = () => {
 
             for (const shape of this.selectedShapes){
-                if (shape.constructor.name !== "shapeGroup"){
+                if (shape.constructor.name !== "ShapeGroup"){
                     continue
                 }
 
-                controller.newAction(
-                    () => {
-                        for (const innerShape of shape.innerShapes){
-                            controller.newShape(innerShape)
-                        }
-
-                        controller.removeShape(shape)
-                    },
-                    () => {
-                        controller.newShape(shape)
-
-                        for (const innerShape of shape.innerShapes){
-                            controller.newShape(innerShape)
-                        }
-                    },
-                    []
-                )
+                controller.beginAction()
+                controller.takeStep("split",[shape])
+                controller.endAction()
             }
 
         }

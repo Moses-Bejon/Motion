@@ -71,6 +71,26 @@ export class HistoryManager{
 
         for (const step of Array.from(steps)){
 
+            if (step[0] === "split"){
+                forwardSteps.push(["deleteShape",step[1]])
+
+                for (const shape of returnValues[0]){
+                    forwardSteps.push(["restoreShape",[shape]])
+                }
+                returnValues.shift()
+
+                // we don't want to have a split pushed into the forward steps so we continue here
+                continue
+            }
+
+            if (step[0] === "merge"){
+                // forward steps should include deletion of shapes that merged
+                // it is a shape creation so its created merged shape will be created later
+                for (const shape of step[1][0]){
+                    forwardSteps.push(["deleteShape",[shape]])
+                }
+            }
+
             // if step involves creating a shape
             if (shapeCreation.includes(step[0])){
                 forwardSteps.push(["restoreShape",[returnValues[0]]])

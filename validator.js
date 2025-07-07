@@ -76,6 +76,10 @@ export function validateShapeList(possibleShapeList){
     return validateList(possibleShapeList,validateShape)
 }
 
+export function validateNonEmptyShapeList(possibleShapeList){
+    return validateShapeList(possibleShapeList) && possibleShapeList.length > 0
+}
+
 export function validateFont(possibleFont){
     return validateString(possibleFont) && fontsList.includes(possibleFont)
 }
@@ -99,8 +103,8 @@ export const operationToValidation = {
     "rotate":[validateShape,validateReal,validateVector2d],
     "scale":[validateShape,validateNonZeroReal,validateVector2d],
     "duplicate":[validateShape],
-    "mergeShapes":[validateShapeList],
-    "splitShape":[validateShapeGroup],
+    "merge":[validateNonEmptyShapeList],
+    "split":[validateShapeGroup],
     "deleteShape":[validateShape],
     "moveOneAbove":[validateShape],
     "moveOneBelow":[validateShape],
@@ -112,7 +116,7 @@ export const operationToValidation = {
 
 // list of operations that involve creating a shape
 export const shapeCreation = ["createDrawing","createEllipse","createGraphic","createPolygon",
-    "createShapeGroup","createText","duplicate"]
+    "createShapeGroup","createText","duplicate","merge"]
 
 export function validateOperation(operation,operands){
     const validation = operationToValidation[operation]

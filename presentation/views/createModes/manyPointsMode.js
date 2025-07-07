@@ -9,6 +9,10 @@ export class ManyPointsMode {
         this.createCanvas = createCanvas
     }
 
+    static acceptKeyDownOnShape(keyboardEvent,shape){
+        return false
+    }
+
     acceptKeyDown(keyboardEvent){
         return false
     }

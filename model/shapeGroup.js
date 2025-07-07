@@ -20,7 +20,7 @@ export class ShapeGroup extends Shape{
         const serialisedInnerShapes = []
 
         for (const innerShape of this.innerShapes){
-            serialisedInnerShapes.push(innerShape.save())
+            serialisedInnerShapes.push(innerShape.save(fileSerializer))
         }
 
         shapeSave.innerShapes = serialisedInnerShapes
