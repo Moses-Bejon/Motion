@@ -201,6 +201,16 @@ export class SceneController {
                 this.#deleteShape(operand[0])
                 this.returnValues.push(shapesToReturn)
                 break
+            case "swapZIndices":
+
+                const tempZIndex = operand[1].ZIndex
+
+                operand[1].geometryAttributeUpdate("ZIndex",operand[0].ZIndex)
+                operand[0].geometryAttributeUpdate("ZIndex",tempZIndex)
+
+                this.#updateShape(operand[0])
+                this.#updateShape(operand[1])
+                break
 
             // controller level operations:
             case "showShape":

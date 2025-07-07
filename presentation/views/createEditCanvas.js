@@ -414,14 +414,9 @@ export class CreateEditCanvas extends Canvas{
                 indexOfTopShape --
             }
 
-            controller.newAction(() => {
-                    this.moveShapesOneAbove(shapesToMove)
-                },
-                () => {
-                    this.moveShapesOneBelow(shapesToMove)
-                },
-                []
-            )
+            controller.beginAction()
+            this.#moveShapesOneAbove(shapesToMove)
+            controller.endAction()
 
             pointerEvent.stopPropagation()
         }
@@ -437,14 +432,9 @@ export class CreateEditCanvas extends Canvas{
                 indexOfBottomShape ++
             }
 
-            controller.newAction(() => {
-                    this.moveShapesOneBelow(shapesToMove)
-                },
-                () => {
-                    this.moveShapesOneAbove(shapesToMove)
-                },
-                []
-            )
+            controller.beginAction()
+            this.#moveShapesOneBelow(shapesToMove)
+            controller.endAction()
 
             pointerEvent.stopPropagation()
         }
@@ -669,18 +659,7 @@ export class CreateEditCanvas extends Canvas{
         return positions
     }
 
-    swapZIndicesOfShapes(shape1,shape2){
-        const tempZIndex = shape2.ZIndex
-
-        shape2.ZIndex = shape1.ZIndex
-        shape1.ZIndex = tempZIndex
-
-        // this ensures controller knows we updated the shapes
-        shape2.geometryAttributeUpdate("ZIndex",shape2.ZIndex)
-        shape1.geometryAttributeUpdate("ZIndex",shape1.ZIndex)
-    }
-
-    moveShapesOneAbove(shapes){
+    #moveShapesOneAbove(shapes){
         const positions = this.positionsOfShapesInZIndexArray(shapes).reverse()
 
         // remove any shapes already on the top from the shapes we are going to move
@@ -694,11 +673,15 @@ export class CreateEditCanvas extends Canvas{
             const shapeAhead = this.shapesInOrderOfZIndex[position+1]
             const shape = this.shapesInOrderOfZIndex[position]
 
-            this.swapZIndicesOfShapes(shape,shapeAhead)
+            controller.takeStep("swapZIndices",[shape,shapeAhead])
+
+            // takeStep is not executed immediately, as such we keep our list up to date like this
+            this.shapesInOrderOfZIndex[position] = shapeAhead
+            this.shapesInOrderOfZIndex[position+1] = shape
         }
     }
 
-    moveShapesOneBelow(shapes){
+    #moveShapesOneBelow(shapes){
         const positions = this.positionsOfShapesInZIndexArray(shapes)
 
         let bottom = 0
@@ -711,7 +694,11 @@ export class CreateEditCanvas extends Canvas{
             const shapeBehind = this.shapesInOrderOfZIndex[position-1]
             const shape = this.shapesInOrderOfZIndex[position]
 
-            this.swapZIndicesOfShapes(shape,shapeBehind)
+            controller.takeStep("swapZIndices",[shape,shapeBehind])
+
+            // takeStep is not executed immediately, as such we keep our list up to date like this
+            this.shapesInOrderOfZIndex[position] = shapeBehind
+            this.shapesInOrderOfZIndex[position-1] = shape
         }
     }
 

@@ -79,8 +79,6 @@ export class Shape {
         this[attribute] = newValue
 
         this.updateGeometry()
-
-        controller.updateShape(this)
     }
 
     addTimelineEvent(event){

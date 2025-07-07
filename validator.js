@@ -106,8 +106,7 @@ export const operationToValidation = {
     "merge":[validateNonEmptyShapeList],
     "split":[validateShapeGroup],
     "deleteShape":[validateShape],
-    "moveOneAbove":[validateShape],
-    "moveOneBelow":[validateShape],
+    "swapZIndices":[validateShape,validateShape],
     "moveToFront":[validateShape],
     "moveToBack":[validateShape],
     "newAppearanceTime":[validateShape,validateTime],
@@ -123,6 +122,11 @@ export function validateOperation(operation,operands){
 
     // is the operation valid
     if (validation === undefined){
+        return false
+    }
+
+    // are there the right number of operands
+    if (operands.length !== validation.length){
         return false
     }
 

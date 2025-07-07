@@ -32,7 +32,8 @@ const operationToInverse = {
     }],
     "scale":["scale",(operands) => {
         return [operands[0],1/operands[1],operands[2]]
-    }]
+    }],
+    "swapZIndices":["swapZIndices",returnInput],
 }
 
 const stepToTimelineEvents = {
