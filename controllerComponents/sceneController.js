@@ -8,6 +8,7 @@ import {Polygon} from "../model/polygon.js";
 import {ShapeGroup} from "../model/shapeGroup.js";
 import {Text} from "../model/text.js";
 import {isLess} from "../maths.js";
+import {operationToAttribute} from "../typesOfOperation.js";
 
 export class SceneController {
     constructor() {
@@ -226,7 +227,14 @@ export class SceneController {
                 this.ZIndexOfLowestShape --
                 this.#updateShape(operand[0])
                 break
+            case "newText":
+                this.returnValues.push(operand[0].text)
 
+                operand[0].text = operand[1]
+                operand[0].defaultTextReplaced = true
+                this.#updateShape(operand[0])
+                operand[0].updateGeometry()
+                break
 
             // controller level operations:
             case "showShape":
@@ -241,7 +249,21 @@ export class SceneController {
             case "shapeAttributeUpdate":
                 operand[0].geometryAttributeUpdate(operand[1],operand[2])
                 this.#updateShape(operand[0])
+                operand[0].updateGeometry()
                 break
+
+            default:
+                if (operationToAttribute[operation] !== undefined){
+
+                    this.returnValues.push(operand[0][operationToAttribute[operation]])
+
+                    operand[0].geometryAttributeUpdate(operationToAttribute[operation],operand[1])
+                    operand[0].updateGeometry()
+                    this.#updateShape(operand[0])
+
+                } else {
+                    console.error(`unknown operation: ${operation}`)
+                }
         }
     }
 

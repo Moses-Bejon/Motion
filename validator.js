@@ -109,6 +109,7 @@ export const operationToValidation = {
     "swapZIndices":[validateShape,validateShape],
     "moveToFront":[validateShape],
     "moveToBack":[validateShape],
+    "newText":[validateShape,validateString],
     "newAppearanceTime":[validateShape,validateTime],
     "newDisappearanceTime":[validateShape,validateTime]
 }

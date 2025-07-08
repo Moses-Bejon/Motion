@@ -20,8 +20,9 @@ export class TextMode {
         switch (key){
             // removes last letter of text
             case "Backspace":
-                shape.geometryAttributeUpdate("text",shape.text.slice(0,-1))
-                shape.defaultTextReplaced = true
+                controller.beginAction()
+                controller.takeStep("newText",[shape,shape.text.slice(0,-1)])
+                controller.endAction()
                 return true
         }
 
@@ -33,10 +34,13 @@ export class TextMode {
         // if the default text has been replaced, add on to text
         // otherwise, replace the default text
         if (shape.defaultTextReplaced){
-            shape.geometryAttributeUpdate("text",shape.text+key)
+            controller.beginAction()
+            controller.takeStep("newText",[shape,shape.text+key])
+            controller.endAction()
         } else {
-            shape.defaultTextReplaced = true
-            shape.geometryAttributeUpdate("text",key)
+            controller.beginAction()
+            controller.takeStep("newText",[shape,key])
+            controller.endAction()
         }
         return true
     }

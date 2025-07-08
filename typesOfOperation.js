@@ -25,7 +25,7 @@ export const operationToInverse = {
     }],
     "swapZIndices":["swapZIndices",returnInput],
     "shapeAttributeUpdate":["shapeAttributeUpdate",(operands,returnValue) => {
-        return [operands[0],returnValue]
+        return [operands[0],"text",returnValue]
     }],
 }
 
@@ -49,7 +49,8 @@ export const stepToTimelineEvents = {
 
 export const operationToAttribute = {
     "moveToFront":"ZIndex",
-    "moveToBack":"ZIndex"
+    "moveToBack":"ZIndex",
+    "newText":"text"
 }
 
 // list of operations that involve creating a shape
