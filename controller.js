@@ -80,7 +80,7 @@ class ControllerClass {
         try {
             const returnValues = await this.currentScene.executeSteps(this.currentState.steps)
 
-            this.historyManager.newAction(this.currentState.steps,returnValues,beforeSteps)
+            this.historyManager.newAction(this.currentState.steps,returnValues)
 
             this.#newState(this.currentState.endAction())
 
