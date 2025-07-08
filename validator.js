@@ -111,7 +111,16 @@ export const operationToValidation = {
     "moveToBack":[validateShape],
     "newText":[validateShape,validateString],
     "newAppearanceTime":[validateShape,validateTime],
-    "newDisappearanceTime":[validateShape,validateTime]
+    "newDisappearanceTime":[validateShape,validateTime],
+    "newColour":[validateShape,validateColour],
+    "newOutlineColour":[validateShape,validateColour],
+    "newThickness":[validateShape,validatePositiveReal],
+    "newFillColour":[validateShape,validateColour],
+    "newFont":[validateShape,validateFont],
+    "newFontSize":[validateShape,validatePositiveReal],
+    "newFontColour":[validateShape,validateColour],
+    "newHeight":[validateShape,validatePositiveReal],
+    "newWidth":[validateShape,validatePositiveReal]
 }
 
 export function validateOperation(operation,operands){

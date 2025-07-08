@@ -327,6 +327,7 @@ export class CreateEditCanvas extends Canvas{
                     controller.takeStep("translate",[duplicate,[50,50]])
                 }
 
+
                 // the duplicates become selected after they are made
                 controller.endAction().then(() => {
                     controller.getSelectedShapesManager().selectNewShapes(duplicates)

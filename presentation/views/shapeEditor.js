@@ -69,44 +69,19 @@ const shapeToShapeProperties = {
     }
 }
 
-const nameToChangeFunction = {
-    "Appearance time": (shape,value) => {
-        shape.newAppearanceTime(value)
-    },
-    "Disappearance time": (shape,value) => {
-        shape.newDisappearanceTime(value)
-    },
-    "Colour": (shape,value) => {
-        shape.geometryAttributeUpdate("colour",value)
-    },
-    "Thickness": (shape,value) => {
-        shape.geometryAttributeUpdate("thickness",value)
-    },
-    "Polygon fill": (shape,value) => {
-        shape.geometryAttributeUpdate("fillColour",value)
-    },
-    "Outline colour": (shape,value) => {
-        shape.geometryAttributeUpdate("outlineColour",value)
-    },
-    "Width": (shape,value) => {
-        shape.geometryAttributeUpdate("width",value)
-    },
-    "Height": (shape,value) => {
-        shape.geometryAttributeUpdate("height",value)
-    },
-    "Text": (shape,value) => {
-        shape.geometryAttributeUpdate("text",value)
-        shape.defaultTextReplaced = true
-    },
-    "Font colour": (shape,value) => {
-        shape.geometryAttributeUpdate("fontColour",value)
-    },
-    "Font size (pt)": (shape,value) => {
-        shape.geometryAttributeUpdate("fontSize",value)
-    },
-    "Font": (shape,value) => {
-        shape.geometryAttributeUpdate("fontFamily",value)
-    }
+const nameToChangeStep = {
+    "Appearance time": "newAppearanceTime",
+    "Disappearance time": "newDisappearanceTime",
+    "Colour": "newColour",
+    "Thickness": "newThickness",
+    "Polygon fill": "newFillColour",
+    "Outline colour": "newOutlineColour",
+    "Width": "newWidth",
+    "Height": "newHeight",
+    "Text": "newText",
+    "Font colour": "newFontColour",
+    "Font size (pt)": "newFontSize",
+    "Font": "newFont"
 }
 
 const nameToGetFunction = {
@@ -400,48 +375,13 @@ export class ShapeEditor extends AbstractView{
             }
         }
 
-        const previousValues = shapesAffected.map((shape) => {return nameToGetFunction[propertyName](shape)})
+        const changeStep = nameToChangeStep[propertyName]
 
-        const changeFunction = nameToChangeFunction[propertyName]
-
-        const timelineEvents = []
-        const attribute = nameToTimelineAttribute[propertyName]
-
-        // for example, appearance and disappearance return false since they aren't attribute changes
-        if (attribute) {
-            for (let i = 0; i < shapesAffected.length; i++) {
-                timelineEvents.push(
-                    {
-                        "type": "change",
-                        "shape": shapesAffected[i],
-                        "forward": () => {
-                            changeFunction(shapesAffected[i], newValue)
-                        },
-                        "backward": () => {
-                            changeFunction(shapesAffected[i], previousValues[i])
-                        },
-                        "timeChange": returnInput,
-                        "attribute":attribute,
-                        "previousValue":previousValues[i],
-                        "value":newValue
-                    }
-                )
-            }
+        controller.beginAction()
+        for (const shape of shapesAffected){
+            controller.takeStep(changeStep,[shape,newValue])
         }
-
-        controller.newAction(
-            () => {
-                for (const shape of shapesAffected){
-                    changeFunction(shape,newValue)
-                }
-            },
-            () => {
-                for (let i = 0; i<shapesAffected.length;i++){
-                    changeFunction(shapesAffected[i],previousValues[i])
-                }
-            },
-            timelineEvents
-        )
+        controller.endAction()
     }
 
     sortShapeNames(){

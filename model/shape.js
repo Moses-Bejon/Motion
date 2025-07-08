@@ -75,12 +75,6 @@ export class Shape {
         increment2dVectorBy(this.offset,translationVector)
     }
 
-    geometryAttributeUpdate(attribute, newValue){
-        this[attribute] = newValue
-
-        this.updateGeometry()
-    }
-
     addTimelineEvent(event){
         this.timelineEvents.add(event)
     }
