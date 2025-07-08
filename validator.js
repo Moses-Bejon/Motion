@@ -113,10 +113,6 @@ export const operationToValidation = {
     "newDisappearanceTime":[validateShape,validateTime]
 }
 
-// list of operations that involve creating a shape
-export const shapeCreation = ["createDrawing","createEllipse","createGraphic","createPolygon",
-    "createShapeGroup","createText","duplicate","merge"]
-
 export function validateOperation(operation,operands){
     const validation = operationToValidation[operation]
 

@@ -126,6 +126,7 @@ export class SceneController {
         switch (operation){
             // view level operations:
             case "goToTime":
+                this.returnValues.push(this.clock())
                 this.#goToTime(operand[0])
                 break
             case "createDrawing":
@@ -211,6 +212,21 @@ export class SceneController {
                 this.#updateShape(operand[0])
                 this.#updateShape(operand[1])
                 break
+            case "moveToFront":
+                this.returnValues.push(operand[0].ZIndex)
+
+                operand[0].ZIndex = this.ZIndexOfHighestShape
+                this.ZIndexOfHighestShape ++
+                this.#updateShape(operand[0])
+                break
+            case "moveToBack":
+                this.returnValues.push(operand[0].ZIndex)
+
+                operand[0].ZIndex = this.ZIndexOfLowestShape
+                this.ZIndexOfLowestShape --
+                this.#updateShape(operand[0])
+                break
+
 
             // controller level operations:
             case "showShape":
@@ -221,6 +237,10 @@ export class SceneController {
                 break
             case "restoreShape":
                 this.#restoreShape(operand[0])
+                break
+            case "shapeAttributeUpdate":
+                operand[0].geometryAttributeUpdate(operand[1],operand[2])
+                this.#updateShape(operand[0])
                 break
         }
     }

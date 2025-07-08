@@ -703,36 +703,25 @@ export class CreateEditCanvas extends Canvas{
     }
 
     moveShapesToFront(shapesToMove){
-        // sort in reverse order of Z index, we will put lower ones on the top first
+        // sort in order of Z index, we will put lower ones on the top first
         shapesToMove.sort((shape1,shape2) => {return shape1.ZIndex-shape2.ZIndex})
 
-        const previousZIndices = shapesToMove.map((shape) => {return shape.ZIndex})
-
+        controller.beginAction()
         for (const shape of shapesToMove){
-            controller.moveShapeToFront(shape)
+            controller.takeStep("moveToFront",[shape])
         }
+        controller.endAction()
+    }
 
-        const newZIndices = shapesToMove.map((shape) => {return shape.ZIndex})
+    moveShapesToBack(shapesToMove){
+        // sort in reverse order of Z index, we will put higher ones on the bottom first
+        shapesToMove.sort((shape1,shape2) => {return shape2.ZIndex-shape1.ZIndex})
 
-        controller.newAction(
-            () => {
-                for (let i = 0; i<shapesToMove.length;i++){
-                    shapesToMove[i].geometryAttributeUpdate("ZIndex",newZIndices[i])
-                }
-                for (const shape of shapesToMove){
-                    controller.updateShape(shape)
-                }
-            },
-            () => {
-                for (let i = 0; i<shapesToMove.length;i++){
-                    shapesToMove[i].geometryAttributeUpdate("ZIndex",previousZIndices[i])
-                }
-                for (const shape of shapesToMove){
-                    controller.updateShape(shape)
-                }
-            },
-            []
-        )
+        controller.beginAction()
+        for (const shape of shapesToMove){
+            controller.takeStep("moveToBack",[shape])
+        }
+        controller.endAction()
     }
 
     userRotate(angle,aboutCentre){

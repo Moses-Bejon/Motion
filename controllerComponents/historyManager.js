@@ -1,58 +1,14 @@
 import {RootAction} from "../model/rootAction.js";
 import {Action} from "../model/action.js";
 import {autoAddToTimeline} from "../globalValues.js";
-import {shapeCreation} from "../validator.js";
-import {returnInput,multiply2dVectorByScalar} from "../maths.js";
 import {controller} from "../controller.js";
-import {TranslationTween} from "../model/tweens/translateTween.js";
-import {RotationTween} from "../model/tweens/rotationTween.js";
-import {ScaleTween} from "../model/tweens/scaleTween.js";
-
-const operationToInverse = {
-    // 0 is inverse operation, 1 is function to run on operands and save to reverse them
-    "goToTime":["goToTime",
-        (operands,save) => {
-            const toReturn = save.aggregateModels.clock
-
-            // this means the next step to be reversed has the right clock value
-            save.aggregateModels.clock = operands[0]
-
-            return [toReturn]
-        }
-    ],
-    "deleteShape":["restoreShape",returnInput],
-    "restoreShape":["deleteShape",returnInput],
-    "translate":["translate",
-        (operands) => {
-        return [operands[0],multiply2dVectorByScalar(-1,operands[1])]
-        }
-    ],
-    "rotate":["rotate",(operands) => {
-        return [operands[0],-operands[1],operands[2]]
-    }],
-    "scale":["scale",(operands) => {
-        return [operands[0],1/operands[1],operands[2]]
-    }],
-    "swapZIndices":["swapZIndices",returnInput],
-}
-
-const stepToTimelineEvents = {
-    "translate":(operands) => {
-        const shapeTween = new TranslationTween(operands[1], operands[0])
-
-        return shapeTween.getTimelineEvents()
-    },
-    "rotate": (operands) => {
-        const shapeTween = new RotationTween(operands[1],operands[2],operands[0])
-
-        return shapeTween.getTimelineEvents()
-    },
-    "scale": (operands) => {
-        const shapeTween = new ScaleTween(operands[1],operands[2],operands[0])
-
-        return shapeTween.getTimelineEvents()
-    }
-}
+import {
+    operationToInverse,
+    operationToAttribute,
+    operationsWhichReturn,
+    stepToTimelineEvents,
+    shapeCreation
+} from "../typesOfOperation.js";
 
 export class HistoryManager{
     constructor() {
@@ -72,13 +28,24 @@ export class HistoryManager{
 
         for (const step of Array.from(steps)){
 
+            let returnValue
+            if (operationsWhichReturn.includes(step[0])){
+                returnValue = returnValues.shift()
+            }
+
+            const attribute = operationToAttribute[step[0]]
+
+            if (attribute !== undefined){
+                forwardSteps.push(["shapeAttributeUpdate",[step[1][0],attribute,step[1][0][attribute]]])
+                continue
+            }
+
             if (step[0] === "split"){
                 forwardSteps.push(["deleteShape",step[1]])
 
-                for (const shape of returnValues[0]){
+                for (const shape of returnValue){
                     forwardSteps.push(["restoreShape",[shape]])
                 }
-                returnValues.shift()
 
                 // we don't want to have a split pushed into the forward steps so we continue here
                 continue
@@ -94,8 +61,7 @@ export class HistoryManager{
 
             // if step involves creating a shape
             if (shapeCreation.includes(step[0])){
-                forwardSteps.push(["restoreShape",[returnValues[0]]])
-                returnValues.shift()
+                forwardSteps.push(["restoreShape",[returnValue]])
             } else{
                 forwardSteps.push(step)
             }
@@ -104,12 +70,18 @@ export class HistoryManager{
         return forwardSteps
     }
 
-    static reverseSteps(steps,beforeSteps){
+    static reverseSteps(steps,returnValues){
 
         const reversedSteps = []
 
         // steps is copied to ensure the original steps aren't replaced with the reversed ones
         for (const step of steps){
+
+            let returnValue
+            if (operationsWhichReturn.includes(step[0])){
+                returnValue = returnValues.shift()
+            }
+
             const reverseApproach = operationToInverse[step[0]]
             const reversedStep = []
 
@@ -117,7 +89,7 @@ export class HistoryManager{
             reversedStep.push(reverseApproach[0])
 
             // new operand
-            reversedStep.push(reverseApproach[1](step[1],beforeSteps))
+            reversedStep.push(reverseApproach[1](step[1],returnValue))
 
             reversedSteps.push(reversedStep)
         }
@@ -143,12 +115,12 @@ export class HistoryManager{
         this.previousAction = newAction
     }
 
-    newAction(steps,returnValues,beforeSteps){
+    newAction(steps,returnValues){
 
         // copy of returnValues made as returnValues is used again down the line and forwardSteps is destructive
         const forwardSteps = HistoryManager.forwardSteps(steps,Array.from(returnValues))
-        // copy of forwardSteps and beforeSteps for same reason
-        const backwardSteps = HistoryManager.reverseSteps(Array.from(forwardSteps),structuredClone(beforeSteps))
+        // copy of forwardSteps and returnValues for same reason
+        const backwardSteps = HistoryManager.reverseSteps(Array.from(forwardSteps),Array.from(returnValues))
 
         const addable = HistoryManager.canBeAddedToTimeline(forwardSteps)
 
