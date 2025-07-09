@@ -109,7 +109,11 @@ export class HistoryManager{
 
     #updatePreviousAction(newAction){
         for (const subscriber of this.previousActionSubscribers){
-            subscriber.newPreviousAction(newAction)
+            try {
+                subscriber.newPreviousAction(newAction)
+            } catch (e) {
+                console.error(e)
+            }
         }
 
         this.previousAction = newAction

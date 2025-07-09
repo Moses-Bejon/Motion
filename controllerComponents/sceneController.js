@@ -9,6 +9,7 @@ import {ShapeGroup} from "../model/shapeGroup.js";
 import {Text} from "../model/text.js";
 import {isLess} from "../maths.js";
 import {operationToAttribute} from "../typesOfOperation.js";
+import {timeEpsilon} from "../globalValues.js";
 
 export class SceneController {
     constructor() {
@@ -432,9 +433,14 @@ export class SceneController {
             throw new Error("attempted to change the time of a non-existing timeline event")
         }
 
-        this.#removeModelFromTimeline(event)
+        const timeBeforeOperation = this.clock()
+        this.#goToTime(Math.min(newTime,event.time)-timeEpsilon)
+
+        this.#unsafeRemoveModelFromTimeline(event)
         event.time = newTime
-        this.#addModelToTimeline(event)
+        this.#unsafeAddModelToTimeline(event)
+
+        this.#goToTime(timeBeforeOperation)
 
         this.#updateModel("timelineEvents",event)
     }
@@ -469,7 +475,7 @@ export class SceneController {
         }
     }
 
-    #addModelToTimeline(model){
+    #unsafeAddModelToTimeline(model){
         const placeToInsert = binaryInsertion(
             this.aggregateModels.timelineEvents.content,
             model.time,
@@ -477,21 +483,22 @@ export class SceneController {
         )
 
         this.aggregateModels.timelineEvents.content.splice(placeToInsert,0,model)
-
-        if (model.time <= this.clock()){
-            this.executeInvisibleSteps(model.forward)
-            this.currentTimelineEvent ++
-        }
     }
 
-    #removeModelFromTimeline(model){
-        if (model.time <= this.clock()){
-            this.executeInvisibleSteps(model.backward)
-            this.currentTimelineEvent --
-        }
+    #addModelToTimeline(model){
 
-        this.currentTimelineTweens.delete(model.tween)
+        const timeBeforeOperation = this.clock()
 
+        // go to time before event happens
+        this.#goToTime(model.time-timeEpsilon)
+
+        this.#unsafeAddModelToTimeline(model)
+
+        // return to after event happened, this time with that event happening
+        this.#goToTime(timeBeforeOperation)
+    }
+
+    #unsafeRemoveModelFromTimeline(model){
         const indexToRemove = this.timelineEvents().indexOf(model)
 
         if (indexToRemove > -1) {
@@ -500,6 +507,19 @@ export class SceneController {
             // indexOf outputs -1 if not in list
             throw new Error("attempted to remove a non-existing model")
         }
+    }
+
+    #removeModelFromTimeline(model){
+
+        const timeBeforeOperation = this.clock()
+
+        // go to before event happened
+        this.#goToTime(model.time - timeEpsilon)
+
+        this.#unsafeRemoveModelFromTimeline(model)
+
+        // return to after the event happened, this time without the event
+        this.#goToTime(timeBeforeOperation)
     }
 
     #removeModel(aggregateModelName,model){

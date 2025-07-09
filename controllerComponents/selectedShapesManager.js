@@ -25,7 +25,11 @@ export class SelectedShapesManager{
         this.selectedShapes = new Set(shapes)
 
         for (const subscriber of this.selectedShapesSubscribers){
-            subscriber.updateAggregateModel("selectedShapes",this.selectedShapes)
+            try {
+                subscriber.updateAggregateModel("selectedShapes",this.selectedShapes)
+            } catch (e){
+                console.error(e)
+            }
         }
     }
 
@@ -42,7 +46,11 @@ export class SelectedShapesManager{
         this.selectedShapes.add(shape)
 
         for (const subscriber of this.selectedShapesSubscribers){
-            subscriber.addModel("selectedShapes",shape)
+            try{
+                subscriber.addModel("selectedShapes",shape)
+            } catch (e){
+                console.error(e)
+            }
         }
     }
 
@@ -54,7 +62,12 @@ export class SelectedShapesManager{
         this.selectedShapes.delete(shape)
 
         for (const subscriber of this.selectedShapesSubscribers){
-            subscriber.removeModel("selectedShapes",shape)
+            try{
+                subscriber.removeModel("selectedShapes",shape)
+            } catch (e){
+                console.error(e)
+            }
+
         }
     }
 

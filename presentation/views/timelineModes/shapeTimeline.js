@@ -226,17 +226,9 @@ export class shapeTimeline{
         const previousTime = this.endTime
         const newTime = this.parentTimeline.snapValueToCellBorder(this.parentTimeline.timeLinePositionToTime(newEnd))
 
-        controller.newAction(
-            () => {
-                this.shape.disappearanceTime = newTime
-                controller.changeTimeOfEvent(this.disappearanceEvent,newTime)
-            },
-            () => {
-                this.shape.disappearanceTime = previousTime
-                controller.changeTimeOfEvent(this.disappearanceEvent,previousTime)
-            },
-            []
-        )
+        controller.beginAction()
+        controller.takeStep("newDisappearanceTime",[this.shape,newTime])
+        controller.endAction()
     }
 
     dragLeftBumper(pointerEvent){
@@ -260,17 +252,9 @@ export class shapeTimeline{
         const previousTime = this.startTime
         const newTime = this.parentTimeline.snapValueToCellBorder(this.parentTimeline.timeLinePositionToTime(newStart))
 
-        controller.newAction(
-            () => {
-                this.shape.appearanceTime = newTime
-                controller.changeTimeOfEvent(this.appearanceEvent,newTime)
-            },
-            () => {
-                this.shape.appearanceTime = previousTime
-                controller.changeTimeOfEvent(this.appearanceEvent,previousTime)
-            },
-            []
-        )
+        controller.beginAction()
+        controller.takeStep("newAppearanceTime",[this.shape,newTime])
+        controller.endAction()
     }
 
     deselectAll(){
