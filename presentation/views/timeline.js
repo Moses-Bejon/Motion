@@ -373,16 +373,16 @@ export class Timeline extends AbstractView{
     }
 
     snapValueToCellBorder(value){
-        return Math.round(value/timelineSnapLength)*timelineSnapLength
+        return clamp(Math.round(value/timelineSnapLength)*timelineSnapLength,0,animationEndTimeSeconds)
     }
 
     snapValueToCell(value){
-
-        if (value === animationEndTimeSeconds){
-            return timelineSnapLength*Math.floor(animationEndTimeSeconds/timelineSnapLength) - timelineSnapLength/2
-        }
-
-        return Math.round((value - timelineSnapLength/2)/timelineSnapLength)*timelineSnapLength + timelineSnapLength/2
+        return clamp(
+            Math.round((value - timelineSnapLength/2)/timelineSnapLength)
+            *timelineSnapLength + timelineSnapLength/2,
+            timelineSnapLength/2,
+            animationEndTimeSeconds-timelineSnapLength/2
+        )
     }
 
     deselectAll(){
@@ -404,13 +404,16 @@ export class Timeline extends AbstractView{
                 return true
 
             case "ArrowRight":
-                controller.newClockTime(controller.clock()+timelineSnapLength)
-                this.snapTimeToCell()
+
+                controller.beginAction()
+                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock()+timelineSnapLength)])
+                controller.endAction()
                 return true
 
             case "ArrowLeft":
-                controller.newClockTime(controller.clock()-timelineSnapLength)
-                this.snapTimeToCell()
+                controller.beginAction()
+                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock()-timelineSnapLength)])
+                controller.endAction()
                 return true
         }
 

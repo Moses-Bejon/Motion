@@ -53,7 +53,7 @@ export class FileSerializer{
 
         const scene = new SceneController()
 
-        scene.executeInvisibleSteps([["goToTime",[save.clock]]])
+        scene.executeInvisibleSteps([["goToTime",[save.aggregateModels.clock]]])
 
         scene.numberOfEachTypeOfShape = save.numberOfEachTypeOfShape
         scene.ZIndexOfHighestShape = save.ZIndexOfHighestShape
@@ -171,8 +171,10 @@ export class FileSerializer{
         const loadedTimelineEvents = []
 
         for (const timelineEvent of shapeJSON.timelineEvents){
-            loadedTimelineEvents.push(this.loadTimelineEvent(newShape,loadedTimelineEvents))
+            loadedTimelineEvents.push(this.loadTimelineEvent(newShape,timelineEvent))
         }
+
+        newShape.timelineEvents = new Set(loadedTimelineEvents)
 
         return newShape
     }

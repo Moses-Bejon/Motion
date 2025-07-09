@@ -479,11 +479,8 @@ export class SceneController {
         this.aggregateModels.timelineEvents.content.splice(placeToInsert,0,model)
 
         if (model.time <= this.clock()){
-            this.currentTimelineEvent ++
-        }
-
-        if (model.time <= this.clock()){
             this.executeInvisibleSteps(model.forward)
+            this.currentTimelineEvent ++
         }
     }
 
@@ -562,19 +559,32 @@ export class SceneController {
 
     #addModelToSubscribers(aggregateModel,model){
         for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
-            subscriber.addModel(aggregateModel,model)
+            try {
+                subscriber.addModel(aggregateModel,model)
+            } catch (e){
+                console.error(e)
+            }
         }
     }
 
     #removeModelFromSubscribers(aggregateModel,model){
         for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
-            subscriber.removeModel(aggregateModel,model)
+            try {
+                subscriber.removeModel(aggregateModel,model)
+            } catch (e){
+                console.error(e)
+            }
         }
     }
 
     #updateModelForSubscribers(aggregateModel,model,previousModel=model){
         for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
-            subscriber.updateModel(aggregateModel,model,previousModel)
+
+            try {
+                subscriber.updateModel(aggregateModel,model,previousModel)
+            } catch (e){
+                console.error(e)
+            }
 
             // ensures selected shape is updated for any subscribers
             if (controller.selectedShapesManager.isSelected(model)){
@@ -586,7 +596,11 @@ export class SceneController {
 
     #updateAggregateModelForSubscribers(aggregateModel){
         for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
-            subscriber.updateAggregateModel(aggregateModel,this.aggregateModels[aggregateModel].content)
+            try {
+                subscriber.updateAggregateModel(aggregateModel,this.aggregateModels[aggregateModel].content)
+            } catch (e){
+                console.error(e)
+            }
         }
     }
 
