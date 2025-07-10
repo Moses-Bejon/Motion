@@ -27,23 +27,72 @@ export const operationToInverse = {
     "shapeAttributeUpdate":["shapeAttributeUpdate",(operands,returnValue) => {
         return [operands[0],operands[1],returnValue]
     }],
+    "addTimelineEvent":["removeTimelineEvent",returnInput],
+    "removeTimelineEvent":["addTimelineEvent",returnInput],
+}
+
+export const stepToAddableToTimeline = {
+    "goToTime":false,
+    "createDrawing":false,
+    "createEllipse":false,
+    "createGraphic":false,
+    "createPolygon":false,
+    "createShapeGroup":false,
+    "createText":false,
+    "translate":false,
+    "rotate":false,
+    "scale":false,
+    "duplicate":false,
+    "merge":false,
+    "split":false,
+    "deleteShape":false,
+    "swapZIndices":false,
+    "moveToFront":false,
+    "moveToBack":false,
+    "newText":true,
+    "newAppearanceTime":false,
+    "newDisappearanceTime":false,
+    "newColour":true,
+    "newOutlineColour":true,
+    "newThickness":true,
+    "newFillColour":true,
+    "newFont":true,
+    "newFontSize":true,
+    "newFontColour":true,
+    "newHeight":true,
+    "newWidth":true,
+    "addTimelineEvent":false,
+    "removeTimelineEvent":false,
+    "showShape":false,
+    "hideShape":false,
+    "restoreShape":false,
+    "shapeAttributeUpdate":false
 }
 
 export const stepToTimelineEvents = {
-    "translate":(operands) => {
+    "translate":(step,inverseStep,time) => {
         const shapeTween = new TranslationTween(operands[1], operands[0])
 
         return shapeTween.getTimelineEvents()
     },
-    "rotate": (operands) => {
+    "rotate": (step,inverseStep,time) => {
         const shapeTween = new RotationTween(operands[1],operands[2],operands[0])
 
         return shapeTween.getTimelineEvents()
     },
-    "scale": (operands) => {
+    "scale": (step,inverseStep,time) => {
         const shapeTween = new ScaleTween(operands[1],operands[2],operands[0])
 
         return shapeTween.getTimelineEvents()
+    },
+    "shapeAttributeUpdate": (step,inverseStep,time) => {
+        return {
+            "type":"change",
+            "shape":step[1][0],
+            "time":time,
+            "forward":[step],
+            "backward":[inverseStep]
+        }
     }
 }
 

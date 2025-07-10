@@ -7,7 +7,7 @@ import {
     operationToAttribute,
     operationsWhichReturn,
     stepToTimelineEvents,
-    shapeCreation
+    shapeCreation, stepToAddableToTimeline
 } from "../typesOfOperation.js";
 
 export class HistoryManager{
@@ -98,8 +98,7 @@ export class HistoryManager{
 
     static canBeAddedToTimeline(steps){
         for (const step of steps){
-            // if there is no way to turn this into a timeline event
-            if (stepToTimelineEvents[step[0]] === undefined){
+            if (!stepToAddableToTimeline[step[0]]){
                 return false
             }
         }
@@ -119,6 +118,48 @@ export class HistoryManager{
         this.previousAction = newAction
     }
 
+    getPreviousActionTimelineEvents(){
+        if (!this.previousAction.addableToTimeline){
+            throw new Error("cannot add non-addable action to timeline")
+        }
+
+        const shapeToTimelineEvents = {}
+
+        const steps = this.previousAction.forwardAction.length
+        for (let i = 0; i < steps; i++){
+            const event = stepToTimelineEvents[this.previousAction.forwardAction[i][0]](
+                this.previousAction.forwardAction[i],
+                this.previousAction.backwardAction[steps-i-1],
+                controller.clock()
+            )
+
+            const existingEventGroup = shapeToTimelineEvents[event.shape]
+
+            if (existingEventGroup === undefined){
+                shapeToTimelineEvents[event.shape] = {}
+            }
+
+            const existingEvent = shapeToTimelineEvents[event.shape][event.type]
+
+            if (existingEvent !== undefined){
+                existingEvent.forward = existingEvent.forward.concat(event.forward)
+                existingEvent.backward = event.backward.concat(existingEvent.backward)
+
+            } else {
+                shapeToTimelineEvents[event.shape][event.type] = event
+            }
+        }
+
+        const timelineEvents = []
+
+        for (const timelineEventGroup of Object.values(shapeToTimelineEvents)){
+            for (const timelineEvent of Object.values(timelineEventGroup)){
+                timelineEvents.push(timelineEvent)
+            }
+        }
+        return timelineEvents
+    }
+
     newAction(steps,returnValues){
 
         // copy of returnValues made as returnValues is used again down the line and forwardSteps is destructive
@@ -126,7 +167,7 @@ export class HistoryManager{
         // copy of forwardSteps and returnValues for same reason
         const backwardSteps = HistoryManager.reverseSteps(Array.from(forwardSteps),Array.from(returnValues))
 
-        const addable = HistoryManager.canBeAddedToTimeline(forwardSteps)
+        const addable = HistoryManager.canBeAddedToTimeline(steps)
 
         const newAction = new Action(forwardSteps,backwardSteps,addable)
 

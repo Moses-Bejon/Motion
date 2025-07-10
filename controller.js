@@ -184,6 +184,18 @@ class ControllerClass {
             }
         }
     }
+
+    addPreviousTimelineEventToTimeline(){
+        this.beginAction()
+
+        const timelineEvents = this.historyManager.getPreviousActionTimelineEvents()
+
+        for (const timelineEvent of timelineEvents){
+            this.takeStep("addTimelineEvent",[timelineEvent])
+        }
+
+        this.endAction()
+    }
 }
 
 export const controller = new ControllerClass()

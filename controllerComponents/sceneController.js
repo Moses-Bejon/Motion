@@ -10,6 +10,7 @@ import {Text} from "../model/text.js";
 import {isLess} from "../maths.js";
 import {operationToAttribute} from "../typesOfOperation.js";
 import {timeEpsilon} from "../globalValues.js";
+import {randomBrightColour} from "../random.js";
 
 export class SceneController {
     constructor() {
@@ -250,6 +251,12 @@ export class SceneController {
                 operand[0].disappearanceTime = operand[1]
                 this.#updateShape(operand[0])
                 break
+            case "addTimelineEvent":
+                this.#newTimelineEvent(operand[0])
+                break
+            case "removeTimelineEvent":
+                this.#removeModelFromTimeline(operand[0])
+                break
 
             // controller level operations:
             case "showShape":
@@ -422,6 +429,11 @@ export class SceneController {
     }
 
     #newTimelineEvent(event){
+
+        if (event.colour === undefined){
+            event.colour = randomBrightColour()
+        }
+
         event.shape.addTimelineEvent(event)
 
         this.#addModel("timelineEvents",event)
@@ -517,6 +529,7 @@ export class SceneController {
         this.#goToTime(model.time - timeEpsilon)
 
         this.#unsafeRemoveModelFromTimeline(model)
+        model.shape.removeTimelineEvent(model)
 
         // return to after the event happened, this time without the event
         this.#goToTime(timeBeforeOperation)

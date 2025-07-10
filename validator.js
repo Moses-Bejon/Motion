@@ -4,6 +4,7 @@ import {fontsList} from "./globalValues.js";
 import {controller} from "./controller.js";
 import {ShapeGroup} from "./model/shapeGroup.js";
 import {Shape} from "./model/shape.js";
+import {operationToAttribute} from "./typesOfOperation.js";
 
 export function validateReal(possibleNumber){
     return typeof possibleNumber === "number"
@@ -23,6 +24,10 @@ export function validateNatural(possibleNatural){
 
 export function validatePositiveReal(possibleNumber){
     return validateReal(possibleNumber) && possibleNumber > 0
+}
+
+export function validateNonNegativeReal(possibleNumber){
+    return validateReal(possibleNumber) && possibleNumber >= 0
 }
 
 export function validateBoolean(possibleBoolean){
@@ -88,9 +93,21 @@ export function validateFile(file){
     return file instanceof File
 }
 
+export function validateAttribute(attribute){
+    return Object.values(operationToAttribute).includes(attribute)
+}
+
+export function validateTimelineEvent(possibleTimelineEvent){
+    return validateShape(possibleTimelineEvent.shape) &&
+        validateSteps(possibleTimelineEvent.forward) &&
+        validateSteps(possibleTimelineEvent.backward) &&
+        validateTime(possibleTimelineEvent.time) &&
+        ["change","tweenStart","tweenEnd","appearance","disappearance"].includes(possibleTimelineEvent.type)
+}
+
 const shapeValidation = [validateTime,validateTime]
 
-export const operationToValidation = {
+export const operationToValidationViewLevel = {
     "goToTime":[validateTime],
     "createDrawing":shapeValidation.concat([validateColour,validatePositiveReal,validateLine]),
     "createEllipse":shapeValidation.concat([validateVector2d,validatePositiveReal,validatePositiveReal,
@@ -120,10 +137,12 @@ export const operationToValidation = {
     "newFontSize":[validateShape,validatePositiveReal],
     "newFontColour":[validateShape,validateColour],
     "newHeight":[validateShape,validatePositiveReal],
-    "newWidth":[validateShape,validatePositiveReal]
+    "newWidth":[validateShape,validatePositiveReal],
+    "addTimelineEvent":[validateTimelineEvent],
+    "removeTimelineEvent":[validateTimelineEvent]
 }
 
-export function validateOperation(operation,operands){
+export function validateOperation(operation, operands,operationToValidation){
     const validation = operationToValidation[operation]
 
     // is the operation valid
@@ -144,5 +163,61 @@ export function validateOperation(operation,operands){
     }
 
     // if all validation checks pass, it is valid
+    return true
+}
+
+export const attributeToValidation = {
+    "ZIndex":validateInteger,
+    "text":validateString,
+    "appearanceTime":validateNonNegativeReal,
+    "disappearanceTime":validatePositiveReal,
+    "colour":validateColour,
+    "thickness":validatePositiveReal,
+    "fillColour":validateColour,
+    "outlineColour":validateColour,
+    "width":validatePositiveReal,
+    "height":validatePositiveReal,
+    "fontColour":validateColour,
+    "fontSize":validatePositiveReal,
+    "fontFamily":validateFont,
+    "rotation":validateReal,
+    "scale":validateNonZeroReal,
+}
+
+export const operationToValidationAtControllerLevel = Object.assign({
+    "showShape":[validateShape],
+    "hideShape":[validateShape],
+    "restoreShape":[validateShape],
+
+    // the shape attribute which is changed to is validated later, so returns true for now
+    "shapeAttributeUpdate":[validateShape,validateAttribute,() => true],
+},operationToValidationViewLevel)
+
+export function validateOperationViewLevel(operation, operands){
+    return validateOperation(operation,operands,operationToValidationViewLevel)
+}
+
+export function validateOperationControllerLevel(operation,operands){
+
+    if (!validateOperation(operation,operands,operationToValidationAtControllerLevel)){
+        return false
+    }
+
+    if (operation === "shapeAttributeUpdate"){
+        if (!attributeToValidation[operands[1]](operands[2])){
+            return false
+        }
+    }
+
+    return true
+}
+
+export function validateSteps(steps){
+
+    for (const step of steps){
+        if (!validateOperationControllerLevel(step[0],step[1])){
+            return false
+        }
+    }
     return true
 }

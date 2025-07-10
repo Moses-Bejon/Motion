@@ -51,7 +51,7 @@ export class timeCursor{
 
         this.addToTimelineButton.onpointerdown = (pointerEvent) => {
 
-            controller.addPreviousActionTimelineEventToTimeline()
+            controller.addPreviousTimelineEventToTimeline()
 
             pointerEvent.stopPropagation()
         }

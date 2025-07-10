@@ -1,5 +1,5 @@
 import {IdleState} from "./idle.js";
-import {validateOperation} from "../validator.js";
+import {validateOperationViewLevel} from "../validator.js";
 
 export class ReceivingActionState {
     constructor() {
@@ -11,7 +11,7 @@ export class ReceivingActionState {
     }
 
     takeStep(operation,operands){
-        if (!validateOperation(operation,operands)){
+        if (!validateOperationViewLevel(operation,operands)){
             throw new Error("invalid step sent to controller")
         }
 
