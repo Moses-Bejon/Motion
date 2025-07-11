@@ -29,45 +29,23 @@ export const operationToInverse = {
     }],
     "addTimelineEvent":["removeTimelineEvent",returnInput],
     "removeTimelineEvent":["addTimelineEvent",returnInput],
+    "changeTimeOfTimelineEvent":["changeTimeOfTimelineEvent",(operands,returnValue) => {
+        return [operands[0],returnValue]
+    }],
 }
 
-export const stepToAddableToTimeline = {
-    "goToTime":false,
-    "createDrawing":false,
-    "createEllipse":false,
-    "createGraphic":false,
-    "createPolygon":false,
-    "createShapeGroup":false,
-    "createText":false,
-    "translate":false,
-    "rotate":false,
-    "scale":false,
-    "duplicate":false,
-    "merge":false,
-    "split":false,
-    "deleteShape":false,
-    "swapZIndices":false,
-    "moveToFront":false,
-    "moveToBack":false,
-    "newText":true,
-    "newAppearanceTime":false,
-    "newDisappearanceTime":false,
-    "newColour":true,
-    "newOutlineColour":true,
-    "newThickness":true,
-    "newFillColour":true,
-    "newFont":true,
-    "newFontSize":true,
-    "newFontColour":true,
-    "newHeight":true,
-    "newWidth":true,
-    "addTimelineEvent":false,
-    "removeTimelineEvent":false,
-    "showShape":false,
-    "hideShape":false,
-    "restoreShape":false,
-    "shapeAttributeUpdate":false
-}
+export const stepToAddableToTimeline = new Set([
+    "newText",
+    "newColour",
+    "newOutlineColour",
+    "newThickness",
+    "newFillColour",
+    "newFont",
+    "newFontSize",
+    "newFontColour",
+    "newHeight",
+    "newWidth",
+])
 
 export const stepToTimelineEvents = {
     "translate":(step,inverseStep,time) => {

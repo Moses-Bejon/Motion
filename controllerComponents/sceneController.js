@@ -257,6 +257,11 @@ export class SceneController {
             case "removeTimelineEvent":
                 this.#removeModelFromTimeline(operand[0])
                 break
+            case "changeTimeOfTimelineEvent":
+                this.returnValues.push(this.clock())
+
+                this.#changeTimeOfEvent(operand[0],operand[1])
+                break
 
             // controller level operations:
             case "showShape":

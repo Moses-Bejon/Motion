@@ -139,7 +139,8 @@ export const operationToValidationViewLevel = {
     "newHeight":[validateShape,validatePositiveReal],
     "newWidth":[validateShape,validatePositiveReal],
     "addTimelineEvent":[validateTimelineEvent],
-    "removeTimelineEvent":[validateTimelineEvent]
+    "removeTimelineEvent":[validateTimelineEvent],
+    "changeTimeOfTimelineEvent":[validateTimelineEvent,validateTime],
 }
 
 export function validateOperation(operation, operands,operationToValidation){

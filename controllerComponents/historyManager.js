@@ -98,7 +98,7 @@ export class HistoryManager{
 
     static canBeAddedToTimeline(steps){
         for (const step of steps){
-            if (!stepToAddableToTimeline[step[0]]){
+            if (!stepToAddableToTimeline.has(step[0])){
                 return false
             }
         }

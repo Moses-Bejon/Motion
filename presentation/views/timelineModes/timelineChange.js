@@ -71,21 +71,13 @@ export class timelineChange{
 
     finishDragging(pointerEvent){
         const newProportion = this.drag(pointerEvent)
-
-        const previousTime = this.changeEvent.time
         const newTime = this.parentTimeline.snapValueToCell(
             this.parentTimeline.timeLinePositionToTime(newProportion)
         )
 
-        controller.newAction(
-            () => {
-                controller.changeTimeOfEvent(this.changeEvent,newTime)
-            },
-            () => {
-                controller.changeTimeOfEvent(this.changeEvent,previousTime)
-            },
-            []
-        )
+        controller.beginAction()
+        controller.takeStep("changeTimeOfTimelineEvent",[this.changeEvent,newTime])
+        controller.endAction()
 
         this.select()
     }
