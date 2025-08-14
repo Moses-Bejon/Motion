@@ -188,10 +188,13 @@ class ControllerClass {
     addPreviousTimelineEventToTimeline(){
         this.beginAction()
 
-        const timelineEvents = this.historyManager.getPreviousActionTimelineEvents()
+        const stepsToAddToTimeline = this.historyManager.getStepsToAddPreviousActionToTimeline()
 
-        for (const timelineEvent of timelineEvents){
-            this.takeStep("addTimelineEvent",[timelineEvent])
+        console.log(stepsToAddToTimeline)
+
+        for (const step of stepsToAddToTimeline){
+            console.log(step)
+            this.currentState.takeStep(step[0],step[1])
         }
 
         this.endAction()

@@ -10,7 +10,6 @@ import {Text} from "../model/text.js";
 import {isLess} from "../maths.js";
 import {operationToAttribute} from "../typesOfOperation.js";
 import {timeEpsilon} from "../globalValues.js";
-import {randomBrightColour} from "../random.js";
 
 export class SceneController {
     constructor() {
@@ -27,9 +26,6 @@ export class SceneController {
         // index of the timeline event in forward state closest to current time i.e. the one that's just been done
         // -1 if there are no timeline events or none in forward state
         this.currentTimelineEvent = -1
-
-        // all the tweens the controller should think about when updating
-        this.currentTimelineTweens = new Set()
 
         this.animationEndTimeSeconds = 10
 
@@ -159,14 +155,17 @@ export class SceneController {
                 break
             case "translate":
                 operand[0].translate(operand[1])
+                operand[0].updateGeometry()
                 this.#updateShape(operand[0])
                 break
             case "rotate":
                 operand[0].rotate(operand[1],operand[2])
+                operand[0].updateGeometry()
                 this.#updateShape(operand[0])
                 break
             case "scale":
                 operand[0].scale(operand[1],operand[2])
+                operand[0].updateGeometry()
                 this.#updateShape(operand[0])
                 break
             case "duplicate":
@@ -251,17 +250,6 @@ export class SceneController {
                 operand[0].disappearanceTime = operand[1]
                 this.#updateShape(operand[0])
                 break
-            case "addTimelineEvent":
-                this.#newTimelineEvent(operand[0])
-                break
-            case "removeTimelineEvent":
-                this.#removeModelFromTimeline(operand[0])
-                break
-            case "changeTimeOfTimelineEvent":
-                this.returnValues.push(this.clock())
-
-                this.#changeTimeOfEvent(operand[0],operand[1])
-                break
 
             // controller level operations:
             case "showShape":
@@ -277,6 +265,22 @@ export class SceneController {
                 operand[0][operand[1]] = operand[2]
                 this.#updateShape(operand[0])
                 operand[0].updateGeometry()
+                break
+            case "addTween":
+                operand[0].addTween(operand[1])
+                operand[0].goToTime(this.clock())
+                break
+            case "removeTween":
+                operand[0].removeTween(operand[1])
+                operand[0].goToTime(this.clock())
+                break
+            case "newTweenStart":
+                this.returnValues.push(operand[0].newStartTime(operand[1]))
+                operand[0].shape.goToTime(this.clock())
+                break
+            case "newTweenEnd":
+                this.returnValues.push(operand[0].newEndTime(operand[1]))
+                operand[0].shape.goToTime(this.clock())
                 break
 
             default:
@@ -301,14 +305,8 @@ export class SceneController {
             const nextEvent = this.timelineEvents()[i]
 
             if (nextEvent.time > time){
-
                 // we are just before the place where the time is greater than us
                 this.currentTimelineEvent = i-1
-
-                for (const tween of this.currentTimelineTweens){
-                    tween.goToTime(time)
-                }
-
                 return
             }
 
@@ -326,13 +324,7 @@ export class SceneController {
             const previousEvent = this.timelineEvents()[i]
 
             if (previousEvent.time <= time){
-
                 this.currentTimelineEvent = i
-
-                for (const tween of this.currentTimelineTweens){
-                    tween.goToTime(time)
-                }
-
                 return
             }
 
@@ -352,6 +344,11 @@ export class SceneController {
         this.aggregateModels.clock.content = time
 
         this.aggregateModels.clock.updateModel = true
+
+        for (const shape of this.displayShapes()){
+            shape.goToTime(time)
+            this.#updateShape(shape)
+        }
     }
 
     #newShape(shape,operands){
@@ -367,8 +364,15 @@ export class SceneController {
         }
         const shapeName = shapeTypeString + " " + this.numberOfEachTypeOfShape[shapeTypeString]
 
-        const shapeInstance =
-            new shape(appearance,disappearance,this.ZIndexOfHighestShape, shapeName,this.selectedDirectory,...operands.slice(2))
+        const shapeInstance = new shape()
+        shapeInstance.setupInScene(
+            appearance,
+            disappearance,
+            this.ZIndexOfHighestShape,
+            shapeName,
+            this.selectedDirectory,
+            ...operands.slice(2)
+        )
 
         this.ZIndexOfHighestShape++
 
@@ -434,13 +438,6 @@ export class SceneController {
     }
 
     #newTimelineEvent(event){
-
-        if (event.colour === undefined){
-            event.colour = randomBrightColour()
-        }
-
-        event.shape.addTimelineEvent(event)
-
         this.#addModel("timelineEvents",event)
     }
 
@@ -623,12 +620,12 @@ export class SceneController {
             } catch (e){
                 console.error(e)
             }
+        }
 
-            // ensures selected shape is updated for any subscribers
-            if (controller.selectedShapesManager.isSelected(model)){
-                controller.selectedShapesManager.deselectShape(model)
-                controller.selectedShapesManager.selectShape(model)
-            }
+        // ensures selected shape is updated for any subscribers
+        if (controller.selectedShapesManager.isSelected(model)){
+            controller.selectedShapesManager.deselectShape(model)
+            controller.selectedShapesManager.selectShape(model)
         }
     }
 

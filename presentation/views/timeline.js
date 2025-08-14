@@ -315,8 +315,9 @@ export class Timeline extends AbstractView{
     updateModel(aggregateModel,model){
         switch (aggregateModel){
             case "selectedShapes":
-                // selects the part of the html that displays the model name
-                this.shapeToTimeline.get(model).label.innerText = model.name
+                this.shapeToTimeline.get(model).shapeSection.remove()
+                this.shapeToTimeline.delete(model)
+                new shapeTimeline(this,model)
                 break
             case "timelineEvents":
 

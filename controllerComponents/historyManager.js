@@ -9,6 +9,9 @@ import {
     stepToTimelineEvents,
     shapeCreation, stepToAddableToTimeline
 } from "../typesOfOperation.js";
+import {TranslationTween} from "../model/tweens/translateTween.js";
+import {RotationTween} from "../model/tweens/rotationTween.js";
+import {ScaleTween} from "../model/tweens/scaleTween.js";
 
 export class HistoryManager{
     constructor() {
@@ -118,45 +121,117 @@ export class HistoryManager{
         this.previousAction = newAction
     }
 
+    getStepsToAddPreviousActionToTimeline(){
+        if (!this.previousAction.addableToTimeline){
+            throw new Error("cannot add non-addable action to timeline")
+        }
+
+        // reverse the operation we are going to turn into an event
+        controller.currentScene.executeSteps(this.previousAction.backwardAction)
+
+        const stepsToAddToTimeline = []
+        const steps = this.previousAction.forwardAction
+
+        for (const step of steps){
+            switch (step[0]){
+                case "translate": {
+                    const tween = new TranslationTween(step[1][0])
+                    tween.setup(controller.clock(), step[1][1])
+
+                    stepsToAddToTimeline.push(["addTween", [step[1][0], tween]])
+                    break
+                }
+
+                case "rotate": {
+                    const tween = new RotationTween(step[1][0])
+                    tween.setup(controller.clock(), step[1][1], step[1][2])
+
+                    stepsToAddToTimeline.push(["addTween", [step[1][0], tween]])
+                    break
+                }
+
+                case "scale": {
+                    const tween = new ScaleTween(step[1][0])
+                    tween.setup(controller.clock(), step[1][1], step[1][2])
+
+                    stepsToAddToTimeline.push(["addTween", [step[1][0], tween]])
+                    break
+                }
+
+                case "shapeAttributeUpdate": {
+
+                }
+            }
+        }
+
+        return stepsToAddToTimeline
+    }
+
     getPreviousActionTimelineEvents(){
         if (!this.previousAction.addableToTimeline){
             throw new Error("cannot add non-addable action to timeline")
         }
 
-        const shapeToTimelineEvents = {}
+        const shapeToTimelineEvents = new Map()
+        const shapeToTweens = new Map()
 
         const steps = this.previousAction.forwardAction.length
         for (let i = 0; i < steps; i++){
-            const event = stepToTimelineEvents[this.previousAction.forwardAction[i][0]](
+            const events = stepToTimelineEvents[this.previousAction.forwardAction[i][0]](
                 this.previousAction.forwardAction[i],
                 this.previousAction.backwardAction[steps-i-1],
                 controller.clock()
             )
 
-            const existingEventGroup = shapeToTimelineEvents[event.shape]
+            for (const event of events){
+                if (!shapeToTimelineEvents.has(event.shape)){
+                    shapeToTimelineEvents.set(event.shape,{})
+                }
 
-            if (existingEventGroup === undefined){
-                shapeToTimelineEvents[event.shape] = {}
-            }
+                if (Object.hasOwn(event,"tween")){
+                    if (!shapeToTweens.has(event.shape)){
+                        shapeToTweens.set(event.shape,[])
+                    }
 
-            const existingEvent = shapeToTimelineEvents[event.shape][event.type]
+                    shapeToTweens.get(event.shape).push(event.tween)
+                }
 
-            if (existingEvent !== undefined){
-                existingEvent.forward = existingEvent.forward.concat(event.forward)
-                existingEvent.backward = event.backward.concat(existingEvent.backward)
+                const existingEvent = shapeToTimelineEvents.get(event.shape)[event.type]
 
-            } else {
-                shapeToTimelineEvents[event.shape][event.type] = event
+                if (existingEvent !== undefined){
+                    existingEvent.forward = existingEvent.forward.concat(event.forward)
+                    existingEvent.backward = event.backward.concat(existingEvent.backward)
+
+                } else {
+                    console.log(event.type)
+                    shapeToTimelineEvents.get(event.shape)[event.type] = event
+                }
             }
         }
 
         const timelineEvents = []
 
-        for (const timelineEventGroup of Object.values(shapeToTimelineEvents)){
-            for (const timelineEvent of Object.values(timelineEventGroup)){
+        for (const [shape,timelineEventGroup] of Array.from(shapeToTimelineEvents)){
+            for (const [type,timelineEvent] of Object.entries(timelineEventGroup)){
+                console.log(timelineEventGroup)
                 timelineEvents.push(timelineEvent)
+
+                if (type === "tweenStart"){
+                    for (const tween of shapeToTweens.get(shape)){
+                        tween.tweenStartEvent = timelineEvent
+                    }
+                }
+
+                if (type === "tweenEnd"){
+                    for (const tween of shapeToTweens.get(shape)){
+                        tween.tweenEndEvent = timelineEvent
+                    }
+                }
             }
         }
+
+        console.log(timelineEvents)
+
         return timelineEvents
     }
 
@@ -178,7 +253,7 @@ export class HistoryManager{
 
         // if we automatically add timeline events and there are timeline events automatically add them
         if (autoAddToTimeline && addable){
-            this.addPreviousActionTimelineEventToTimeline()
+            controller.addPreviousTimelineEventToTimeline()
         }
     }
 

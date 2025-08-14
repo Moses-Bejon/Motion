@@ -41,16 +41,6 @@ export class shapeTimeline{
         // (I need them to be high to ensure that thinner tweens are above thicker tweens)
         this.timelineContainer.style.zIndex = 0
 
-        for (const timelineEvent of shape.timelineEvents){
-            if (timelineEvent.type === "appearance"){
-                this.appearanceEvent = timelineEvent
-            } else if (timelineEvent.type === "disappearance"){
-                this.disappearanceEvent = timelineEvent
-            } else {
-                this.addTimeLineEvent(timelineEvent)
-            }
-        }
-
         this.timeline = document.createElement("div")
         this.timeline.style.position = "relative"
         this.timeline.className = "timelineEvents"
@@ -118,6 +108,10 @@ export class shapeTimeline{
 
         parentTimeline.timelineList.appendChild(this.shapeSection)
         parentTimeline.shapeToTimeline.set(shape,this)
+
+        for (const tween of shape.tweens){
+            this.tweenToTimelineTween.set(tween,new timelineTween(this.parentTimeline,this.timelineContainer,tween))
+        }
     }
 
     possibleNewTween(tween){
@@ -223,7 +217,6 @@ export class shapeTimeline{
     finishDraggingRightBumper(pointerEvent){
         const newEnd = this.dragRightBumper(pointerEvent)
 
-        const previousTime = this.endTime
         const newTime = this.parentTimeline.snapValueToCellBorder(this.parentTimeline.timeLinePositionToTime(newEnd))
 
         controller.beginAction()
@@ -249,7 +242,6 @@ export class shapeTimeline{
     finishDraggingLeftBumper(pointerEvent){
         const newStart = this.dragLeftBumper(pointerEvent)
 
-        const previousTime = this.startTime
         const newTime = this.parentTimeline.snapValueToCellBorder(this.parentTimeline.timeLinePositionToTime(newStart))
 
         controller.beginAction()

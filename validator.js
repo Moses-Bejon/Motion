@@ -5,6 +5,7 @@ import {controller} from "./controller.js";
 import {ShapeGroup} from "./model/shapeGroup.js";
 import {Shape} from "./model/shape.js";
 import {operationToAttribute} from "./typesOfOperation.js";
+import {Tween} from "./model/tweens/tween.js";
 
 export function validateReal(possibleNumber){
     return typeof possibleNumber === "number"
@@ -97,12 +98,8 @@ export function validateAttribute(attribute){
     return Object.values(operationToAttribute).includes(attribute)
 }
 
-export function validateTimelineEvent(possibleTimelineEvent){
-    return validateShape(possibleTimelineEvent.shape) &&
-        validateSteps(possibleTimelineEvent.forward) &&
-        validateSteps(possibleTimelineEvent.backward) &&
-        validateTime(possibleTimelineEvent.time) &&
-        ["change","tweenStart","tweenEnd","appearance","disappearance"].includes(possibleTimelineEvent.type)
+export function validateTween(tween){
+    return tween instanceof Tween
 }
 
 const shapeValidation = [validateTime,validateTime]
@@ -138,9 +135,10 @@ export const operationToValidationViewLevel = {
     "newFontColour":[validateShape,validateColour],
     "newHeight":[validateShape,validatePositiveReal],
     "newWidth":[validateShape,validatePositiveReal],
-    "addTimelineEvent":[validateTimelineEvent],
-    "removeTimelineEvent":[validateTimelineEvent],
-    "changeTimeOfTimelineEvent":[validateTimelineEvent,validateTime],
+    "addTween":[validateShape,validateTween],
+    "removeTween":[validateShape,validateTween],
+    "newTweenStart":[validateTween,validateTime],
+    "newTweenEnd":[validateTween,validateTime]
 }
 
 export function validateOperation(operation, operands,operationToValidation){
@@ -167,58 +165,6 @@ export function validateOperation(operation, operands,operationToValidation){
     return true
 }
 
-export const attributeToValidation = {
-    "ZIndex":validateInteger,
-    "text":validateString,
-    "appearanceTime":validateNonNegativeReal,
-    "disappearanceTime":validatePositiveReal,
-    "colour":validateColour,
-    "thickness":validatePositiveReal,
-    "fillColour":validateColour,
-    "outlineColour":validateColour,
-    "width":validatePositiveReal,
-    "height":validatePositiveReal,
-    "fontColour":validateColour,
-    "fontSize":validatePositiveReal,
-    "fontFamily":validateFont,
-    "rotation":validateReal,
-    "scale":validateNonZeroReal,
-}
-
-export const operationToValidationAtControllerLevel = Object.assign({
-    "showShape":[validateShape],
-    "hideShape":[validateShape],
-    "restoreShape":[validateShape],
-
-    // the shape attribute which is changed to is validated later, so returns true for now
-    "shapeAttributeUpdate":[validateShape,validateAttribute,() => true],
-},operationToValidationViewLevel)
-
 export function validateOperationViewLevel(operation, operands){
     return validateOperation(operation,operands,operationToValidationViewLevel)
-}
-
-export function validateOperationControllerLevel(operation,operands){
-
-    if (!validateOperation(operation,operands,operationToValidationAtControllerLevel)){
-        return false
-    }
-
-    if (operation === "shapeAttributeUpdate"){
-        if (!attributeToValidation[operands[1]](operands[2])){
-            return false
-        }
-    }
-
-    return true
-}
-
-export function validateSteps(steps){
-
-    for (const step of steps){
-        if (!validateOperationControllerLevel(step[0],step[1])){
-            return false
-        }
-    }
-    return true
 }

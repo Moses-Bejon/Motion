@@ -10,6 +10,11 @@ import {ScaleTween} from "../model/tweens/scaleTween.js";
 import {Shape} from "../model/shape.js";
 
 export class FileSerializer{
+
+    static loadTween(tweenSave){
+
+    }
+
     constructor() {
     }
 
@@ -75,15 +80,7 @@ export class FileSerializer{
         let newShape
         switch (shapeJSON.shapeType){
             case "drawing":
-                newShape = new Drawing(
-                    shapeJSON.appearanceTime,
-                    shapeJSON.disappearanceTime,
-                    shapeJSON.ZIndex,
-                    shapeJSON.name,
-                    shapeJSON.directory,
-                    shapeJSON.colour,
-                    shapeJSON.thickness,
-                    shapeJSON.points)
+                newShape = Drawing.load(shapeJSON)
                 break
             case "shapeGroup":
 

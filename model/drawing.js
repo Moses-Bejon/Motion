@@ -3,9 +3,12 @@ import {isLess, increment2dVectorBy, scale2dVectorAboutPoint, getRotateByAngle} 
 import {maximumOfArray} from "../dataStructureOperations.js";
 
 export class Drawing extends Shape{
-    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,colour,thickness,points) {
+    constructor() {
+        super()
+    }
 
-        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,colour,thickness,points) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
 
         this.colour = colour
         this.thickness = thickness
@@ -14,6 +17,19 @@ export class Drawing extends Shape{
         this.updateGeometry()
 
         super.setupOffset()
+    }
+
+    static load(save){
+        const loadedShape = Shape.load(save)
+
+        loadedShape.colour = save.colour
+        loadedShape.thickness = save.thickness
+        loadedShape.points = save.points
+
+        loadedShape.updateGeometry()
+        loadedShape.setupOffset()
+
+        return loadedShape
     }
 
     static lineBetween(x1,y1,x2,y2,thickness,colour){
@@ -51,17 +67,6 @@ export class Drawing extends Shape{
         return shapeSave
     }
 
-    load(save){
-        super.load(save)
-
-        this.colour = save.colour
-        this.thickness = save.thickness
-        this.points = save.points
-
-        this.updateGeometry()
-        this.setupOffset()
-    }
-
     getNewGeometryGroup(){
         const newGeometry = document.createElementNS("http://www.w3.org/2000/svg","g")
 
@@ -89,7 +94,6 @@ export class Drawing extends Shape{
             increment2dVectorBy(point,translationVector)
         }
 
-        this.updateGeometry()
         this.translateOffsetPointBy(translationVector)
     }
 
@@ -100,7 +104,6 @@ export class Drawing extends Shape{
 
         this.thickness = Math.abs(scaleFactor*this.thickness)
 
-        this.updateGeometry()
         this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
@@ -110,7 +113,6 @@ export class Drawing extends Shape{
             this.points[i] = rotationFunction(this.points[i])
         }
 
-        this.updateGeometry()
         this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 

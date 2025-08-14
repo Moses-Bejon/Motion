@@ -2,9 +2,9 @@ import {controller} from "../../controller.js";
 import {Tween} from "./tween.js";
 
 export class InterpolateTween extends Tween{
-    constructor(startState,endState,operation,inverseOperation,shape) {
+    constructor(startState,endState,operation,inverseOperation,shape,time) {
 
-        super(shape)
+        super(shape,time)
 
         this.startState = startState
         this.endState = endState

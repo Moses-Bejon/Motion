@@ -3,17 +3,28 @@ import {controller} from "../../controller.js";
 import {Tween} from "./tween.js";
 
 export class RotationTween extends Tween{
-    constructor(angle,aboutCentre,shape) {
+    constructor(shape) {
 
         super(shape)
+
+        // we need to ensure we don't get confused by our own translations
+        this.translationCausedByUs = [0,0]
+    }
+
+    setup(time,angle,aboutCentre){
+        super.setup(time)
 
         this.totalAngle = angle
         this.previousAngle = 0
 
-        // we need to ensure we don't get confused by our own translations
-        this.translationCausedByUs = [0,0]
-
         this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getOffsetPoint())
+    }
+
+    static load(save){
+        this.totalAngle = save.totalAngle
+        this.relativeCentre = save.relativeCentre
+
+        super.load(save)
     }
 
     save(){
@@ -24,13 +35,6 @@ export class RotationTween extends Tween{
         tweenSave.tweenType = "rotationTween"
 
         return tweenSave
-    }
-
-    load(save){
-        this.totalAngle = save.totalAngle
-        this.relativeCentre = save.relativeCentre
-
-        super.load(save)
     }
 
     rotateByAngle(angle){
@@ -44,36 +48,32 @@ export class RotationTween extends Tween{
 
         const positionBeforeRotation = this.shape.getOffsetPoint()
 
-        this.shape.rotate(angle,centre)
+        controller.currentScene.executeInvisibleSteps([
+            ["rotate",[this.shape,angle,centre]]
+        ])
 
         increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getOffsetPoint(),positionBeforeRotation))
     }
 
-    goToTime(time){
-        const currentAngle = this.totalAngle*(time-this.startTime)/this.timeLength
+    goToTweenProportion(proportion){
+        const currentAngle = this.totalAngle*proportion
 
         const angleToRotate = currentAngle-this.previousAngle
 
         this.rotateByAngle(angleToRotate)
 
         this.previousAngle = currentAngle
-
-        controller.updateShapeWithoutOnionSkins(this.shape)
     }
 
     finish(){
         this.rotateByAngle(this.totalAngle-this.previousAngle)
 
         this.previousAngle = this.totalAngle
-
-        controller.updateShape(this.shape)
     }
 
     beforeStart(){
         this.rotateByAngle(-this.previousAngle)
 
         this.previousAngle = 0
-
-        controller.updateShape(this.shape)
     }
 }

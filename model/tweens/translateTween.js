@@ -3,12 +3,23 @@ import {Tween} from "./tween.js";
 import {multiply2dVectorByScalar, subtract2dVectors} from "../../maths.js";
 
 export class TranslationTween extends Tween{
-    constructor(translationVector,shape) {
-
+    constructor(shape) {
         super(shape)
+    }
+
+    setup(time,translationVector){
+        super.setup(time)
 
         this.totalTranslation = translationVector
         this.previousTranslation = [0,0]
+    }
+
+    static load(save,shape){
+        const loadedTween = new Tween(shape)
+
+        loadedTween.totalTranslation = save.totalTranslation
+
+        super.load(save)
     }
 
     save(){
@@ -20,37 +31,32 @@ export class TranslationTween extends Tween{
         return tweenSave
     }
 
-    load(save){
-        this.totalTranslation = save.totalTranslation
+    goToTweenProportion(proportion){
 
-        super.load(save)
-    }
-
-    goToTime(time){
-        const currentTranslation = multiply2dVectorByScalar((time-this.startTime)/this.timeLength,this.totalTranslation)
+        const currentTranslation = multiply2dVectorByScalar(proportion,this.totalTranslation)
 
         const toTranslate = subtract2dVectors(currentTranslation,this.previousTranslation)
 
-        this.shape.translate(toTranslate)
+        controller.currentScene.executeInvisibleSteps([
+            ["translate",[this.shape,toTranslate]]
+        ])
 
         this.previousTranslation = currentTranslation
-
-        controller.updateShapeWithoutOnionSkins(this.shape)
     }
 
     finish(){
-        this.shape.translate(subtract2dVectors(this.totalTranslation,this.previousTranslation))
+        controller.currentScene.executeInvisibleSteps([
+            ["translate",[this.shape,subtract2dVectors(this.totalTranslation,this.previousTranslation)]]
+        ])
 
         this.previousTranslation = this.totalTranslation
-
-        controller.updateShape(this.shape)
     }
 
     beforeStart(){
-        this.shape.translate(subtract2dVectors([0,0],this.previousTranslation))
+        controller.currentScene.executeInvisibleSteps([
+            ["translate",[this.shape,subtract2dVectors([0,0],this.previousTranslation)]]
+        ])
 
         this.previousTranslation = [0,0]
-
-        controller.updateShape(this.shape)
     }
 }

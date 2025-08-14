@@ -3,15 +3,19 @@ import {controller} from "../../controller.js";
 import {Tween} from "./tween.js";
 
 export class ScaleTween extends Tween{
-    constructor(scaleFactor,aboutCentre,shape) {
+    constructor(shape) {
 
         super(shape)
 
-        this.totalScale = scaleFactor
-        this.previousScale = 1
-
         // we need to ensure we don't get confused by our own translations
         this.translationCausedByUs = [0,0]
+    }
+
+    setup(time,scaleFactor,aboutCentre){
+        super.setup(time)
+
+        this.totalScale = scaleFactor
+        this.previousScale = 1
 
         this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getOffsetPoint())
     }
@@ -44,36 +48,32 @@ export class ScaleTween extends Tween{
 
         const positionBeforeScale = this.shape.getOffsetPoint()
 
-        this.shape.scale(scaleFactor,centre)
+        controller.currentScene.executeInvisibleSteps([
+            ["scale",[this.shape,scaleFactor,centre]]
+        ])
 
         increment2dVectorBy(this.translationCausedByUs,subtract2dVectors(this.shape.getOffsetPoint(),positionBeforeScale))
     }
 
-    goToTime(time){
-        const currentScale = 1+(this.totalScale-1)*(time-this.startTime)/this.timeLength
+    goToTweenProportion(proportion){
+        const currentScale = 1+(this.totalScale-1)*proportion
 
         const amountToScale = currentScale/this.previousScale
 
         this.scaleBy(amountToScale)
 
         this.previousScale = currentScale
-
-        controller.updateShapeWithoutOnionSkins(this.shape)
     }
 
     finish(){
         this.scaleBy(this.totalScale/this.previousScale)
 
         this.previousScale = this.totalScale
-
-        controller.updateShape(this.shape)
     }
 
     beforeStart(){
         this.scaleBy(1/this.previousScale)
 
         this.previousScale = 1
-
-        controller.updateShape(this.shape)
     }
 }

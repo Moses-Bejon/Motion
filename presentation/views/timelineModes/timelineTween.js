@@ -8,18 +8,10 @@ export class timelineTween{
         this.timelineContainer = timelineContainer
         this.tween = tween
 
-        this.receivedStart = false
-        this.receivedEnd = false
-    }
-
-    receiveStart(start){
-        this.receivedStart = true
-        this.start = start
-
         this.startNode = document.createElement("div")
         this.startNode.className = "eventToken"
-        this.startNode.style.backgroundColor = this.start.colour
-        this.startProportion = this.parentTimeline.timeToTimelinePosition(this.start.time)
+        this.startNode.style.backgroundColor = this.tween.colour
+        this.startProportion = this.parentTimeline.timeToTimelinePosition(this.tween.startTime)
         this.startPositionPercent = this.startProportion*100
         this.startNode.style.left = this.startPositionPercent + "%"
 
@@ -32,18 +24,10 @@ export class timelineTween{
             "ew-resize"
         )
 
-        if (this.receivedEnd){
-            this.finaliseTween()
-        }
-    }
-
-    receiveEnd(end){
-        this.receivedEnd = true
-        this.end = end
-
         this.endNode = document.createElement("div")
         this.endNode.className = "eventToken"
-        this.endProportion = this.parentTimeline.timeToTimelinePosition(this.end.time)
+        this.endNode.style.backgroundColor = this.tween.colour
+        this.endProportion = this.parentTimeline.timeToTimelinePosition(this.tween.startTime+this.tween.timeLength)
         this.endPositionPercent = this.endProportion*100
         this.endNode.style.left = this.endPositionPercent + "%"
 
@@ -56,19 +40,11 @@ export class timelineTween{
             "ew-resize"
         )
 
-        if (this.receivedStart){
-            this.finaliseTween()
-        }
-    }
-
-    finaliseTween(){
-        this.endNode.style.backgroundColor = this.start.colour
-
         this.connector = document.createElement("div")
         this.connector.className = "tweenConnector"
         this.connector.style.left = this.startPositionPercent + "%"
         this.connector.style.right = (100-this.endPositionPercent) + "%"
-        this.connector.style.backgroundColor = this.start.colour
+        this.connector.style.backgroundColor = this.tween.colour
 
         this.connector.style.cursor = "pointer"
         this.connector.onpointerdown = (pointerEvent) => {
@@ -177,24 +153,11 @@ export class timelineTween{
 
         this.endProportion = newEnd
 
-        const previousTime = this.tween.endTime
-        const newTime = this.parentTimeline.snapValueToCell(this.parentTimeline.timeLinePositionToTime(newEnd))
-
-        controller.newAction(
-            () => {
-                this.tween.newEndTime(newTime)
-                controller.changeTimeOfEvent(this.end,newTime)
-
-                // if we are in the middle of a tween, this ensures the tween is in the right place
-                controller.newClockTime(controller.clock())
-            },
-            () => {
-                this.tween.newEndTime(previousTime)
-                controller.changeTimeOfEvent(this.end,previousTime)
-                controller.newClockTime(controller.clock())
-            },
-            []
+        controller.beginAction()
+        controller.takeStep("newTweenEnd",
+            [this.tween,this.parentTimeline.snapValueToCell(this.parentTimeline.timeLinePositionToTime(newEnd))]
         )
+        controller.endAction()
 
         this.updateTweenLength()
         this.select()
@@ -219,26 +182,12 @@ export class timelineTween{
 
         this.startProportion = newStart
 
-        const previousTime = this.tween.startTime
-        const newTime = this.parentTimeline.snapValueToCell(this.parentTimeline.timeLinePositionToTime(newStart))
-
-        controller.newAction(
-            () => {
-                this.tween.newStartTime(newTime)
-                controller.changeTimeOfEvent(this.start,newTime)
-
-                // if we are in the middle of a tween, this ensures the tween is in the right place
-                controller.newClockTime(controller.clock())
-            },
-            () => {
-                this.tween.newStartTime(previousTime)
-                controller.changeTimeOfEvent(this.start,previousTime)
-                controller.newClockTime(controller.clock())
-            },
-            []
+        controller.beginAction()
+        controller.takeStep("newTweenStart",
+            [this.tween,this.parentTimeline.snapValueToCell(this.parentTimeline.timeLinePositionToTime(newStart))]
         )
+        controller.endAction()
 
         this.updateTweenLength()
-        this.select()
     }
 }

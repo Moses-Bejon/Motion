@@ -1,13 +1,13 @@
 import {getRotateByAngle, increment2dVectorBy, scale2dVectorAboutPoint, midPoint2d} from "../maths.js";
-import {controller} from "../controller.js";
 
 export class Shape {
-    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory) {
+    constructor() {
+        this.tweens = new Set()
+    }
+
+    setupInScene(appearanceTime,disappearanceTime,ZIndex,name,directory){
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
-
-        // all the things that occur to the shape throughout the animation
-        this.timelineEvents = new Set()
 
         this.ZIndex = ZIndex
         this.name = name
@@ -16,45 +16,59 @@ export class Shape {
         this.directory = directory
     }
 
+    addTween(tween){
+        this.tweens.add(tween)
+    }
+
+    removeTween(tween){
+        this.tweens.delete(tween)
+    }
+
+    static load(save,shape){
+        shape.name = save.name
+        shape.directory = save.directory
+        shape.appearanceTime = save.appearanceTime
+        shape.disappearanceTime = save.disappearanceTime
+        shape.ZIndex = save.ZIndex
+
+        for (const tween of save.tweens){
+            // TODO: FIX THIS, NEEDS DESERIALISING
+            shape.tweens.add(tween)
+        }
+    }
+
     setupOffset(){
         this.offset = midPoint2d([this.left,this.top],[this.right,this.bottom])
     }
 
-    save(fileSerializer){
+    save(){
 
-        const savedTimelineEvents = []
+        const serialisedTweens = []
 
-        for (const timelineEvent of this.timelineEvents){
-            savedTimelineEvents.push(fileSerializer.serializeTimelineEvent(timelineEvent))
+        for (const tween of this.tweens){
+            serialisedTweens.push(tween.save())
         }
+
         return {
             "name":this.name,
             "directory":this.directory,
             "appearanceTime":this.appearanceTime,
             "disappearanceTime":this.disappearanceTime,
             "ZIndex":this.ZIndex,
-            "timelineEvents":savedTimelineEvents
+            "tweens":serialisedTweens
         }
     }
 
-    load(save){
-        this.name = save.name
-        this.directory = save.directory
-        this.appearanceTime = save.appearanceTime
-        this.disappearanceTime = save.disappearanceTime
-        this.ZIndex = save.ZIndex
+    goToTime(time){
 
-        this.timelineEvents = new Set()
-    }
+        // TODO: improve efficiency by only considering active tweens
+        for (const tween of this.tweens){
+            tween.goToTime(time)
+        }
 
-    newAppearanceTime(newTime){
-        this.appearanceTime = newTime
-        controller.changeTimeOfEvent(this.appearanceEvent,newTime)
-    }
 
-    newDisappearanceTime(newTime){
-        this.disappearanceTime = newTime
-        controller.changeTimeOfEvent(this.disappearanceEvent,newTime)
+
+        this.updateGeometry()
     }
 
     getOffsetPoint(){
@@ -73,24 +87,5 @@ export class Shape {
 
     translateOffsetPointBy(translationVector){
         increment2dVectorBy(this.offset,translationVector)
-    }
-
-    addTimelineEvent(event){
-        this.timelineEvents.add(event)
-    }
-
-    removeTimelineEvent(event){
-        this.timelineEvents.delete(event)
-    }
-
-    static copyTimelineEvents(fromShape,toShape){
-        const fileSerializer = controller.fileSerializer
-
-        // copies timeline events over
-        for (const timelineEvent of fromShape.timelineEvents){
-            toShape.addTimelineEvent(
-                fileSerializer.loadTimelineEvent(toShape,fileSerializer.serializeTimelineEvent(timelineEvent))
-            )
-        }
     }
 }

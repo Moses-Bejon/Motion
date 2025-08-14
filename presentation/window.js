@@ -20,7 +20,9 @@ export class AbstractWindow extends HTMLElement{
     }
 
     static loadWindow(save){
-        let window
+
+        // default in case of failure
+        let window = document.createElement("create-edit-canvas")
 
         switch (save.windowType){
             case "horizontallySplit":
