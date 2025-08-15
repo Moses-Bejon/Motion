@@ -7,51 +7,43 @@ import {
 } from "../maths.js";
 
 export class Ellipse extends Shape{
-    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,centre,height,width,outlineColour,colour,rotation,thickness){
-        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
+    constructor(){
+        super()
+    }
+
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,centre,height,width,outlineColour,colour,rotation,thickness) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
 
         this.centre = centre
-        this.height = height
-        this.width = width
-        this.outlineColour = outlineColour
-        this.colour = colour
         this.rotation = rotation
-        this.thickness = thickness
+        this.attributes.height = [Shape.getShapeAttributeChange(0,height)]
+        this.attributes.width = [Shape.getShapeAttributeChange(0,width)]
+        this.attributes.outlineColour = [Shape.getShapeAttributeChange(0,outlineColour)]
+        this.attributes.colour = [Shape.getShapeAttributeChange(0,colour)]
+        this.attributes.thickness = [Shape.getShapeAttributeChange(0,thickness)]
+    }
 
-        this.updateGeometry()
+    static load(save){
+        const loadedShape = Shape.load(save)
 
-        super.setupOffset()
+        loadedShape.centre = save.centre
+        loadedShape.rotation = save.rotation
+
+        loadedShape.updateGeometry()
+        loadedShape.setupOffset()
+
+        return loadedShape
     }
 
     save(fileSerializer){
         const shapeSave = super.save(fileSerializer)
 
         shapeSave.centre = this.centre
-        shapeSave.height = this.height
-        shapeSave.width = this.width
-        shapeSave.outlineColour = this.outlineColour
-        shapeSave.colour = this.colour
         shapeSave.rotation = this.rotation
-        shapeSave.thickness = this.thickness
 
         shapeSave.shapeType = "ellipse"
 
         return shapeSave
-    }
-
-    load(save){
-        super.load(save)
-
-        this.centre = save.centre
-        this.height = save.height
-        this.width = save.width
-        this.outlineColour = save.outlineColour
-        this.colour = save.colour
-        this.rotation = save.rotation
-        this.thickness = save.thickness
-
-        this.updateGeometry()
-        this.setupOffset()
     }
 
     updateGeometry(){
@@ -115,17 +107,27 @@ export class Ellipse extends Shape{
     translate(translationVector){
         increment2dVectorBy(this.centre,translationVector)
 
-        this.updateGeometry()
         this.translateOffsetPointBy(translationVector)
     }
 
     scale(scaleFactor,aboutCentre){
         scale2dVectorAboutPoint(this.centre,aboutCentre,scaleFactor)
-        this.height *= Math.abs(scaleFactor)
-        this.width *= Math.abs(scaleFactor)
-        this.thickness *= Math.abs(scaleFactor)
 
-        this.updateGeometry()
+        this.height *= Math.abs(scaleFactor)
+        for (const change of this.attributes.height){
+            change.value *= Math.abs(scaleFactor)
+        }
+
+        this.width *= Math.abs(scaleFactor)
+        for (const change of this.attributes.width){
+            change.value *= Math.abs(scaleFactor)
+        }
+
+        this.thickness *= Math.abs(scaleFactor)
+        for (const change of this.attributes.thickness){
+            change.value *= Math.abs(scaleFactor)
+        }
+
         this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
@@ -135,7 +137,6 @@ export class Ellipse extends Shape{
         this.centre = rotation(this.centre)
 
         this.rotation += angle
-        this.updateGeometry()
         this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 

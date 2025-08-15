@@ -2,16 +2,32 @@ import {Shape} from "./shape.js";
 import {controller} from "../controller.js";
 
 export class ShapeGroup extends Shape{
-    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,innerShapes) {
+    constructor() {
+        super()
+    }
 
-        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,innerShapes) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
 
         // this sort retains the z-index of the shapes initially before they were merged
         this.innerShapes = innerShapes.sort((shape1,shape2) => {return shape1.ZIndex-shape2.ZIndex})
 
         this.updateGeometry()
+        this.setupOffset()
+    }
 
-        super.setupOffset()
+    static async load(save){
+        const loadedShape = Shape.load(save)
+
+        loadedShape.innerShapes = []
+
+        for (const innerShape of save.innerShapes){
+            // TODO: fix:
+            loadedShape.innerShapes.push(await controller.loadShape(innerShape))
+        }
+
+        loadedShape.updateGeometry()
+        loadedShape.setupOffset()
     }
 
     save(fileSerializer){
@@ -28,19 +44,6 @@ export class ShapeGroup extends Shape{
         shapeSave.shapeType = "shapeGroup"
 
         return shapeSave
-    }
-
-    async load(save){
-        super.load(save)
-
-        this.innerShapes = []
-
-        for (const innerShape of save.innerShapes){
-            this.innerShapes.push(await controller.loadShape(innerShape))
-        }
-
-        this.updateGeometry()
-        this.setupOffset()
     }
 
     updateGeometry(){
@@ -78,7 +81,6 @@ export class ShapeGroup extends Shape{
             shape.translate(translationVector)
         }
 
-        this.updateGeometry()
         this.translateOffsetPointBy(translationVector)
     }
 
@@ -87,7 +89,6 @@ export class ShapeGroup extends Shape{
             shape.scale(scaleFactor,aboutCentre)
         }
 
-        this.updateGeometry()
         this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
@@ -96,7 +97,6 @@ export class ShapeGroup extends Shape{
             shape.rotate(angle,aboutCentre)
         }
 
-        this.updateGeometry()
         this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 

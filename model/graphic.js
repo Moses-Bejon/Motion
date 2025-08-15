@@ -8,12 +8,28 @@ import {
 } from "../maths.js";
 
 export class Graphic extends Shape{
-    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,source,topLeft,rotation){
-        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
+    constructor(){
+        super()
+    }
 
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory, source, topLeft, rotation) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
         this.source = source
         this.topLeft = topLeft
         this.rotation = rotation
+    }
+
+    static async load(save){
+        const loadedShape = Shape.load(save)
+
+        loadedShape.topLeft = save.topLeft
+        loadedShape.rotation = save.rotation
+
+        loadedShape.source = save.source
+
+        await loadedShape.loadImage()
+
+        loadedShape.updateGeometry()
     }
 
     save(fileSerializer){
@@ -21,29 +37,11 @@ export class Graphic extends Shape{
 
         shapeSave.topLeft = this.topLeft
         shapeSave.rotation = this.rotation
-        shapeSave.width = this.width
-        shapeSave.height = this.height
         shapeSave.source = this.source
 
         shapeSave.shapeType = "graphic"
 
         return shapeSave
-    }
-
-    async load(save){
-        super.load(save)
-
-        this.topLeft = save.topLeft
-        this.rotation = save.rotation
-
-        this.source = save.source
-
-        await this.loadImage()
-
-        this.width = save.width
-        this.height = save.height
-
-        this.updateGeometry()
     }
 
     // as loading up a new image source can take a while, it is separate from the update geometry and constructor logic
@@ -75,9 +73,10 @@ export class Graphic extends Shape{
             htmlImage.src = this.source
 
             htmlImage.onload = () => {
-                this.width = htmlImage.width
-                this.height = htmlImage.height
+                this.attributes.width = [Shape.getShapeAttributeChange(0,htmlImage.width)]
+                this.attributes.height = [Shape.getShapeAttributeChange(0,htmlImage.height)]
 
+                this.updateAttributes(0)
                 this.updateGeometry()
                 super.setupOffset()
 
@@ -93,6 +92,13 @@ export class Graphic extends Shape{
     }
 
     updateGeometry(){
+
+        // this may be called before the image has loaded. If this is the case, we will not update now but later.
+        // update geometry is called as soon as the image has loaded and will then be displayed
+        if (this.image === undefined){
+            return;
+        }
+
         [this.top,this.bottom,this.left,this.right] = getEdgesOfBoxAfterRotation(
             [
                 this.topLeft,
@@ -125,16 +131,22 @@ export class Graphic extends Shape{
     translate(translationVector){
         increment2dVectorBy(this.topLeft,translationVector)
 
-        this.updateGeometry()
         this.translateOffsetPointBy(translationVector)
     }
 
     scale(scaleFactor,aboutCentre){
         scale2dVectorAboutPoint(this.topLeft,aboutCentre,scaleFactor)
-        this.width *= Math.abs(scaleFactor)
-        this.height *= Math.abs(scaleFactor)
 
-        this.updateGeometry()
+        this.width *= Math.abs(scaleFactor)
+        for (const change of this.attributes.width){
+            change.value *= Math.abs(scaleFactor)
+        }
+
+        this.height *= Math.abs(scaleFactor)
+        for (const change of this.attributes.height){
+            change.value *= Math.abs(scaleFactor)
+        }
+
         this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
@@ -144,7 +156,6 @@ export class Graphic extends Shape{
         this.topLeft = rotation(this.topLeft)
 
         this.rotation += angle
-        this.updateGeometry()
         this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 

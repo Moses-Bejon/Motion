@@ -95,11 +95,14 @@ export class Shape {
         shape.appearanceTime = save.appearanceTime
         shape.disappearanceTime = save.disappearanceTime
         shape.ZIndex = save.ZIndex
+        shape.attributes = save.attributes
 
         for (const tween of save.tweens){
             // TODO: FIX THIS, NEEDS DESERIALISING
             shape.tweens.add(tween)
         }
+
+        return shape
     }
 
     setupOffset(){
@@ -120,7 +123,8 @@ export class Shape {
             "appearanceTime":this.appearanceTime,
             "disappearanceTime":this.disappearanceTime,
             "ZIndex":this.ZIndex,
-            "tweens":serialisedTweens
+            "tweens":serialisedTweens,
+            "attributes":this.attributes
         }
     }
 

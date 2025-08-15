@@ -2,12 +2,14 @@ import {Drawing} from "./drawing.js"
 import {Shape} from "./shape.js";
 
 export class Polygon extends Drawing{
-    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,colour,fillColour,thickness,points){
-        super(appearanceTime,disappearanceTime,ZIndex,name,directory,colour,thickness,points)
+    constructor(){
+        super()
+    }
 
-        this.fillColour = fillColour
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,colour,fillColour,thickness,points) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,colour,thickness,points)
 
-        this.updateGeometry()
+        this.attributes.fillColour = [Shape.getShapeAttributeChange(0,fillColour)]
     }
 
     static fillArea(points,fill){
@@ -29,19 +31,9 @@ export class Polygon extends Drawing{
     save(fileSerializer){
         const shapeSave = super.save(fileSerializer)
 
-        shapeSave.fillColour = this.fillColour
-
         shapeSave.shapeType = "polygon"
 
         return shapeSave
-    }
-
-    load(save){
-        super.load(save)
-
-        this.fillColour = save.fillColour
-
-        this.updateGeometry()
     }
 
     updateGeometry() {

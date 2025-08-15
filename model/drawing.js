@@ -24,8 +24,6 @@ export class Drawing extends Shape{
     static load(save){
         const loadedShape = Shape.load(save)
 
-        loadedShape.colour = save.colour
-        loadedShape.thickness = save.thickness
         loadedShape.points = save.points
 
         loadedShape.updateGeometry()
@@ -105,6 +103,9 @@ export class Drawing extends Shape{
         }
 
         this.thickness = Math.abs(scaleFactor*this.thickness)
+        for (const change of this.attributes.thickness){
+            change.value *= Math.abs(scaleFactor)
+        }
 
         this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }

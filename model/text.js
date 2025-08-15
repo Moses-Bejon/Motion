@@ -8,50 +8,47 @@ import {
 } from "../maths.js";
 
 export class Text extends Shape{
-    constructor(appearanceTime,disappearanceTime,ZIndex,name,directory,bottomLeft,rotation,colour,size,family){
-        super(appearanceTime,disappearanceTime,ZIndex,name,directory)
+    constructor(){
+        super()
+    }
 
-        this.text = "Begin typing"
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,bottomLeft,rotation,colour,size,family) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
+
+        this.attributes.text = [Shape.getShapeAttributeChange(0,"Begin Typing")]
         this.defaultTextReplaced = false
 
         this.bottomLeft = bottomLeft
         this.rotation = rotation
-        this.fontColour = colour
-        this.fontSize = size
-        this.fontFamily = family
+        this.attributes.fontColour = [Shape.getShapeAttributeChange(0,colour)]
+        this.attributes.fontSize = [Shape.getShapeAttributeChange(0,size)]
+        this.attributes.fontFamily = [Shape.getShapeAttributeChange(0,family)]
 
+        this.updateAttributes(0)
         this.updateGeometry()
 
         super.setupOffset()
     }
 
+    static load(save){
+        const loadedShape = Shape.load(save)
+
+        loadedShape.defaultTextReplaced = true
+
+        loadedShape.bottomLeft = save.bottomLeft
+
+        loadedShape.updateGeometry()
+        loadedShape.setupOffset()
+    }
+
     save(fileSerializer){
         const shapeSave = super.save(fileSerializer)
 
-        shapeSave.text = this.text
         shapeSave.bottomLeft = this.bottomLeft
-        shapeSave.fontColour = this.fontColour
-        shapeSave.fontSize = this.fontSize
-        shapeSave.fontFamily = this.fontFamily
 
         shapeSave.shapeType = "text"
 
         return shapeSave
-    }
-
-    load(save){
-        super.load(save)
-
-        this.defaultTextReplaced = true
-
-        this.text = save.text
-        this.bottomLeft = save.bottomLeft
-        this.fontColour = save.fontColour
-        this.fontSize = save.fontSize
-        this.fontFamily = save.fontFamily
-
-        this.updateGeometry()
-        this.setupOffset()
     }
 
     updateWidthAndHeightFromText(){
@@ -128,7 +125,6 @@ export class Text extends Shape{
     translate(translationVector){
         increment2dVectorBy(this.bottomLeft,translationVector)
 
-        this.updateGeometry()
         this.translateOffsetPointBy(translationVector)
     }
 
@@ -136,8 +132,10 @@ export class Text extends Shape{
         scale2dVectorAboutPoint(this.bottomLeft,aboutCentre,scaleFactor)
 
         this.fontSize *= Math.abs(scaleFactor)
+        for (const change of this.attributes.fontSize){
+            change.value *= Math.abs(scaleFactor)
+        }
 
-        this.updateGeometry()
         this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
@@ -147,7 +145,6 @@ export class Text extends Shape{
         this.bottomLeft = rotation(this.bottomLeft)
 
         this.rotation += angle
-        this.updateGeometry()
         this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 
