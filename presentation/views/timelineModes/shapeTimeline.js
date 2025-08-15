@@ -14,7 +14,7 @@ export class shapeTimeline{
     constructor(parentTimeline,shape) {
 
         // timeline event object to event token geometry on timeline
-        this.timelineEventToEventToken = new Map()
+        this.attributeChangeToEventToken = new Map()
 
         // tween model to relevant tween presentation class
         this.tweenToTimelineTween = new Map()
@@ -112,6 +112,15 @@ export class shapeTimeline{
         for (const tween of shape.tweens){
             this.tweenToTimelineTween.set(tween,new timelineTween(this.parentTimeline,this.timelineContainer,tween))
         }
+
+        for (const [attribute,changes] of Object.entries(shape.attributes)){
+            for (let i = 1; i < changes.length; i++){
+                this.attributeChangeToEventToken.set(
+                    changes[i],
+                    new timelineChange(this.parentTimeline,this.timelineContainer,changes[i],this.shape,attribute)
+                )
+            }
+        }
     }
 
     possibleNewTween(tween){
@@ -123,32 +132,10 @@ export class shapeTimeline{
     addTimeLineEvent(event){
 
         switch (event.type){
-            // we use the shapes to tell us about these types of events
-            // since they have appearance and disappearance times
+            // for when shapes can appear and disappear
             case "appearance":
             case "disappearance":
                 return
-
-            case "change":
-                this.timelineEventToEventToken.set(event,new timelineChange(this.parentTimeline,this.timelineContainer,event))
-
-                break
-
-            case "tweenStart":
-
-                this.possibleNewTween(event.tween)
-
-                this.tweenToTimelineTween.get(event.tween).receiveStart(event)
-
-                break
-
-            case "tweenEnd":
-
-                this.possibleNewTween(event.tween)
-
-                this.tweenToTimelineTween.get(event.tween).receiveEnd(event)
-
-                break
 
             default:
                 console.error("unexpected shape type",event.type)
@@ -158,8 +145,8 @@ export class shapeTimeline{
     removeTimeLineEvent(event){
 
         if (event.type === "change"){
-            this.timelineEventToEventToken.get(event).remove()
-            this.timelineEventToEventToken.delete(event)
+            this.attributeChangeToEventToken.get(event).remove()
+            this.attributeChangeToEventToken.delete(event)
         } else if (event.type === "tweenStart"){
             this.tweenToTimelineTween.get(event.tween).removeStart()
         } else if (event.type === "tweenEnd"){
@@ -169,7 +156,7 @@ export class shapeTimeline{
 
     updateTimeLineEvent(event){
         if (event.type === "change"){
-            this.timelineEventToEventToken.get(event).update()
+            this.attributeChangeToEventToken.get(event).update()
         } else if (event.type === "tweenStart"){
             this.tweenToTimelineTween.get(event.tween).removeStart()
             this.tweenToTimelineTween.get(event.tween).receiveStart(event)
@@ -250,7 +237,7 @@ export class shapeTimeline{
     }
 
     deselectAll(){
-        for (const [event,token] of this.timelineEventToEventToken){
+        for (const [event,token] of this.attributeChangeToEventToken){
             token.deselect()
         }
 

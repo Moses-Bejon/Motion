@@ -190,10 +190,7 @@ class ControllerClass {
 
         const stepsToAddToTimeline = this.historyManager.getStepsToAddPreviousActionToTimeline()
 
-        console.log(stepsToAddToTimeline)
-
         for (const step of stepsToAddToTimeline){
-            console.log(step)
             this.currentState.takeStep(step[0],step[1])
         }
 

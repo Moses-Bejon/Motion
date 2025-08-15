@@ -229,12 +229,8 @@ export class SceneController {
                 this.#updateShape(operand[0])
                 break
             case "newText":
-                this.returnValues.push(operand[0].text)
-
-                operand[0].text = operand[1]
+                this.#executeStep(["shapeAttributeUpdate",[operand[0],"text",operand[1]]])
                 operand[0].defaultTextReplaced = true
-                this.#updateShape(operand[0])
-                operand[0].updateGeometry()
                 break
             case "newAppearanceTime":
                 this.#changeTimeOfEvent(operand[0].appearanceEvent,operand[1])
@@ -262,17 +258,20 @@ export class SceneController {
                 this.#restoreShape(operand[0])
                 break
             case "shapeAttributeUpdate":
-                operand[0][operand[1]] = operand[2]
-                this.#updateShape(operand[0])
+                this.returnValues.push(operand[0][operand[1]])
+                operand[0].shapeAttributeUpdate(operand[1],operand[2])
                 operand[0].updateGeometry()
+                this.#updateShape(operand[0])
                 break
             case "addTween":
                 operand[0].addTween(operand[1])
                 operand[0].goToTime(this.clock())
+                this.#updateShape(operand[0])
                 break
             case "removeTween":
                 operand[0].removeTween(operand[1])
                 operand[0].goToTime(this.clock())
+                this.#updateShape(operand[0])
                 break
             case "newTweenStart":
                 this.returnValues.push(operand[0].newStartTime(operand[1]))
@@ -283,14 +282,32 @@ export class SceneController {
                 operand[0].shape.goToTime(this.clock())
                 break
 
+            case "newShapeAttributeChange":
+                operand[0].newShapeAttributeChange(operand[1],operand[2],operand[3])
+                operand[0].goToTime(this.clock())
+                this.#updateShape(operand[0])
+                break
+
+            case "removeShapeAttributeChange":
+                operand[0].removeShapeAttributeChange(operand[1],operand[2],operand[3])
+                operand[0].goToTime(this.clock())
+                this.#updateShape(operand[0])
+                break
+
+            case "changeTimeOfShapeAttributeChange":
+                this.returnValues.push(operand[2].time)
+
+                operand[0].changeTimeOfShapeAttributeChange(operand[1],operand[2],operand[3])
+                operand[0].goToTime(this.clock())
+                this.#updateShape(operand[0])
+                break
+
             default:
                 if (operationToAttribute[operation] !== undefined){
 
-                    this.returnValues.push(operand[0][operationToAttribute[operation]])
-
-                    operand[0][operationToAttribute[operation]] = operand[1]
-                    operand[0].updateGeometry()
-                    this.#updateShape(operand[0])
+                    this.#executeStep(
+                        ["shapeAttributeUpdate",[operand[0],operationToAttribute[operation],operand[1]]]
+                    )
 
                 } else {
                     console.error(`unknown operation: ${operation}`)
@@ -406,9 +423,23 @@ export class SceneController {
 
         this.#addModel("allShapes",shape)
 
-        for (const timelineEvent of shape.timelineEvents){
-            this.#addModel("timelineEvents",timelineEvent)
+        shape.appearanceEvent = {
+            "type": "appearance",
+            "shape": shape,
+            "time": shape.appearanceTime,
+            "forward": [["showShape",[shape]]],
+            "backward": [["hideShape",[shape]]]
         }
+        shape.disappearanceEvent = {
+            "type": "disappearance",
+            "shape": shape,
+            "time": shape.disappearanceTime,
+            "forward": [["hideShape",[shape]]],
+            "backward": [["showShape",[shape]]]
+        }
+
+        this.#newTimelineEvent(shape.appearanceEvent)
+        this.#newTimelineEvent(shape.disappearanceEvent)
     }
 
     #deleteShape(shape){
@@ -531,7 +562,6 @@ export class SceneController {
         this.#goToTime(model.time - timeEpsilon)
 
         this.#unsafeRemoveModelFromTimeline(model)
-        model.shape.removeTimelineEvent(model)
 
         // return to after the event happened, this time without the event
         this.#goToTime(timeBeforeOperation)

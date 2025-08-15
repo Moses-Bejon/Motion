@@ -6,6 +6,7 @@ import {ShapeGroup} from "./model/shapeGroup.js";
 import {Shape} from "./model/shape.js";
 import {operationToAttribute} from "./typesOfOperation.js";
 import {Tween} from "./model/tweens/tween.js";
+import {returnTrue} from "./maths.js";
 
 export function validateReal(possibleNumber){
     return typeof possibleNumber === "number"
@@ -44,7 +45,9 @@ export function validateDirectory(directory){
 }
 
 export function validateColour(colour) {
-    const regularExpression = /^#[0-9a-f]{6}$|^transparent$/i
+
+
+    const regularExpression = /^#[0-9a-f]{6}$|^transparent$|rgb\(.+\)/i
 
     return validateString(colour) && regularExpression.test(colour)
 }
@@ -102,6 +105,12 @@ export function validateTween(tween){
     return tween instanceof Tween
 }
 
+export function validateShapeAttributeChange(shapeAttributeChange){
+    return Object.hasOwn(shapeAttributeChange,"colour") && validateColour(shapeAttributeChange.colour) &&
+        Object.hasOwn(shapeAttributeChange,"time") && validateTime(shapeAttributeChange.time) &&
+        Object.hasOwn(shapeAttributeChange,"value")
+}
+
 const shapeValidation = [validateTime,validateTime]
 
 export const operationToValidationViewLevel = {
@@ -138,7 +147,11 @@ export const operationToValidationViewLevel = {
     "addTween":[validateShape,validateTween],
     "removeTween":[validateShape,validateTween],
     "newTweenStart":[validateTween,validateTime],
-    "newTweenEnd":[validateTween,validateTime]
+    "newTweenEnd":[validateTween,validateTime],
+    "shapeAttributeUpdate":[validateShape,validateAttribute,returnTrue],
+    "newShapeAttributeChange":[validateShape,validateAttribute,returnTrue,validateTime],
+    "removeShapeAttributeChange":[validateShape,validateAttribute,returnTrue,validateTime],
+    "changeTimeOfShapeAttributeChange":[validateShape,validateAttribute,validateShapeAttributeChange,validateTime],
 }
 
 export function validateOperation(operation, operands,operationToValidation){

@@ -1,4 +1,6 @@
 import {getRotateByAngle, increment2dVectorBy, scale2dVectorAboutPoint, midPoint2d} from "../maths.js";
+import {randomBrightColour} from "../random.js";
+import {binaryInsertion} from "../dataStructureOperations.js";
 
 export class Shape {
     constructor() {
@@ -14,6 +16,69 @@ export class Shape {
 
         // indicates which directory I am a part of
         this.directory = directory
+
+        this.attributes = {}
+    }
+
+    static getShapeAttributeChange(time,value){
+        return {
+            "time":time,
+            "value":value,
+            "colour":randomBrightColour(),
+        }
+    }
+
+    updateAttributes(time){
+        for (const [attribute,attributeChanges] of Object.entries(this.attributes)){
+            let attributeIndex = 0
+            while (attributeIndex<attributeChanges.length && attributeChanges[attributeIndex].time <= time){
+                attributeIndex++
+            }
+            attributeIndex--
+
+            this[attribute] = attributeChanges[attributeIndex].value
+        }
+    }
+
+    shapeAttributeUpdate(attribute,value){
+
+        const attributeEntry = this.attributes[attribute]
+
+        // not an attribute that changes over time
+        if (attributeEntry === undefined){
+            this[attribute] = value
+            return
+        }
+
+        // attribute that could change but doesn't currently
+        if (attributeEntry.length === 1){
+            this.attributes[attribute] = [Shape.getShapeAttributeChange(0,value)]
+            this[attribute] = value
+            return
+        }
+
+        // attribute that already changes over time
+        this[attribute] = value
+    }
+
+    newShapeAttributeChange(attribute,value,time){
+        this.attributes[attribute].push(Shape.getShapeAttributeChange(time,value))
+    }
+
+    changeTimeOfShapeAttributeChange(attribute,changeAttribute,newTime){
+        const index = this.attributes[attribute].findIndex(change => change === changeAttribute)
+        changeAttribute.time = newTime
+        this.attributes[attribute].splice(index,1)
+        this.attributes[attribute].splice(
+            binaryInsertion(this.attributes[attribute],newTime,(item) => item.time),
+            0,
+            changeAttribute
+        )
+    }
+
+    removeShapeAttributeChange(attribute,value,time){
+        const index = this.attributes[attribute].findIndex(change => change.time === time && change.value === value)
+        this.attributes[attribute].splice(index,1)
     }
 
     addTween(tween){
@@ -66,7 +131,7 @@ export class Shape {
             tween.goToTime(time)
         }
 
-
+        this.updateAttributes(time)
 
         this.updateGeometry()
     }

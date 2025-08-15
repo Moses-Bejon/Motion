@@ -3,10 +3,12 @@ import {clamp} from "../../../maths.js";
 import {addDragLogicTo} from "../../../dragLogic.js";
 
 export class timelineChange{
-    constructor(parentTimeline,timelineContainer,changeEvent) {
+    constructor(parentTimeline,timelineContainer,changeEvent,shape,attribute) {
         this.parentTimeline = parentTimeline
         this.timelineContainer = timelineContainer
         this.changeEvent = changeEvent
+        this.shape = shape
+        this.attribute = attribute
 
         this.proportion = this.parentTimeline.timeToTimelinePosition(this.changeEvent.time)
 
@@ -76,7 +78,10 @@ export class timelineChange{
         )
 
         controller.beginAction()
-        controller.takeStep("changeTimeOfTimelineEvent",[this.changeEvent,newTime])
+        controller.takeStep(
+            "changeTimeOfShapeAttributeChange",
+            [this.shape,this.attribute,this.changeEvent,newTime]
+        )
         controller.endAction()
 
         this.select()

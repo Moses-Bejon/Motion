@@ -10,9 +10,11 @@ export class Drawing extends Shape{
     setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,colour,thickness,points) {
         super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
 
-        this.colour = colour
-        this.thickness = thickness
+        this.attributes.colour = [Shape.getShapeAttributeChange(0,colour)]
+        this.attributes.thickness = [Shape.getShapeAttributeChange(0,thickness)]
         this.points = points
+
+        this.updateAttributes(0)
 
         this.updateGeometry()
 

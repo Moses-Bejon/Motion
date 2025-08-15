@@ -160,6 +160,11 @@ export class HistoryManager{
 
                 case "shapeAttributeUpdate": {
 
+                    // if you changed an attribute for the pure reason
+                    this.previousAction = this.previousAction.previousAction
+
+                    stepsToAddToTimeline.push(["newShapeAttributeChange", [step[1][0], step[1][1], step[1][2],controller.clock()]])
+                    break
                 }
             }
         }
@@ -203,7 +208,6 @@ export class HistoryManager{
                     existingEvent.backward = event.backward.concat(existingEvent.backward)
 
                 } else {
-                    console.log(event.type)
                     shapeToTimelineEvents.get(event.shape)[event.type] = event
                 }
             }
@@ -213,7 +217,6 @@ export class HistoryManager{
 
         for (const [shape,timelineEventGroup] of Array.from(shapeToTimelineEvents)){
             for (const [type,timelineEvent] of Object.entries(timelineEventGroup)){
-                console.log(timelineEventGroup)
                 timelineEvents.push(timelineEvent)
 
                 if (type === "tweenStart"){
@@ -229,8 +232,6 @@ export class HistoryManager{
                 }
             }
         }
-
-        console.log(timelineEvents)
 
         return timelineEvents
     }
