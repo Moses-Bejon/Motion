@@ -1,5 +1,4 @@
 import {Drawing} from "../model/drawing.js";
-import {ShapeGroup} from "../model/shapeGroup.js";
 import {SceneController} from "./sceneController.js";
 import {Ellipse} from "../model/ellipse.js";
 import {Graphic} from "../model/graphic.js";
@@ -68,7 +67,7 @@ export class FileSerializer{
         this.allTweens = save.allTweens
 
         for (const shape of save.aggregateModels.allShapes){
-            const loadedShape = await this.loadShape(shape,scene)
+            const loadedShape = await this.loadShape(shape)
 
             scene.executeInvisibleSteps([["restoreShape",[loadedShape]]])
         }
@@ -76,27 +75,11 @@ export class FileSerializer{
         return scene
     }
 
-    async loadShape(shapeJSON,scene){
+    async loadShape(shapeJSON){
         let newShape
         switch (shapeJSON.shapeType){
             case "drawing":
                 newShape = Drawing.load(shapeJSON)
-                break
-            case "shapeGroup":
-
-                const innerShapes = []
-
-                for (const innerShapeJSON of shapeJSON.innerShapes){
-                    innerShapes.push(await this.loadShape(innerShapeJSON,scene))
-                }
-
-                newShape = new ShapeGroup(
-                    shapeJSON.appearanceTime,
-                    shapeJSON.disappearanceTime,
-                    shapeJSON.ZIndex,
-                    shapeJSON.name,
-                    shapeJSON.directory,
-                    innerShapes)
                 break
             case "ellipse":
                 newShape = new Ellipse(

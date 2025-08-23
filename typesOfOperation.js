@@ -90,11 +90,9 @@ export const operationToAttribute = {
 }
 
 // list of operations that involve creating a shape
-export const shapeCreation = ["createDrawing","createEllipse","createGraphic","createPolygon",
-    "createShapeGroup","createText","duplicate","merge"]
+export const shapeCreation = ["createDrawing","createEllipse","createGraphic","createPolygon","createText",
+    "duplicate"]
 
 export const operationsWhichReturn = Object.keys(operationToInverse).concat(shapeCreation).concat([
-    "goToTime",
-    "split",
-    "merge",
+    "goToTime"
 ])

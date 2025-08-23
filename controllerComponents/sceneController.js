@@ -1,13 +1,11 @@
 import {model} from "../model/model.js";
 import {controller} from "../controller.js";
 import {Drawing} from "../model/drawing.js";
-import {binaryInsertion, maximumOfArray} from "../dataStructureOperations.js";
+import {binaryInsertion} from "../dataStructureOperations.js";
 import {Ellipse} from "../model/ellipse.js";
 import {Graphic} from "../model/graphic.js";
 import {Polygon} from "../model/polygon.js";
-import {ShapeGroup} from "../model/shapeGroup.js";
 import {Text} from "../model/text.js";
-import {isLess} from "../maths.js";
 import {operationToAttribute} from "../typesOfOperation.js";
 import {timeEpsilon} from "../globalValues.js";
 
@@ -144,9 +142,6 @@ export class SceneController {
             case "createPolygon":
                 this.returnValues.push(this.#newShape(Polygon,operand))
                 break
-            case "createShapeGroup":
-                this.returnValues.push(this.#newShape(ShapeGroup,operand))
-                break
             case "createText":
                 this.returnValues.push(this.#newShape(Text,operand))
                 break
@@ -181,28 +176,6 @@ export class SceneController {
                 this.#restoreShape(duplicate)
                 this.returnValues.push(duplicate)
 
-                break
-            case "merge":
-                const innerShapes = operand[0]
-
-                for (const shape of innerShapes){
-                    this.#deleteShape(shape)
-                }
-
-                const appearanceTime = maximumOfArray(innerShapes, (shape) => shape.appearanceTime, isLess)
-                const disappearanceTime = maximumOfArray(innerShapes, (shape) => shape.disappearanceTime)
-
-                this.returnValues.push(this.#newShape(ShapeGroup,[appearanceTime,disappearanceTime,innerShapes]))
-                break
-            case "split":
-
-                const shapesToReturn = []
-                for (const shape of operand[0].innerShapes){
-                    this.#restoreShape(shape)
-                    shapesToReturn.push(shape)
-                }
-                this.#deleteShape(operand[0])
-                this.returnValues.push(shapesToReturn)
                 break
             case "swapZIndices":
 

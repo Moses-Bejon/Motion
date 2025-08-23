@@ -24,7 +24,6 @@ import {SelectionBox} from "./createModes/selectionBox.js";
 import {isLess} from "../../maths.js";
 import {binaryInsertion, binarySearch, maximumOfArray} from "../../dataStructureOperations.js";
 import {EditMode} from "./createModes/editMode.js";
-import {ShapeGroup} from "../../model/shapeGroup.js";
 import {TransformMode} from "./createModes/transformMode.js";
 
 const template = document.createElement("template")
@@ -210,8 +209,6 @@ p{
     <button id="duplicate" class="editButton">Duplicate</button>
     <button id="copy" class="editButton">Copy</button>
     <button id="paste" class="editButton">Paste</button>
-    <button id="merge" class="editButton">Merge</button>
-    <button id="split" class="editButton">Split</button>
     <button id="delete" class="editButton">Delete</button>
     <button id="transform" class="editButton">Transform</button>
     <button id="moveAbove" class="editButton">Move one above</button>
@@ -357,30 +354,6 @@ export class CreateEditCanvas extends Canvas{
             })
 
             pointerEvent.stopPropagation()
-        }
-        this.shadowRoot.getElementById("merge").onpointerdown = () => {
-
-            // needs at least 2 shapes to combine them
-            if (this.selectedShapes.size < 2){
-                return
-            }
-
-            controller.beginAction()
-            controller.takeStep("merge",[Array.from(this.selectedShapes)])
-            controller.endAction()
-        }
-        this.shadowRoot.getElementById("split").onpointerdown = () => {
-
-            for (const shape of this.selectedShapes){
-                if (shape.constructor.name !== "ShapeGroup"){
-                    continue
-                }
-
-                controller.beginAction()
-                controller.takeStep("split",[shape])
-                controller.endAction()
-            }
-
         }
         this.shadowRoot.getElementById("delete").onpointerdown = () => {
 
@@ -593,10 +566,6 @@ export class CreateEditCanvas extends Canvas{
             case "Drawing":
                 return ManyPointsMode
             case "Polygon":
-                return ManyPointsMode
-            case "ShapeGroup":
-                // for the purposes of a mode, a shape group can be considered to be a group of points
-                // each point being a shape
                 return ManyPointsMode
             case "Ellipse":
                 return EllipseMode

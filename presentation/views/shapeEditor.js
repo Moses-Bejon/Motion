@@ -60,7 +60,6 @@ const shapeToShapeProperties = {
         "Width":floatInput,
         "Height":floatInput
     },
-    "ShapeGroup":{},
     "Text":{
         "Text":stringInput,
         "Font colour":colourInput,

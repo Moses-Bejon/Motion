@@ -2,7 +2,6 @@
 
 import {fontsList} from "./globalValues.js";
 import {controller} from "./controller.js";
-import {ShapeGroup} from "./model/shapeGroup.js";
 import {Shape} from "./model/shape.js";
 import {operationToAttribute} from "./typesOfOperation.js";
 import {Tween} from "./model/tweens/tween.js";
@@ -77,10 +76,6 @@ export function validateShape(possibleShape){
     return possibleShape instanceof Shape
 }
 
-export function validateShapeGroup(possibleShapeGroup){
-    return validateShape(possibleShapeGroup) && possibleShapeGroup instanceof ShapeGroup
-}
-
 export function validateShapeList(possibleShapeList){
     return validateList(possibleShapeList,validateShape)
 }
@@ -120,14 +115,11 @@ export const operationToValidationViewLevel = {
         validateColour,validateColour,validateReal,validatePositiveReal]),
     "createGraphic":shapeValidation.concat([validateFile,validateVector2d,validateReal]),
     "createPolygon":shapeValidation.concat([validateColour,validateColour,validatePositiveReal,validateLine]),
-    "createShapeGroup":shapeValidation.concat([validateShapeList]),
     "createText":shapeValidation.concat([validateVector2d,validateReal,validateColour,validatePositiveReal,validateFont]),
     "translate":[validateShape,validateVector2d],
     "rotate":[validateShape,validateReal,validateVector2d],
     "scale":[validateShape,validateNonZeroReal,validateVector2d],
     "duplicate":[validateShape],
-    "merge":[validateNonEmptyShapeList],
-    "split":[validateShapeGroup],
     "deleteShape":[validateShape],
     "swapZIndices":[validateShape,validateShape],
     "moveToFront":[validateShape],
