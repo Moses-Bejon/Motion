@@ -56,7 +56,9 @@ export class Polygon extends Drawing{
 
     copy(){
 
-        const copy = new Polygon(
+        const copy = new Polygon()
+
+        copy.setupInScene(
             this.appearanceTime,
             this.disappearanceTime,
             this.ZIndex,

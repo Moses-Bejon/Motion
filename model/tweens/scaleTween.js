@@ -30,6 +30,18 @@ export class ScaleTween extends Tween{
         return tweenSave
     }
 
+    copy(){
+        const copy = new ScaleTween(this.shape)
+        copy.setup(
+            this.startTime+this.timeLength,
+            this.totalScale,
+            add2dVectors(this.relativeCentre,this.shape.getOffsetPoint())
+        )
+        copy.newStartTime(this.startTime)
+        copy.previousScale = this.previousScale
+        return copy
+    }
+
     load(save){
         this.totalScale = save.totalScale
         this.relativeCentre = save.relativeCentre

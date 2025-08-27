@@ -31,6 +31,14 @@ export class TranslationTween extends Tween{
         return tweenSave
     }
 
+    copy(){
+        const copy = new TranslationTween(this.shape)
+        copy.setup(this.startTime+this.timeLength,this.totalTranslation)
+        copy.newStartTime(this.startTime)
+        copy.previousTranslation = this.previousTranslation
+        return copy
+    }
+
     goToTweenProportion(proportion){
 
         const currentTranslation = multiply2dVectorByScalar(proportion,this.totalTranslation)

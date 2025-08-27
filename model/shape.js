@@ -5,6 +5,8 @@ import {binaryInsertion} from "../dataStructureOperations.js";
 export class Shape {
     constructor() {
         this.tweens = new Set()
+
+        this.attributes = {}
     }
 
     setupInScene(appearanceTime,disappearanceTime,ZIndex,name,directory){
@@ -16,8 +18,15 @@ export class Shape {
 
         // indicates which directory I am a part of
         this.directory = directory
+    }
 
-        this.attributes = {}
+    static copyTimelineEvents(source,destination){
+        for (const tween of source.tweens){
+            const newTween = tween.copy()
+            newTween.shape = destination
+            destination.addTween(newTween)
+        }
+        destination.attributes = structuredClone(source.attributes)
     }
 
     static getShapeAttributeChange(time,value){

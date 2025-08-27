@@ -37,6 +37,18 @@ export class RotationTween extends Tween{
         return tweenSave
     }
 
+    copy(){
+        const copy = new RotationTween(this.shape)
+        copy.setup(
+            this.startTime+this.timeLength,
+            this.totalAngle,
+            add2dVectors(this.relativeCentre,this.shape.getOffsetPoint())
+        )
+        copy.newStartTime(this.startTime)
+        copy.previousAngle = this.previousAngle
+        return copy
+    }
+
     rotateByAngle(angle){
         const centre = add2dVectors(
             this.shape.getOffsetPoint(),

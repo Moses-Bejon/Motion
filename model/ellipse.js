@@ -142,7 +142,9 @@ export class Ellipse extends Shape{
 
     copy(){
 
-        const copy = new Ellipse(
+        const copy = new Ellipse()
+
+        copy.setupInScene(
             this.appearanceTime,
             this.disappearanceTime,
             this.ZIndex,

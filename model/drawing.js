@@ -121,7 +121,9 @@ export class Drawing extends Shape{
 
     copy(){
 
-        const copy = new Drawing(
+        const copy = new Drawing()
+
+        copy.setupInScene(
             this.appearanceTime,
             this.disappearanceTime,
             this.ZIndex,

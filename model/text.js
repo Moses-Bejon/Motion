@@ -149,7 +149,9 @@ export class Text extends Shape{
     }
 
     copy(){
-        const copy = new Text(
+        const copy = new Text()
+
+        copy.setupInScene(
             this.appearanceTime,
             this.disappearanceTime,
             this.ZIndex,

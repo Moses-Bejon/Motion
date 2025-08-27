@@ -160,7 +160,10 @@ export class Graphic extends Shape{
     }
 
     copy(){
-        const copy = new Graphic(
+
+        const copy = new Graphic()
+
+        copy.setupInScene(
             this.appearanceTime,
             this.disappearanceTime,
             this.ZIndex,
@@ -174,7 +177,6 @@ export class Graphic extends Shape{
         copy.image = this.image
         copy.width = this.width
         copy.height = this.height
-        copy.rotation = this.rotation
 
         Shape.copyTimelineEvents(this,copy)
         copy.updateGeometry()
