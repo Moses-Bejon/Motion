@@ -21,6 +21,11 @@ export class Ellipse extends Shape{
         this.attributes.outlineColour = [Shape.getShapeAttributeChange(0,outlineColour)]
         this.attributes.colour = [Shape.getShapeAttributeChange(0,colour)]
         this.attributes.thickness = [Shape.getShapeAttributeChange(0,thickness)]
+
+        this.updateAttributes(0)
+        this.updateGeometry()
+
+        super.setupOffset()
     }
 
     static load(save){
