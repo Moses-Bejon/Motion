@@ -114,8 +114,8 @@ export class Graphic extends Shape{
 
         const clonedImage = this.image.cloneNode(false)
 
-        clonedImage.style.width = this.width
-        clonedImage.style.height = this.height
+        clonedImage.style.width = this.width + "px"
+        clonedImage.style.height = this.height + "px"
         clonedImage.setAttribute("preserveAspectRatio","none")
         clonedImage.setAttribute("x",this.topLeft[0])
         clonedImage.setAttribute("y",this.topLeft[1])
