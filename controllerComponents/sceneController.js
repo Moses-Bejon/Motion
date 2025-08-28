@@ -127,7 +127,10 @@ export class SceneController {
         new Function(
             ...Object.keys(operationToFunction),
             ...Object.keys(scriptVariables),
-            script
+            `
+            "use strict";
+            ${script}
+            `
         )(...Object.values(operationToFunction),...Object.values(scriptVariables))
         await this.finishSteps()
 
