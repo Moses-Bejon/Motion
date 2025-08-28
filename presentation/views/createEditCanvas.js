@@ -311,24 +311,14 @@ export class CreateEditCanvas extends Canvas{
 
         this.shadowRoot.getElementById("duplicate").onpointerdown = (pointerEvent) => {
 
-            controller.beginAction()
-            for (const shape of this.selectedShapes){
-                controller.takeStep("duplicate",[shape])
+            controller.executeScript(`
+            for (const shape of selectedShapes){
+                const newShape = duplicate(shape)
+                translate(newShape,[50,50])
             }
-
-            controller.endAction().then((duplicates) => {
-                controller.beginAction()
-
-                // the duplicates become translated after they are made so they are not on top of each other
-                for (const duplicate of duplicates){
-                    controller.takeStep("translate",[duplicate,[50,50]])
-                }
-
-
-                // the duplicates become selected after they are made
-                controller.endAction().then(() => {
-                    controller.getSelectedShapesManager().selectNewShapes(duplicates)
-                })
+            `,{"selectedShapes":this.selectedShapes}
+            ).then((duplicates) => {
+                controller.getSelectedShapesManager().selectNewShapes(duplicates)
             })
 
             // prevents the click on the canvas from deselecting the selected shapes
@@ -339,18 +329,14 @@ export class CreateEditCanvas extends Canvas{
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("paste").onpointerdown = (pointerEvent) => {
-            controller.beginAction()
-            for (const shape of controller.paste()){
-                controller.takeStep("duplicate",[shape])
+
+            controller.executeScript(`
+            for (const shape of copiedShapes){
+                const newShape = duplicate(shape)
+                translate(newShape,[50,50])
             }
-            controller.endAction().then((duplicates) => {
-                controller.beginAction()
-                for (const duplicate of duplicates){
-                    controller.takeStep("translate",[duplicate,[50,50]])
-                }
-                controller.endAction().then(() => {
-                    controller.getSelectedShapesManager().selectNewShapes(duplicates)
-                })
+            `,{"copiedShapes":controller.paste()}).then((duplicates) => {
+                controller.getSelectedShapesManager().selectNewShapes(duplicates)
             })
 
             pointerEvent.stopPropagation()

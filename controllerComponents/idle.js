@@ -1,5 +1,6 @@
 import {ReceivingActionState} from "./receivingAction.js";
 import {PlayingState} from "./playing.js";
+import {ExecutingScriptState} from "./executingScript.js";
 
 export class IdleState {
     constructor() {
@@ -15,6 +16,10 @@ export class IdleState {
 
     endAction(){
         throw new Error("can't end an action if haven't started one")
+    }
+
+    executeScript(script){
+        return new ExecutingScriptState(script)
     }
 
     play(){

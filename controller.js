@@ -95,6 +95,31 @@ class ControllerClass {
 
     }
 
+    async executeScript(script,scriptVariables = {}){
+
+        // if the steps fail this is a backup (history manager also gleans some info from this)
+        const beforeSteps = JSON.parse(this.fileSerializer.serializeScene(this.currentScene))
+
+        try {
+            this.#newState(this.currentState.executeScript(script))
+
+            const [steps,returnValues] = await this.currentScene.executeScript(script,scriptVariables)
+
+            this.historyManager.newAction(steps,returnValues)
+
+            this.#newState(new IdleState())
+
+            return returnValues
+
+        } catch (e){
+            console.error(e)
+
+            this.currentScene = await this.fileSerializer.loadScene(beforeSteps)
+
+            this.#newState(new IdleState())
+        }
+    }
+
     play(){
         try {
             this.#newState(this.currentState.play())

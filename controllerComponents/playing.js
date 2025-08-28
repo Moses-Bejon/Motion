@@ -16,6 +16,10 @@ export class PlayingState {
         throw new Error("can't end an action while playing an animation")
     }
 
+    executeScript(script){
+        throw new Error("can't execute a script while playing an animation")
+    }
+
     play(){
         return new IdleState()
     }

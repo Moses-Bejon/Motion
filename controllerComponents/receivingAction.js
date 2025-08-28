@@ -24,6 +24,10 @@ export class ReceivingActionState {
         return new IdleState()
     }
 
+    executeScript(script){
+        throw new Error("can't execute a script while still receiving an action")
+    }
+
     play(){
         throw new Error("can't play while still receiving an action")
     }

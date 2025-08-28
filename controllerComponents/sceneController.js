@@ -8,6 +8,7 @@ import {Polygon} from "../model/polygon.js";
 import {Text} from "../model/text.js";
 import {operationToAttribute} from "../typesOfOperation.js";
 import {timeEpsilon} from "../globalValues.js";
+import {operationToValidationViewLevel} from "../validator.js";
 
 export class SceneController {
     constructor() {
@@ -107,6 +108,30 @@ export class SceneController {
 
         // these are populated while steps are executed
         return Array.from(this.returnValues)
+    }
+
+    async executeScript(script,scriptVariables){
+        const steps = []
+
+        const operationToFunction = {}
+
+        for (const operation of Object.keys(operationToValidationViewLevel)){
+            operationToFunction[operation] = (...args) => {
+                steps.push([operation,args])
+                this.#executeStep([operation,args])
+                return this.returnValues[this.returnValues.length-1]
+            }
+        }
+
+        this.beginSteps()
+        new Function(
+            ...Object.keys(operationToFunction),
+            ...Object.keys(scriptVariables),
+            script
+        )(...Object.values(operationToFunction),...Object.values(scriptVariables))
+        await this.finishSteps()
+
+        return [steps,Array.from(this.returnValues)]
     }
 
     // should only be used either:
