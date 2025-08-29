@@ -1,7 +1,8 @@
 import {IdleState} from "./idle.js";
 
 export class PlayingState {
-    constructor() {
+    constructor(animation) {
+        this.animation = animation
     }
 
     beginAction(){
@@ -21,6 +22,8 @@ export class PlayingState {
     }
 
     play(){
+        cancelAnimationFrame(this.animation.nextAnimationFrame)
+
         return new IdleState()
     }
 }

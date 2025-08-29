@@ -17,6 +17,8 @@ import {
     eventTokenWidth, timelineSnapLength
 } from "../../globalValues.js";
 import {clamp} from "../../maths.js";
+import {PlayingState} from "../../controllerComponents/playing.js";
+import {IdleState} from "../../controllerComponents/idle.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -347,17 +349,21 @@ export class Timeline extends AbstractView{
     }
 
     newControllerState(state){
-        if (state === "PlayingState"){
+        if (state instanceof PlayingState){
             this.playButton.onpointerdown = (pointerEvent) => {
-                controller.pauseAnimation()
-                this.snapTimeToCell()
+                controller.play()
+
+                controller.beginAction()
+                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock())])
+                controller.endAction()
+
                 pointerEvent.stopPropagation()
             }
 
             this.playButton.src = "assets/pause.svg"
         } else {
             this.playButton.onpointerdown = (pointerEvent) => {
-                controller.playAnimation()
+                controller.play()
                 pointerEvent.stopPropagation()
             }
 
@@ -396,12 +402,14 @@ export class Timeline extends AbstractView{
 
         switch (keyboardEvent.key){
             case " ":
-                if (controller.animationPlaying){
-                    controller.pauseAnimation()
-                    this.snapTimeToCell()
-                } else {
-                    controller.playAnimation()
+                controller.play()
+
+                if (controller.currentState instanceof IdleState){
+                    controller.beginAction()
+                    controller.takeStep("goToTime",[this.snapValueToCell(controller.clock())])
+                    controller.endAction()
                 }
+
                 return true
 
             case "ArrowRight":
