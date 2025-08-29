@@ -95,9 +95,13 @@ export class timeCursor{
         this.addToTimelineButton.remove()
     }
 
-    removeEventReady(removeEvent,addEvent){
+    removeEventReady(stepsToRemove){
         this.removeButton.onpointerdown = (pointerEvent) => {
-            controller.newAction(removeEvent,addEvent,[])
+            controller.beginAction()
+            for (const step of stepsToRemove){
+                controller.takeStep(...step)
+            }
+            controller.endAction()
             pointerEvent.stopPropagation()
             this.removeEventGone()
         }

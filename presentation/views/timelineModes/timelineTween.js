@@ -81,15 +81,9 @@ export class timelineTween{
         // after it is selected, it is no longer clickable
         this.connector.style.cursor = "auto"
 
-        this.parentTimeline.cursor.removeEventReady(
-            () => {
-                controller.removeTween(this.tween)
-            },
-            () => {
-                controller.addTimeLineEvent(this.tween.tweenStartEvent)
-                controller.addTimeLineEvent(this.tween.tweenEndEvent)
-            }
-        )
+        this.parentTimeline.cursor.removeEventReady([
+            ["removeTween",[this.tween.shape,this.tween]]
+        ])
     }
 
     deselect(){

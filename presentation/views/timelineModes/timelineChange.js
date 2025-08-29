@@ -38,14 +38,9 @@ export class timelineChange{
 
         this.eventToken.style.outline = "1px solid"
 
-        this.parentTimeline.cursor.removeEventReady(
-            () => {
-                controller.removeTimeLineEvent(this.changeEvent)
-            },
-            () => {
-                controller.addTimeLineEvent(this.changeEvent)
-            }
-        )
+        this.parentTimeline.cursor.removeEventReady([
+            ["removeShapeAttributeChange",[this.shape,this.attribute,this.changeEvent.value,this.changeEvent.time]
+            ]])
     }
 
     deselect(){
