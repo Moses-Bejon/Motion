@@ -93,6 +93,6 @@ export const operationToAttribute = {
 export const shapeCreation = ["createDrawing","createEllipse","createGraphic","createPolygon","createText",
     "duplicate"]
 
-export const operationsWhichReturn = Object.keys(operationToInverse).concat(shapeCreation).concat([
-    "goToTime"
+export const operationsWhichReturn = shapeCreation.concat([
+    "goToTime","shapeAttributeUpdate","changeTimeOfTimelineEvent","newTweenStart","newTweenEnd","changeTimeOfShapeAttributeChange"
 ])

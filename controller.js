@@ -143,7 +143,14 @@ class ControllerClass {
 
             this.historyManager.newAction(steps,returnValues)
 
-            this.#newState(new IdleState())
+            if (this.currentState instanceof PlayingState){
+                this.currentState.nextFrame(
+                    this.clock.bind(this),
+                    (time) => {this.currentScene.executeSteps([["goToTime",[time]]])}
+                )
+            } else {
+                this.#newState(new IdleState())
+            }
 
             return returnValues
 

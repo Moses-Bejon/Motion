@@ -38,7 +38,7 @@ export class PlayingState {
 
     executeScript(script){
         cancelAnimationFrame(this.nextAnimationFrame)
-        throw new Error("can't execute a script while playing an animation")
+        return this
     }
 
     play(){
