@@ -18,7 +18,6 @@ import {
 } from "../../globalValues.js";
 import {clamp} from "../../maths.js";
 import {PlayingState} from "../../controllerComponents/playing.js";
-import {IdleState} from "../../controllerComponents/idle.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -199,6 +198,10 @@ export class Timeline extends AbstractView{
         }
 
         this.playButton = this.shadowRoot.getElementById("playButton")
+        this.playButton.onpointerdown = (pointerEvent) => {
+            controller.play()
+            pointerEvent.stopPropagation()
+        }
     }
 
     connectedCallback() {
@@ -214,7 +217,6 @@ export class Timeline extends AbstractView{
         controller.subscribeToControllerState(this)
         controller.subscribeToPreviousAction(this)
         controller.subscribeToSelectedShapes(this)
-        controller.subscribeToSceneModel(this,"timelineEvents")
         controller.subscribeToSceneModel(this,"clock")
     }
 
@@ -226,7 +228,6 @@ export class Timeline extends AbstractView{
         controller.unsubscribeToControllerState(this)
         controller.unsubscribeToPreviousAction(this)
         controller.unsubscribeToSelectedShapes(this)
-        controller.unsubscribeToSceneModel(this,"timelineEvents")
         controller.unsubscribeToSceneModel(this,"clock")
     }
 
@@ -289,9 +290,6 @@ export class Timeline extends AbstractView{
             case "selectedShapes":
                 new shapeTimeline(this,model)
                 break
-            case "timelineEvents":
-                this.shapeToTimeline.get(model.shape)?.addTimeLineEvent(model)
-                break
             default:
                 console.error("timeline got updates from",aggregateModel)
         }
@@ -302,9 +300,6 @@ export class Timeline extends AbstractView{
         switch (aggregateModel){
             case "selectedShapes":
                 this.newSelectedShapes(model)
-                break
-            case "timelineEvents":
-                this.newSelectedShapes(controller.selectedShapes())
                 break
             case "clock":
                 this.cursor.updateTimeCursor()
@@ -321,14 +316,6 @@ export class Timeline extends AbstractView{
                 this.shapeToTimeline.delete(model)
                 new shapeTimeline(this,model)
                 break
-            case "timelineEvents":
-
-                const shape = this.shapeToTimeline.get(model.shape)
-
-                shape.updatePosition()
-                shape.updateTimeLineEvent(model)
-
-                break
             default:
                 console.error("timeline got updates from",aggregateModel)
         }
@@ -340,9 +327,6 @@ export class Timeline extends AbstractView{
                 this.shapeToTimeline.get(model).shapeSection.remove()
                 this.shapeToTimeline.delete(model)
                 break
-            case "timelineEvents":
-                this.shapeToTimeline.get(model.shape)?.removeTimeLineEvent(model)
-                break
             default:
                 console.error("timeline got updates from",aggregateModel)
         }
@@ -350,23 +334,8 @@ export class Timeline extends AbstractView{
 
     newControllerState(state){
         if (state instanceof PlayingState){
-            this.playButton.onpointerdown = (pointerEvent) => {
-                controller.play()
-
-                controller.beginAction()
-                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock())])
-                controller.endAction()
-
-                pointerEvent.stopPropagation()
-            }
-
             this.playButton.src = "assets/pause.svg"
         } else {
-            this.playButton.onpointerdown = (pointerEvent) => {
-                controller.play()
-                pointerEvent.stopPropagation()
-            }
-
             this.playButton.src = "assets/play.svg"
         }
     }
@@ -403,12 +372,6 @@ export class Timeline extends AbstractView{
         switch (keyboardEvent.key){
             case " ":
                 controller.play()
-
-                if (controller.currentState instanceof IdleState){
-                    controller.beginAction()
-                    controller.takeStep("goToTime",[this.snapValueToCell(controller.clock())])
-                    controller.endAction()
-                }
 
                 return true
 

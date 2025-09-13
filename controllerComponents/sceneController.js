@@ -1,13 +1,11 @@
 import {model} from "../model/model.js";
 import {controller} from "../controller.js";
 import {Drawing} from "../model/drawing.js";
-import {binaryInsertion} from "../dataStructureOperations.js";
 import {Ellipse} from "../model/ellipse.js";
 import {Graphic} from "../model/graphic.js";
 import {Polygon} from "../model/polygon.js";
 import {Text} from "../model/text.js";
 import {operationToAttribute} from "../typesOfOperation.js";
-import {timeEpsilon} from "../globalValues.js";
 import {operationToValidationViewLevel} from "../validator.js";
 
 export class SceneController {
@@ -22,10 +20,6 @@ export class SceneController {
         this.ZIndexOfHighestShape = 0
         this.ZIndexOfLowestShape = -1
 
-        // index of the timeline event in forward state closest to current time i.e. the one that's just been done
-        // -1 if there are no timeline events or none in forward state
-        this.currentTimelineEvent = -1
-
         this.animationEndTimeSeconds = 10
 
         // called here to allow for steps to be carried out silently
@@ -38,10 +32,6 @@ export class SceneController {
 
     allShapes(){
         return this.aggregateModels.allShapes.content
-    }
-
-    timelineEvents(){
-        return this.aggregateModels.timelineEvents.content
     }
 
     displayShapes(){
@@ -234,17 +224,15 @@ export class SceneController {
                 operand[0].defaultTextReplaced = true
                 break
             case "newAppearanceTime":
-                this.#changeTimeOfEvent(operand[0].appearanceEvent,operand[1])
-
                 this.returnValues.push(operand[0].appearanceTime)
                 operand[0].appearanceTime = operand[1]
+                this.#sendShapeToTime(operand[0],this.clock())
                 this.#updateShape(operand[0])
                 break
             case "newDisappearanceTime":
-                this.#changeTimeOfEvent(operand[0].disappearanceEvent,operand[1])
-
                 this.returnValues.push(operand[0].disappearanceTime)
                 operand[0].disappearanceTime = operand[1]
+                this.#sendShapeToTime(operand[0],this.clock())
                 this.#updateShape(operand[0])
                 break
 
@@ -316,56 +304,32 @@ export class SceneController {
         }
     }
 
-    #goForwardToTime(time){
-
-        // for every event between now and last event
-        for (let i = this.currentTimelineEvent+1;i<this.timelineEvents().length;i++){
-            const nextEvent = this.timelineEvents()[i]
-
-            if (nextEvent.time > time){
-                // we are just before the place where the time is greater than us
-                this.currentTimelineEvent = i-1
-                return
-            }
-
-            this.executeInvisibleSteps(nextEvent.forward)
-        }
-
-        this.currentTimelineEvent = this.timelineEvents().length-1
-    }
-
-    #goBackwardToTime(time){
-
-        // for every event between now and first event
-        for (let i = this.currentTimelineEvent;i>=0;i--){
-
-            const previousEvent = this.timelineEvents()[i]
-
-            if (previousEvent.time <= time){
-                this.currentTimelineEvent = i
-                return
-            }
-
-            this.executeInvisibleSteps(previousEvent.backward)
-        }
-
-        this.currentTimelineEvent = -1
-    }
-
     #goToTime(time){
-        if (time < this.clock()){
-            this.#goBackwardToTime(time)
-        } else{
-            this.#goForwardToTime(time)
-        }
-
         this.aggregateModels.clock.content = time
-
         this.aggregateModels.clock.updateModel = true
 
-        for (const shape of this.displayShapes()){
-            shape.goToTime(time)
-            this.#updateShape(shape)
+        for (const shape of this.allShapes()){
+            this.#sendShapeToTime(shape,time)
+        }
+    }
+
+    #sendShapeToTime(shape,time){
+        const isDisplayed = this.displayShapes().has(shape)
+        const shouldBeDisplayed = shape.appearanceTime <= time && time < shape.disappearanceTime
+
+        if (isDisplayed){
+            if (!shouldBeDisplayed){
+                this.#hideShape(shape)
+            } else {
+                shape.goToTime(time)
+                this.#updateShape(shape)
+            }
+        } else {
+            if (shouldBeDisplayed){
+                this.#showShape(shape)
+
+                shape.goToTime(time)
+            }
         }
     }
 
@@ -395,24 +359,7 @@ export class SceneController {
         this.ZIndexOfHighestShape++
 
         this.#addModel("allShapes",shapeInstance)
-
-        shapeInstance.appearanceEvent = {
-            "type": "appearance",
-            "shape": shapeInstance,
-            "time": appearance,
-            "forward": [["showShape",[shapeInstance]]],
-            "backward": [["hideShape",[shapeInstance]]]
-        }
-        shapeInstance.disappearanceEvent = {
-            "type": "disappearance",
-            "shape": shapeInstance,
-            "time": shapeInstance.disappearanceTime,
-            "forward": [["hideShape",[shapeInstance]]],
-            "backward": [["showShape",[shapeInstance]]]
-        }
-
-        this.#newTimelineEvent(shapeInstance.appearanceEvent)
-        this.#newTimelineEvent(shapeInstance.disappearanceEvent)
+        this.#sendShapeToTime(shapeInstance,this.clock())
 
         return shapeInstance
     }
@@ -423,30 +370,11 @@ export class SceneController {
         shape.name = this.#findNameWithPrefix(shape.name)
 
         this.#addModel("allShapes",shape)
-
-        shape.appearanceEvent = {
-            "type": "appearance",
-            "shape": shape,
-            "time": shape.appearanceTime,
-            "forward": [["showShape",[shape]]],
-            "backward": [["hideShape",[shape]]]
-        }
-        shape.disappearanceEvent = {
-            "type": "disappearance",
-            "shape": shape,
-            "time": shape.disappearanceTime,
-            "forward": [["hideShape",[shape]]],
-            "backward": [["showShape",[shape]]]
-        }
-
-        this.#newTimelineEvent(shape.appearanceEvent)
-        this.#newTimelineEvent(shape.disappearanceEvent)
+        this.#sendShapeToTime(shape,this.clock())
     }
 
     #deleteShape(shape){
         this.#removeModel("allShapes",shape)
-
-        this.#removeShapeFromTimeline(shape)
 
         if (controller.selectedShapesManager.isSelected(shape)) {
             controller.selectedShapesManager.deselectShape(shape)
@@ -469,49 +397,15 @@ export class SceneController {
         this.#removeModel("displayShapes",shape)
     }
 
-    #newTimelineEvent(event){
-        this.#addModel("timelineEvents",event)
-    }
-
-    #changeTimeOfEvent(event,newTime){
-
-        if (!this.timelineEvents().includes(event)){
-            throw new Error("attempted to change the time of a non-existing timeline event")
-        }
-
-        const timeBeforeOperation = this.clock()
-        this.#goToTime(Math.min(newTime,event.time)-timeEpsilon)
-
-        this.#unsafeRemoveModelFromTimeline(event)
-        event.time = newTime
-        this.#unsafeAddModelToTimeline(event)
-
-        this.#goToTime(timeBeforeOperation)
-
-        this.#updateModel("timelineEvents",event)
-    }
-
-    #removeShapeFromTimeline(shape){
-        for (const timeLineEvent of Array.from(this.timelineEvents())) {
-            if (timeLineEvent.shape === shape) {
-                this.#removeModel("timelineEvents",timeLineEvent)
-            }
-        }
-    }
-
     #addModel(aggregateModelName,model){
         const aggregateModel = this.aggregateModels[aggregateModelName]
 
-        if (aggregateModelName === "timelineEvents"){
-            this.#addModelToTimeline(model)
-        } else {
-            if (aggregateModel.content.has(model)){
-                console.error("attempted to add an existing model")
-                return
-            }
-
-            aggregateModel.content.add(model)
+        if (aggregateModel.content.has(model)){
+            console.error("attempted to add an existing model")
+            return
         }
+
+        aggregateModel.content.add(model)
 
         // if it was going to be removed, just forget about removing it
         if (aggregateModel.modelsToRemove.has(model)){
@@ -521,72 +415,20 @@ export class SceneController {
         }
     }
 
-    #unsafeAddModelToTimeline(model){
-        const placeToInsert = binaryInsertion(
-            this.aggregateModels.timelineEvents.content,
-            model.time,
-            (timeLineEvent)=>{return timeLineEvent.time}
-        )
-
-        this.aggregateModels.timelineEvents.content.splice(placeToInsert,0,model)
-    }
-
-    #addModelToTimeline(model){
-
-        const timeBeforeOperation = this.clock()
-
-        // go to time before event happens
-        this.#goToTime(model.time-timeEpsilon)
-
-        this.#unsafeAddModelToTimeline(model)
-
-        // return to after event happened, this time with that event happening
-        this.#goToTime(timeBeforeOperation)
-    }
-
-    #unsafeRemoveModelFromTimeline(model){
-        const indexToRemove = this.timelineEvents().indexOf(model)
-
-        if (indexToRemove > -1) {
-            this.timelineEvents().splice(indexToRemove, 1)
-        } else {
-            // indexOf outputs -1 if not in list
-            throw new Error("attempted to remove a non-existing model")
-        }
-    }
-
-    #removeModelFromTimeline(model){
-
-        const timeBeforeOperation = this.clock()
-
-        // go to before event happened
-        this.#goToTime(model.time - timeEpsilon)
-
-        this.#unsafeRemoveModelFromTimeline(model)
-
-        // return to after the event happened, this time without the event
-        this.#goToTime(timeBeforeOperation)
-    }
-
     #removeModel(aggregateModelName,model){
+
+        if (aggregateModelName === "allShapes" && this.displayShapes().has(model)){
+            this.#removeModel("displayShapes",model)
+        }
+
         const aggregateModel = this.aggregateModels[aggregateModelName]
 
-        if (aggregateModelName === "timelineEvents"){
-            try {
-                this.#removeModelFromTimeline(model)
-            } catch (e) {
-                console.error(e)
-            }
+        if (!aggregateModel.content.has(model)) {
+            console.error("attempted to remove a non-existing model")
+            return
         }
-        else
-        {
-            if (!aggregateModel.content.has(model)) {
-                console.error("attempted to remove a non-existing model")
-                return
-            }
 
-            aggregateModel.content.delete(model)
-        }
+        aggregateModel.content.delete(model)
 
         // if it was going to be added, just forget about adding it
         if (aggregateModel.modelsToAdd.has(model)){
@@ -643,11 +485,11 @@ export class SceneController {
         }
     }
 
-    #updateModelForSubscribers(aggregateModel,model,previousModel=model){
+    #updateModelForSubscribers(aggregateModel,model){
         for (const subscriber of this.aggregateModels[aggregateModel].subscribers){
 
             try {
-                subscriber.updateModel(aggregateModel,model,previousModel)
+                subscriber.updateModel(aggregateModel,model)
             } catch (e){
                 console.error(e)
             }

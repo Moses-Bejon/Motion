@@ -70,19 +70,23 @@ export class Shape {
         this[attribute] = value
     }
 
+    insertShapeAttributeChange(attribute,changeAttribute){
+        this.attributes[attribute].splice(
+            binaryInsertion(this.attributes[attribute],changeAttribute.time,(item) => item.time),
+            0,
+            changeAttribute
+        )
+    }
+
     newShapeAttributeChange(attribute,value,time){
-        this.attributes[attribute].push(Shape.getShapeAttributeChange(time,value))
+        this.insertShapeAttributeChange(attribute,Shape.getShapeAttributeChange(time,value))
     }
 
     changeTimeOfShapeAttributeChange(attribute,changeAttribute,newTime){
         const index = this.attributes[attribute].findIndex(change => change === changeAttribute)
         changeAttribute.time = newTime
         this.attributes[attribute].splice(index,1)
-        this.attributes[attribute].splice(
-            binaryInsertion(this.attributes[attribute],newTime,(item) => item.time),
-            0,
-            changeAttribute
-        )
+        this.insertShapeAttributeChange(attribute,changeAttribute)
     }
 
     removeShapeAttributeChange(attribute,value,time){

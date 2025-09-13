@@ -6,11 +6,16 @@ import {HistoryManager} from "./controllerComponents/historyManager.js";
 import {SelectedShapesManager} from "./controllerComponents/selectedShapesManager.js"
 import {FileSerializer} from "./controllerComponents/fileSerializer.js";
 import {validateShape} from "./validator.js";
+import {PlayingState} from "./controllerComponents/playing.js";
 
 class ControllerClass {
     constructor() {
 
         this.currentState = new IdleState()
+
+        // if we need to continue playing/rendering after an operation, this stores that fact
+        this.needsToReturnToState = null
+
         // views we have to tell about changes in state
         this.stateSubscribers = new Set()
 
@@ -60,6 +65,21 @@ class ControllerClass {
             console.error(e)
             this.#newState(new IdleState())
         }
+
+        if (this.currentState instanceof PlayingState){
+
+            const currentTime = this.clock()
+
+            this.currentScene.executeInvisibleSteps([["goToTime",[this.currentState.timeAtPlayBegan]]])
+
+            this.needsToReturnToState = this.currentState
+
+            this.currentState = new IdleState()
+
+            this.beginAction()
+
+            controller.takeStep("goToTime",[currentTime])
+        }
     }
 
     takeStep(operation,operands){
@@ -69,7 +89,6 @@ class ControllerClass {
             console.error(e)
             this.#newState(new IdleState())
         }
-
     }
 
     async endAction(){
@@ -83,6 +102,16 @@ class ControllerClass {
             this.historyManager.newAction(this.currentState.steps,returnValues)
 
             this.#newState(this.currentState.endAction())
+
+            if (this.needsToReturnToState !== null){
+                this.#newState(this.needsToReturnToState)
+                this.currentState.timeAtPlayBegan = this.clock()
+                this.currentState.nextFrame(
+                    this.clock.bind(this),
+                    (time) => {this.currentScene.executeSteps([["goToTime",[time]]])}
+                )
+                this.needsToReturnToState = null
+            }
 
             return returnValues
         } catch (e){
@@ -133,6 +162,14 @@ class ControllerClass {
         } catch (e){
             console.error(e)
             this.#newState(new IdleState())
+        }
+
+        if (this.currentState instanceof PlayingState){
+            this.currentState.timeAtPlayBegan = this.clock()
+            this.currentState.nextFrame(
+                this.clock.bind(this),
+                (time) => {this.currentScene.executeSteps([["goToTime",[time]]])}
+            )
         }
     }
 

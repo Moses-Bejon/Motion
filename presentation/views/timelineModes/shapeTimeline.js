@@ -123,49 +123,6 @@ export class shapeTimeline{
         }
     }
 
-    possibleNewTween(tween){
-        if (!this.tweenToTimelineTween.has(tween)){
-            this.tweenToTimelineTween.set(tween,new timelineTween(this.parentTimeline,this.timelineContainer,tween))
-        }
-    }
-
-    addTimeLineEvent(event){
-
-        switch (event.type){
-            // for when shapes can appear and disappear
-            case "appearance":
-            case "disappearance":
-                return
-
-            default:
-                console.error("unexpected shape type",event.type)
-        }
-    }
-
-    removeTimeLineEvent(event){
-
-        if (event.type === "change"){
-            this.attributeChangeToEventToken.get(event).remove()
-            this.attributeChangeToEventToken.delete(event)
-        } else if (event.type === "tweenStart"){
-            this.tweenToTimelineTween.get(event.tween).removeStart()
-        } else if (event.type === "tweenEnd"){
-            this.tweenToTimelineTween.get(event.tween).removeEnd()
-        }
-    }
-
-    updateTimeLineEvent(event){
-        if (event.type === "change"){
-            this.attributeChangeToEventToken.get(event).update()
-        } else if (event.type === "tweenStart"){
-            this.tweenToTimelineTween.get(event.tween).removeStart()
-            this.tweenToTimelineTween.get(event.tween).receiveStart(event)
-        } else if (event.type === "tweenEnd"){
-            this.tweenToTimelineTween.get(event.tween).removeEnd()
-            this.tweenToTimelineTween.get(event.tween).receiveEnd(event)
-        }
-    }
-
     updatePosition(){
 
         this.startTime = this.shape.appearanceTime
