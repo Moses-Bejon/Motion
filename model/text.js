@@ -37,6 +37,7 @@ export class Text extends Shape{
         loadedShape.defaultTextReplaced = true
 
         loadedShape.bottomLeft = save.bottomLeft
+        loadedShape.rotation = save.rotation
 
         return loadedShape
     }
@@ -45,6 +46,7 @@ export class Text extends Shape{
         const shapeSave = super.save(fileSerializer)
 
         shapeSave.bottomLeft = this.bottomLeft
+        shapeSave.rotation = this.rotation
 
         shapeSave.shapeType = "text"
 
