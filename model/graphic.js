@@ -12,8 +12,8 @@ export class Graphic extends Shape{
         super()
     }
 
-    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory, source, topLeft, rotation) {
-        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, source, topLeft, rotation) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name)
         this.source = source
         this.topLeft = topLeft
         this.rotation = rotation
@@ -170,7 +170,6 @@ export class Graphic extends Shape{
             this.disappearanceTime,
             this.ZIndex,
             this.name,
-            this.directory,
             this.source,
             Array.from(this.topLeft),
             this.rotation

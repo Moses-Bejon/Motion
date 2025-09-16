@@ -12,8 +12,8 @@ export class Text extends Shape{
         super()
     }
 
-    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,bottomLeft,rotation,colour,size,family) {
-        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name,bottomLeft,rotation,colour,size,family) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name)
 
         this.attributes.text = [Shape.getShapeAttributeChange(0,"Begin Typing")]
         this.defaultTextReplaced = false
@@ -158,7 +158,6 @@ export class Text extends Shape{
             this.disappearanceTime,
             this.ZIndex,
             this.name,
-            this.directory,
             Array.from(this.bottomLeft),
             this.rotation,
             this.fontColour,

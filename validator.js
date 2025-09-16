@@ -39,10 +39,6 @@ export function validateString(possibleString){
     return typeof possibleString === "string"
 }
 
-export function validateDirectory(directory){
-    return validateString(directory) || directory === null
-}
-
 export function validateColour(colour) {
 
 

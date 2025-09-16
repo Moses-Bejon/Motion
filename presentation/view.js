@@ -11,7 +11,6 @@ const typesOfWindow = {
     "canvas":"create-edit-canvas",
     "timeline":"time-line",
     "shape editor":"shape-editor",
-    "overview":"over-view",
     "renderer":"renderer-window",
     "settings":"settings-window"
 }

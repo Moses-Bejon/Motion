@@ -7,8 +7,8 @@ export class Drawing extends Shape{
         super()
     }
 
-    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,colour,thickness,points) {
-        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name,colour,thickness,points) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name)
 
         this.attributes.colour = [Shape.getShapeAttributeChange(0,colour)]
         this.attributes.thickness = [Shape.getShapeAttributeChange(0,thickness)]
@@ -128,7 +128,6 @@ export class Drawing extends Shape{
             this.disappearanceTime,
             this.ZIndex,
             this.name,
-            this.directory,
             this.colour,
             this.thickness,
             structuredClone(this.points)

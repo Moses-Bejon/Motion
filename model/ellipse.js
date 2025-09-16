@@ -11,8 +11,8 @@ export class Ellipse extends Shape{
         super()
     }
 
-    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,centre,height,width,outlineColour,colour,rotation,thickness) {
-        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory)
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name,centre,height,width,outlineColour,colour,rotation,thickness) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name)
 
         this.centre = centre
         this.rotation = rotation
@@ -152,7 +152,6 @@ export class Ellipse extends Shape{
             this.disappearanceTime,
             this.ZIndex,
             this.name,
-            this.directory,
             Array.from(this.centre),
             this.height,this.width,
             this.outlineColour,

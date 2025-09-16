@@ -40,9 +40,6 @@ export class AbstractWindow extends HTMLElement{
             case "shapeEditor":
                 window = document.createElement("shape-editor")
                 break
-            case "overview":
-                window = document.createElement("over-view")
-                break
             case "renderer":
                 window = document.createElement("renderer-window")
                 break

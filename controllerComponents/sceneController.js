@@ -189,8 +189,6 @@ export class SceneController {
                 duplicate.ZIndex = this.ZIndexOfHighestShape
                 this.ZIndexOfHighestShape ++
 
-                duplicate.directory = this.selectedDirectory
-
                 this.#restoreShape(duplicate)
                 this.returnValues.push(duplicate)
 
@@ -352,7 +350,6 @@ export class SceneController {
             disappearance,
             this.ZIndexOfHighestShape,
             shapeName,
-            this.selectedDirectory,
             ...operands.slice(2)
         )
 

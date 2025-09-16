@@ -12,15 +12,12 @@ export class Shape {
         this.attributes = {}
     }
 
-    setupInScene(appearanceTime,disappearanceTime,ZIndex,name,directory){
+    setupInScene(appearanceTime,disappearanceTime,ZIndex,name){
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
 
         this.ZIndex = ZIndex
         this.name = name
-
-        // indicates which directory I am a part of
-        this.directory = directory
     }
 
     static copyTimelineEvents(source,destination){
@@ -107,7 +104,6 @@ export class Shape {
 
     static load(save,shape){
         shape.name = save.name
-        shape.directory = save.directory
         shape.appearanceTime = save.appearanceTime
         shape.disappearanceTime = save.disappearanceTime
         shape.ZIndex = save.ZIndex
@@ -152,7 +148,6 @@ export class Shape {
 
         return {
             "name":this.name,
-            "directory":this.directory,
             "appearanceTime":this.appearanceTime,
             "disappearanceTime":this.disappearanceTime,
             "ZIndex":this.ZIndex,

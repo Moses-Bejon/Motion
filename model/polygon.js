@@ -6,8 +6,8 @@ export class Polygon extends Drawing{
         super()
     }
 
-    setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,colour,fillColour,thickness,points) {
-        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name, directory,colour,thickness,points)
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name,colour,fillColour,thickness,points) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name,colour,thickness,points)
 
         this.attributes.fillColour = [Shape.getShapeAttributeChange(0,fillColour)]
     }
@@ -74,7 +74,6 @@ export class Polygon extends Drawing{
             this.disappearanceTime,
             this.ZIndex,
             this.name,
-            this.directory,
             this.colour,
             this.fillColour,
             this.thickness,
