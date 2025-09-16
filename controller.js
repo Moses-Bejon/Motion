@@ -219,6 +219,9 @@ class ControllerClass {
         // clearing out undo/redo stack
         this.historyManager = new HistoryManager()
 
+        // clearing out selected shapes
+        this.selectedShapesManager = new SelectedShapesManager()
+
         this.currentScene = await this.fileSerializer.loadScene(file.currentScene)
 
         // allows the saved root window to be loaded in
