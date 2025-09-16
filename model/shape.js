@@ -1,6 +1,9 @@
 import {getRotateByAngle, increment2dVectorBy, scale2dVectorAboutPoint, midPoint2d} from "../maths.js";
 import {randomBrightColour} from "../random.js";
 import {binaryInsertion} from "../dataStructureOperations.js";
+import {TranslationTween} from "./tweens/translateTween.js";
+import {RotationTween} from "./tweens/rotationTween.js";
+import {ScaleTween} from "./tweens/scaleTween.js";
 
 export class Shape {
     constructor() {
@@ -109,13 +112,30 @@ export class Shape {
         shape.disappearanceTime = save.disappearanceTime
         shape.ZIndex = save.ZIndex
         shape.attributes = save.attributes
+        shape.offset = save.offset
 
         for (const tween of save.tweens){
-            // TODO: FIX THIS, NEEDS DESERIALISING
-            shape.tweens.add(tween)
+            shape.tweens.add(this.loadTween(tween,shape))
+        }
+    }
+
+    static loadTween(tweenJSON,shape) {
+        let newTween
+        switch (tweenJSON.tweenType) {
+            case "translationTween":
+                newTween = TranslationTween.load(tweenJSON, shape)
+                break
+            case "rotationTween":
+                newTween = RotationTween.load(tweenJSON, shape)
+                break
+            case "scaleTween":
+                newTween = ScaleTween.load(tweenJSON, shape)
+                break
+            default:
+                throw new Error("Unknown tween type: " + tweenJSON.tweenType)
         }
 
-        return shape
+        return newTween
     }
 
     setupOffset(){
@@ -137,18 +157,20 @@ export class Shape {
             "disappearanceTime":this.disappearanceTime,
             "ZIndex":this.ZIndex,
             "tweens":serialisedTweens,
-            "attributes":this.attributes
+            "attributes":this.attributes,
+            "offset":this.offset
         }
     }
 
     goToTime(time){
 
+        // updating attributes first because when loading from file attributes are undefined which breaks tweens
+        this.updateAttributes(time)
+
         // TODO: improve efficiency by only considering active tweens
         for (const tween of this.tweens){
             tween.goToTime(time)
         }
-
-        this.updateAttributes(time)
 
         this.updateGeometry()
     }

@@ -31,14 +31,14 @@ export class Text extends Shape{
     }
 
     static load(save){
-        const loadedShape = Shape.load(save)
+        const loadedShape = new Text()
+        Shape.load(save,loadedShape)
 
         loadedShape.defaultTextReplaced = true
 
         loadedShape.bottomLeft = save.bottomLeft
 
-        loadedShape.updateGeometry()
-        loadedShape.setupOffset()
+        return loadedShape
     }
 
     save(fileSerializer){

@@ -29,13 +29,11 @@ export class Ellipse extends Shape{
     }
 
     static load(save){
-        const loadedShape = Shape.load(save)
+        const loadedShape = new Ellipse()
+        Shape.load(save,loadedShape)
 
         loadedShape.centre = save.centre
         loadedShape.rotation = save.rotation
-
-        loadedShape.updateGeometry()
-        loadedShape.setupOffset()
 
         return loadedShape
     }

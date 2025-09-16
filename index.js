@@ -56,9 +56,9 @@ defaultWindow.updateEdgePosition(0.8)
 function replaceRootWindowWithSave(save){
         // collapse root window into single window
         while (true){
-                if (rootWindow.constructor.name === "horizontallySplitWindow"){
+                if (rootWindow.constructor.name === "HorizontallySplitWindow"){
                         rootWindow.collapseLeftWindow()
-                } else if (rootWindow.constructor.name === "verticallySplitWindow"){
+                } else if (rootWindow.constructor.name === "VerticallySplitWindow"){
                         rootWindow.collapseTopWindow()
                 } else {
                         break

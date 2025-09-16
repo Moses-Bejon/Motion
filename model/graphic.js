@@ -30,6 +30,8 @@ export class Graphic extends Shape{
         await loadedShape.loadImage()
 
         loadedShape.updateGeometry()
+
+        return loadedShape
     }
 
     save(fileSerializer){

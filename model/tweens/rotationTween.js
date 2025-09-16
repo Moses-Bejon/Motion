@@ -20,19 +20,27 @@ export class RotationTween extends Tween{
         this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getOffsetPoint())
     }
 
-    static load(save){
-        this.totalAngle = save.totalAngle
-        this.relativeCentre = save.relativeCentre
+    static load(save,shape){
+        const loadedTween = new RotationTween(shape)
 
-        super.load(save)
+        loadedTween.totalAngle = save.totalAngle
+        loadedTween.relativeCentre = save.relativeCentre
+        loadedTween.previousAngle = save.previousAngle
+        loadedTween.translationCausedByUs = save.translationCausedByUs
+
+        super.loadTimes(save,loadedTween)
+
+        return loadedTween
     }
 
     save(){
         const tweenSave = super.save()
 
+        tweenSave.tweenType = "rotationTween"
         tweenSave.totalAngle = this.totalAngle
         tweenSave.relativeCentre = this.relativeCentre
-        tweenSave.tweenType = "rotationTween"
+        tweenSave.previousAngle = this.previousAngle
+        tweenSave.translationCausedByUs = this.translationCausedByUs
 
         return tweenSave
     }

@@ -31,4 +31,8 @@ export class ReceivingActionState {
     play(){
         throw new Error("can't play while still receiving an action")
     }
+
+    saveFile(){
+        throw new Error("can't save the file while receiving an action")
+    }
 }

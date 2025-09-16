@@ -12,6 +12,17 @@ export class Polygon extends Drawing{
         this.attributes.fillColour = [Shape.getShapeAttributeChange(0,fillColour)]
     }
 
+    static load(save){
+        const loadedShape = new Polygon()
+        Shape.load(save,loadedShape)
+
+        loadedShape.points = save.points
+
+        loadedShape.updateGeometry()
+
+        return loadedShape
+    }
+
     static fillArea(points,fill){
         const polygon = document.createElementNS("http://www.w3.org/2000/svg","polygon")
 

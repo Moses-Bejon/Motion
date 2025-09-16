@@ -21,4 +21,8 @@ export class ExecutingScriptState {
     play(){
         throw new Error("can't begin playing the animation while still executing a script")
     }
+
+    saveFIle() {
+        throw new Error("can't save the file while executing a script")
+    }
 }

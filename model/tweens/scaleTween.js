@@ -20,12 +20,27 @@ export class ScaleTween extends Tween{
         this.relativeCentre = subtract2dVectors(aboutCentre,this.shape.getOffsetPoint())
     }
 
+    static load(save,shape){
+        const loadedTween = new ScaleTween(shape)
+
+        loadedTween.totalScale = save.totalScale
+        loadedTween.relativeCentre = save.relativeCentre
+        loadedTween.previousScale = save.previousScale
+        loadedTween.translationCausedByUs = save.translationCausedByUs
+
+        super.loadTimes(save,loadedTween)
+
+        return loadedTween
+    }
+
     save(){
         const tweenSave = super.save()
 
+        tweenSave.tweenType = "scaleTween"
         tweenSave.totalScale = this.totalScale
         tweenSave.relativeCentre = this.relativeCentre
-        tweenSave.tweenType = "scaleTween"
+        tweenSave.previousScale = this.previousScale
+        tweenSave.translationCausedByUs = this.translationCausedByUs
 
         return tweenSave
     }
@@ -40,13 +55,6 @@ export class ScaleTween extends Tween{
         copy.newStartTime(this.startTime)
         copy.previousScale = this.previousScale
         return copy
-    }
-
-    load(save){
-        this.totalScale = save.totalScale
-        this.relativeCentre = save.relativeCentre
-
-        super.load(save)
     }
 
     scaleBy(scaleFactor){

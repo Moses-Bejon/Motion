@@ -25,4 +25,8 @@ export class IdleState {
     play(){
         return new PlayingState()
     }
+
+    saveFile(){
+        return this
+    }
 }

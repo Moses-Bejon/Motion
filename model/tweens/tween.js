@@ -13,7 +13,7 @@ export class Tween {
         this.timeLength = time - this.startTime
     }
 
-    static load(save,tween){
+    static loadTimes(save,tween){
         tween.startTime = save.startTime
         tween.timeLength = save.timeLength
     }

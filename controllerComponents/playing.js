@@ -47,4 +47,8 @@ export class PlayingState {
 
         return new IdleState()
     }
+
+    saveFile(){
+        throw new Error("Cannot save the file while an animation is being played")
+    }
 }

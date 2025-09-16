@@ -15,18 +15,22 @@ export class TranslationTween extends Tween{
     }
 
     static load(save,shape){
-        const loadedTween = new Tween(shape)
+        const loadedTween = new TranslationTween(shape)
 
         loadedTween.totalTranslation = save.totalTranslation
+        loadedTween.previousTranslation = save.previousTranslation
 
-        super.load(save)
+        super.loadTimes(save,loadedTween)
+
+        return loadedTween
     }
 
     save(){
         const tweenSave = super.save()
 
-        tweenSave.totalTranslation = this.totalTranslation
         tweenSave.tweenType = "translationTween"
+        tweenSave.totalTranslation = this.totalTranslation
+        tweenSave.previousTranslation = this.previousTranslation
 
         return tweenSave
     }

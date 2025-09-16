@@ -3,54 +3,48 @@ import {SceneController} from "./sceneController.js";
 import {Ellipse} from "../model/ellipse.js";
 import {Graphic} from "../model/graphic.js";
 import {Polygon} from "../model/polygon.js";
-import {TranslationTween} from "../model/tweens/translateTween.js";
-import {RotationTween} from "../model/tweens/rotationTween.js";
-import {ScaleTween} from "../model/tweens/scaleTween.js";
+import {Text} from "../model/text.js";
 import {Shape} from "../model/shape.js";
 
 export class FileSerializer{
-
-    static loadTween(tweenSave){
-
+    constructor() {
     }
 
-    constructor() {
+    readJSONFile(JSONFile){
+
+        const fileReader = new FileReader()
+
+        return new Promise((resolve, reject) => {
+            fileReader.onload = () => {
+                try {
+                    resolve(JSON.parse(fileReader.result))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+            fileReader.onerror = () => reject(fileReader.error)
+            fileReader.readAsText(JSONFile)
+        })
     }
 
     serializeScene(scene){
 
-        const now = scene.clock()
-
-        scene.executeInvisibleSteps([["goToTime",[0]]])
-
         const file = {
-            "aggregateModels":{"allShapes":[],"clock":now},
-            "allTweens":[],
+            "aggregateModels":{"allShapes":[],"clock":scene.clock()},
             "numberOfEachTypeOfShape":scene.numberOfEachTypeOfShape,
             "ZIndexOfHighestShape":scene.ZIndexOfHighestShape,
             "ZIndexOfLowestShape":scene.ZIndexOfLowestShape,
         }
 
         const allShapes = []
-        this.shapeToReference = new Map()
 
-        this.allTweens = []
-        this.tweenToReference = new Map()
-
-        let i = 0
         for (const shape of scene.allShapes()){
             allShapes.push(shape.save(this))
-            this.shapeToReference.set(shape,i)
-
-            i++
         }
 
         file.aggregateModels.allShapes = allShapes
-        file.allTweens = this.allTweens
 
-        scene.executeInvisibleSteps([["goToTime",[now]]])
-
-        return JSON.stringify(file)
+        return file
     }
 
     async loadScene(save){
@@ -62,9 +56,6 @@ export class FileSerializer{
         scene.numberOfEachTypeOfShape = save.numberOfEachTypeOfShape
         scene.ZIndexOfHighestShape = save.ZIndexOfHighestShape
         scene.ZIndexOfLowestShape = save.ZIndexOfLowestShape
-
-        this.tweenReferenceToLoadedTween = new Map()
-        this.allTweens = save.allTweens
 
         for (const shape of save.aggregateModels.allShapes){
             const loadedShape = await this.loadShape(shape)
@@ -82,80 +73,20 @@ export class FileSerializer{
                 newShape = Drawing.load(shapeJSON)
                 break
             case "ellipse":
-                newShape = new Ellipse(
-                    shapeJSON.appearanceTime,
-                    shapeJSON.disappearanceTime,
-                    shapeJSON.ZIndex,
-                    shapeJSON.name,
-                    shapeJSON.directory,
-                    shapeJSON.centre,
-                    shapeJSON.height,
-                    shapeJSON.width,
-                    shapeJSON.outlineColour,
-                    shapeJSON.colour,
-                    shapeJSON.rotation,
-                    shapeJSON.thickness)
+                newShape = Ellipse.load(shapeJSON)
                 break
             case "graphic":
-
-                newShape = new Graphic(
-                    shapeJSON.appearanceTime,
-                    shapeJSON.disappearanceTime,
-                    shapeJSON.ZIndex,
-                    shapeJSON.name,
-                    shapeJSON.directory,
-                    shapeJSON.source,
-                    shapeJSON.topLeft,
-                    shapeJSON.rotation)
-
-                await newShape.loadImage()
-
-                newShape.width = shapeJSON.width
-                newShape.height = shapeJSON.height
-
+                newShape = await Graphic.load(shapeJSON)
                 break
             case "polygon":
-                newShape = new Polygon(
-                    shapeJSON.appearanceTime,
-                    shapeJSON.disappearanceTime,
-                    shapeJSON.ZIndex,
-                    shapeJSON.name,
-                    shapeJSON.directory,
-                    shapeJSON.colour,
-                    shapeJSON.fillColour,
-                    shapeJSON.thickness,
-                    shapeJSON.points,
-                )
+                newShape = Polygon.load(shapeJSON)
                 break
             case "text":
-                newShape = new Text(
-                    shapeJSON.appearanceTime,
-                    shapeJSON.disappearanceTime,
-                    shapeJSON.ZIndex,
-                    shapeJSON.name,
-                    shapeJSON.directory,
-                    shapeJSON.bottomLeft,
-                    shapeJSON.rotation,
-                    shapeJSON.fontColour,
-                    shapeJSON.fontSize,
-                    shapeJSON.fontFamily)
-
-                newShape.defaultTextReplaced = true
-                newShape.text = shapeJSON.text
-
+                newShape = Text.load(shapeJSON)
                 break
             default:
-                console.error("could not load shape - ",shapeJSON)
+                console.error("unrecognised shape - ",shapeJSON.shapeType)
         }
-
-        const loadedTimelineEvents = []
-
-        for (const timelineEvent of shapeJSON.timelineEvents){
-            loadedTimelineEvents.push(this.loadTimelineEvent(newShape,timelineEvent))
-        }
-
-        newShape.timelineEvents = new Set(loadedTimelineEvents)
-
         return newShape
     }
 
@@ -200,81 +131,4 @@ export class FileSerializer{
         }
         return newSteps
     }
-
-    serializeTimelineEvent(timelineEvent){
-
-        const savedTimelineEvent = {
-            "type":timelineEvent.type,
-            "time":timelineEvent.time,
-            "colour":timelineEvent.colour,
-            "forward":this.serializeSteps(timelineEvent.forward),
-            "backward":this.serializeSteps(timelineEvent.backward)
-        }
-
-        if (Object.hasOwn(timelineEvent,"tween")){
-            if (!this.tweenToReference.has(timelineEvent.tween)){
-                this.tweenToReference.set(timelineEvent.tween,this.allTweens.length)
-                this.allTweens.push(timelineEvent.tween.save())
-            }
-
-            savedTimelineEvent.tween = this.tweenToReference.get(timelineEvent.tween)
-        }
-
-        return savedTimelineEvent
-    }
-
-    loadTimelineEvent(shape,savedTimelineEvent){
-
-        let timelineEvent
-
-        if (Object.hasOwn(savedTimelineEvent,"tween")){
-
-            if (!this.tweenReferenceToLoadedTween.has(savedTimelineEvent.tween)){
-
-                const tween = this.allTweens[savedTimelineEvent.tween]
-
-                let loadedTween
-
-                switch (tween.tweenType){
-                    case "translationTween":
-                        loadedTween = new TranslationTween([0,0],shape)
-                        break
-                    case "rotationTween":
-                        loadedTween = new RotationTween(0,[0,0],shape)
-                        break
-                    case "scaleTween":
-                        loadedTween = new ScaleTween(1,[0,0],shape)
-                        break
-                    default:
-                        console.error("unrecognised tween type",tween.tweenType)
-                }
-
-                loadedTween.load(tween)
-
-                this.tweenReferenceToLoadedTween.set(savedTimelineEvent.tween,loadedTween)
-            }
-
-            if (savedTimelineEvent.type === "tweenStart"){
-                timelineEvent = this.tweenReferenceToLoadedTween.get(savedTimelineEvent.tween).getTweenStartEvent()
-            } else {
-                timelineEvent = this.tweenReferenceToLoadedTween.get(savedTimelineEvent.tween).getTweenEndEvent()
-            }
-
-            timelineEvent.time = savedTimelineEvent.time
-            timelineEvent.colour = savedTimelineEvent.colour
-
-        } else {
-            timelineEvent = {
-                "type":savedTimelineEvent.type,
-                "time":savedTimelineEvent.time,
-                "colour":savedTimelineEvent.colour,
-                "shape": shape,
-                "forward":this.deserializeSteps(savedTimelineEvent.forward,shape),
-                "backward":this.deserializeSteps(savedTimelineEvent.backward,shape)
-            }
-        }
-
-        return timelineEvent
-    }
-
 }

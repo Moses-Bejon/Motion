@@ -22,12 +22,12 @@ export class Drawing extends Shape{
     }
 
     static load(save){
-        const loadedShape = Shape.load(save)
+        const loadedShape = new Drawing()
+        Shape.load(save,loadedShape)
 
         loadedShape.points = save.points
 
         loadedShape.updateGeometry()
-        loadedShape.setupOffset()
 
         return loadedShape
     }

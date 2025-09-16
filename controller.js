@@ -20,10 +20,10 @@ class ControllerClass {
         this.stateSubscribers = new Set()
 
         this.currentScene = new SceneController()
+        this.historyManager = new HistoryManager()
         this.selectedShapesManager = new SelectedShapesManager()
         this.keyboardManager = new KeyboardInputsManager()
         this.onionSkinsManager = new OnionSkinsManager()
-        this.historyManager = new HistoryManager()
         this.fileSerializer = new FileSerializer()
         this.clipboard = new Set()
     }
@@ -94,7 +94,7 @@ class ControllerClass {
     async endAction(){
 
         // if the steps fail this is a backup (history manager also gleans some info from this)
-        const beforeSteps = JSON.parse(this.fileSerializer.serializeScene(this.currentScene))
+        const beforeSteps = this.fileSerializer.serializeScene(this.currentScene)
 
         try {
             const returnValues = await this.currentScene.executeSteps(this.currentState.steps)
@@ -136,7 +136,7 @@ class ControllerClass {
         }
 
         // if the steps fail this is a backup (history manager also gleans some info from this)
-        const beforeSteps = JSON.parse(this.fileSerializer.serializeScene(this.currentScene))
+        const beforeSteps = this.fileSerializer.serializeScene(this.currentScene)
 
         try {
             const [steps,returnValues] = await this.currentScene.executeScript(script,scriptVariables)
@@ -178,6 +178,64 @@ class ControllerClass {
                 (time) => {this.currentScene.executeSteps([["goToTime",[time]]])}
             )
         }
+    }
+
+    async saveFile(rootWindowSaved){
+        try {
+            this.#newState(this.currentState.saveFile())
+        } catch (e){
+            console.error(e)
+            this.#newState(new IdleState())
+
+            return
+        }
+
+        const fileName = window.prompt("Enter file name:","untitled")
+
+        // if user clicks cancel
+        if (fileName === null){
+            return
+        }
+
+        const file = {
+            "fileVersion":1,
+            "currentScene":this.fileSerializer.serializeScene(this.currentScene),
+            "rootWindow":rootWindowSaved
+        }
+
+        const jsonFile = JSON.stringify(file)
+
+        const blob = new Blob([jsonFile], { type: 'application/json' })
+        this.downloadFile(URL.createObjectURL(blob),fileName)
+    }
+
+    async loadFile(file){
+        try {
+            file = await this.fileSerializer.readJSONFile(file)
+        } catch (error){
+            throw error
+        }
+
+        // clearing out undo/redo stack
+        this.historyManager = new HistoryManager()
+
+        this.currentScene = await this.fileSerializer.loadScene(file.currentScene)
+
+        // allows the saved root window to be loaded in
+        return file.rootWindow
+    }
+
+    downloadFile(fileURL,fileName){
+        const downloadLink = document.createElement('a')
+        downloadLink.href = fileURL
+        downloadLink.download = fileName
+        document.body.appendChild(downloadLink)
+
+        // trigger download automatically
+        downloadLink.click()
+
+        document.body.removeChild(downloadLink)
+        URL.revokeObjectURL(downloadLink.href)
     }
 
     copy(shapes){

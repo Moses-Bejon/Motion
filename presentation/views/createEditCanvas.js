@@ -356,7 +356,7 @@ export class CreateEditCanvas extends Canvas{
             this.currentMode.switchMode()
 
             // if we are already in transform mode, we go back to edit mode
-            if (this.currentMode.constructor.name === "transformMode"){
+            if (this.currentMode.constructor.name === "TransformMode"){
                 this.currentMode = new EditMode(this)
             } else {
                 this.currentMode = new TransformMode(this)
