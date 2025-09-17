@@ -2,9 +2,6 @@ import {multiply2dVectorByScalar, returnInput} from "./maths.js";
 
 export const operationToInverse = {
     // 0 is inverse operation, 1 is function to run on operands and save to reverse them
-    "goToTime":["goToTime",
-        (operands,returnValue) => [returnValue]
-    ],
     "deleteShape":["restoreShape",returnInput],
     "restoreShape":["deleteShape",returnInput],
     "translate":["translate",
@@ -64,5 +61,5 @@ export const shapeCreation = ["createDrawing","createEllipse","createGraphic","c
     "duplicate"]
 
 export const operationsWhichReturn = shapeCreation.concat([
-    "goToTime","shapeAttributeUpdate","changeTimeOfTimelineEvent","newTweenStart","newTweenEnd","changeTimeOfShapeAttributeChange"
+    "shapeAttributeUpdate","changeTimeOfTimelineEvent","newTweenStart","newTweenEnd","changeTimeOfShapeAttributeChange"
 ])

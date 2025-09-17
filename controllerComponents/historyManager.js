@@ -31,6 +31,11 @@ export class HistoryManager{
 
         for (const step of Array.from(steps)){
 
+            // we do not undo/redo going to a specific time
+            if (step[0] === "goToTime"){
+                continue
+            }
+
             let returnValue
             if (operationsWhichReturn.includes(step[0])){
                 returnValue = returnValues.shift()
@@ -157,6 +162,12 @@ export class HistoryManager{
 
         // copy of returnValues made as returnValues is used again down the line and forwardSteps is destructive
         const forwardSteps = HistoryManager.forwardSteps(steps,Array.from(returnValues))
+
+        // if there are no steps to undo/redo, don't add to history
+        if (forwardSteps.length === 0){
+            return
+        }
+
         // copy of forwardSteps and returnValues for same reason
         const backwardSteps = HistoryManager.reverseSteps(Array.from(forwardSteps),Array.from(returnValues))
 

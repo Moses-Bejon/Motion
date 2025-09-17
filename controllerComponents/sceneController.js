@@ -141,7 +141,6 @@ export class SceneController {
         switch (operation){
             // view level operations:
             case "goToTime":
-                this.returnValues.push(this.clock())
                 this.#goToTime(operand[0])
                 break
             case "createDrawing":
