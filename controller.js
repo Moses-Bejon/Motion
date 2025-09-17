@@ -34,9 +34,6 @@ class ControllerClass {
     allShapes(){
         return this.currentScene.allShapes()
     }
-    timelineEvents(){
-        return this.currentScene.timelineEvents()
-    }
     clock(){
         return this.currentScene.clock()
     }

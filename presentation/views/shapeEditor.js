@@ -179,21 +179,6 @@ const nameToStringToValue =   {
     }
 }
 
-const nameToTimelineAttribute = {
-    "Appearance time": false,
-    "Disappearance time": false,
-    "Colour": "colour",
-    "Thickness": "thickness",
-    "Polygon fill": "fillColour",
-    "Outline colour": "outlineColour",
-    "Width": "width",
-    "Height": "height",
-    "Text": "text",
-    "Font colour":"fontColour",
-    "Font size (pt)": "fontSize",
-    "Font": "fontFamily"
-}
-
 const template = document.createElement("template")
 template.innerHTML = `
     <style>
@@ -266,7 +251,6 @@ export class ShapeEditor extends AbstractView{
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
         controller.subscribeToSelectedShapes(this)
-        controller.subscribeToSceneModel(this,"timelineEvents")
     }
 
     disconnectedCallback(){
@@ -274,7 +258,6 @@ export class ShapeEditor extends AbstractView{
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
         controller.unsubscribeToSelectedShapes(this)
-        controller.unsubscribeToSceneModel(this,"timelineEvents")
     }
 
     save(){
@@ -286,7 +269,7 @@ export class ShapeEditor extends AbstractView{
     }
 
     errorCheckAggregateModel(aggregateModel){
-        if (aggregateModel !== "selectedShapes" && aggregateModel !== "timelineEvents"){
+        if (aggregateModel !== "selectedShapes"){
             console.error("shape editor got updates from",aggregateModel)
         }
     }
@@ -388,13 +371,6 @@ export class ShapeEditor extends AbstractView{
     }
 
     addModel(aggregateModel,model){
-
-        // appearance and disappearance events are added before shape added
-        // therefore no timeline event will ever be added that I care about from timelineEvents
-        if (aggregateModel === "timelineEvents"){
-            return
-        }
-
         this.errorCheckAggregateModel(aggregateModel)
         this.selectedShapesOrdered.push(model)
         this.sortShapeNames()
@@ -422,13 +398,6 @@ export class ShapeEditor extends AbstractView{
     }
 
     removeModel(aggregateModel,model){
-
-        // appearance and disappearance events are removed when shape removed
-        // therefore no timeline event will ever be removed that I care about from timelineEvents
-        if (aggregateModel === "timelineEvents"){
-            return
-        }
-
         this.updateAggregateModel(aggregateModel,controller.selectedShapes())
     }
 

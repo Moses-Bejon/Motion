@@ -6,8 +6,8 @@ import {
     operationToInverse,
     operationToAttribute,
     operationsWhichReturn,
-    stepToTimelineEvents,
-    shapeCreation, stepToAddableToTimeline
+    shapeCreation,
+    stepToAddableToTimeline
 } from "../typesOfOperation.js";
 import {TranslationTween} from "../model/tweens/translateTween.js";
 import {RotationTween} from "../model/tweens/rotationTween.js";
@@ -151,70 +151,6 @@ export class HistoryManager{
         }
 
         return stepsToAddToTimeline
-    }
-
-    getPreviousActionTimelineEvents(){
-        if (!this.previousAction.addableToTimeline){
-            throw new Error("cannot add non-addable action to timeline")
-        }
-
-        const shapeToTimelineEvents = new Map()
-        const shapeToTweens = new Map()
-
-        const steps = this.previousAction.forwardAction.length
-        for (let i = 0; i < steps; i++){
-            const events = stepToTimelineEvents[this.previousAction.forwardAction[i][0]](
-                this.previousAction.forwardAction[i],
-                this.previousAction.backwardAction[steps-i-1],
-                controller.clock()
-            )
-
-            for (const event of events){
-                if (!shapeToTimelineEvents.has(event.shape)){
-                    shapeToTimelineEvents.set(event.shape,{})
-                }
-
-                if (Object.hasOwn(event,"tween")){
-                    if (!shapeToTweens.has(event.shape)){
-                        shapeToTweens.set(event.shape,[])
-                    }
-
-                    shapeToTweens.get(event.shape).push(event.tween)
-                }
-
-                const existingEvent = shapeToTimelineEvents.get(event.shape)[event.type]
-
-                if (existingEvent !== undefined){
-                    existingEvent.forward = existingEvent.forward.concat(event.forward)
-                    existingEvent.backward = event.backward.concat(existingEvent.backward)
-
-                } else {
-                    shapeToTimelineEvents.get(event.shape)[event.type] = event
-                }
-            }
-        }
-
-        const timelineEvents = []
-
-        for (const [shape,timelineEventGroup] of Array.from(shapeToTimelineEvents)){
-            for (const [type,timelineEvent] of Object.entries(timelineEventGroup)){
-                timelineEvents.push(timelineEvent)
-
-                if (type === "tweenStart"){
-                    for (const tween of shapeToTweens.get(shape)){
-                        tween.tweenStartEvent = timelineEvent
-                    }
-                }
-
-                if (type === "tweenEnd"){
-                    for (const tween of shapeToTweens.get(shape)){
-                        tween.tweenEndEvent = timelineEvent
-                    }
-                }
-            }
-        }
-
-        return timelineEvents
     }
 
     newAction(steps,returnValues){

@@ -1,7 +1,4 @@
 import {multiply2dVectorByScalar, returnInput} from "./maths.js";
-import {TranslationTween} from "./model/tweens/translateTween.js";
-import {RotationTween} from "./model/tweens/rotationTween.js";
-import {ScaleTween} from "./model/tweens/scaleTween.js";
 
 export const operationToInverse = {
     // 0 is inverse operation, 1 is function to run on operands and save to reverse them
@@ -44,33 +41,6 @@ export const stepToAddableToTimeline = new Set([
     "scale",
     "rotate"
 ])
-
-export const stepToTimelineEvents = {
-    "translate":(step,inverseStep,time) => {
-        const shapeTween = new TranslationTween(step[1][1],step[1][0],time)
-
-        return [shapeTween.getTimelineEvents()]
-    },
-    "rotate": (step,inverseStep,time) => {
-        const shapeTween = new RotationTween(step[1][1],step[1][2],step[1][0],time)
-
-        return shapeTween.getTimelineEvents()
-    },
-    "scale": (step,inverseStep,time) => {
-        const shapeTween = new ScaleTween(step[1][1],step[1][2],step[1][0],time)
-
-        return shapeTween.getTimelineEvents()
-    },
-    "shapeAttributeUpdate": (step,inverseStep,time) => {
-        return [{
-            "type":"change",
-            "shape":step[1][0],
-            "time":time,
-            "forward":[step],
-            "backward":[inverseStep]
-        }]
-    }
-}
 
 export const operationToAttribute = {
     "moveToFront":"ZIndex",
