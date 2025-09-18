@@ -142,24 +142,22 @@ export class Renderer extends Canvas{
 
         const numberOfFrames = Math.trunc(animationEndTimeSeconds*fps)
 
-        // no onion skins in render please
-        controller.onionSkinsOff()
-
         // go to start of animation
-        controller.goBackwardToTime(0)
+        controller.beginAction()
+        controller.takeStep("goToTime",[0])
+        await controller.endAction()
 
         for (let i = 0; i<numberOfFrames;i++){
             if (this.renderCancelled){
                 break
             }
 
-            controller.goForwardToTime(i*timePerFrame)
+            controller.beginAction()
+            controller.takeStep("goToTime",[i*timePerFrame])
+            await controller.endAction()
 
             await this.captureFrame(timePerTimestamp*i,timePerTimestamp)
         }
-
-        // telling the clock it is now at the end of the animation
-        controller.aggregateModels.clock.content = (numberOfFrames-1)*timePerFrame
 
         if (!this.renderCancelled) {
 
@@ -173,8 +171,9 @@ export class Renderer extends Canvas{
             controller.downloadFile(videoUrl,"animation render")
         }
 
-        controller.onionSkinsOn()
-        controller.newClockTime(now)
+        controller.beginAction()
+        controller.takeStep("goToTime",[now])
+        await controller.endAction()
         this.restoreRenderAnimationButton()
     }
 
