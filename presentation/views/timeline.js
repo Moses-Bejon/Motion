@@ -3,7 +3,6 @@ import {shapeTimeline} from "./timelineModes/shapeTimeline.js";
 import {timeCursor} from "./timelineModes/timeCursor.js";
 import {controller} from "../../controller.js";
 import {
-    animationEndTimeSeconds,
     fontFamily,
     timelineLeftMenuSizePercentage,
     timelineRightMenuSizePercentage,
@@ -14,7 +13,7 @@ import {
     timelineRightMenuSize,
     typicalIconSize,
     typicalIconSizeInt,
-    eventTokenWidth, timelineSnapLength
+    eventTokenWidth
 } from "../../globalValues.js";
 import {clamp} from "../../maths.js";
 import {PlayingState} from "../../controllerComponents/playing.js";
@@ -192,7 +191,7 @@ export class Timeline extends AbstractView{
 
             controller.beginAction()
             controller.takeStep("goToTime",
-                [this.snapValueToCell(this.pointerPositionToTimelinePosition(pointerEvent)*animationEndTimeSeconds)]
+                [this.snapValueToCell(this.pointerPositionToTimelinePosition(pointerEvent)*controller.animationEndTime())]
             )
             controller.endAction()
         }
@@ -241,10 +240,10 @@ export class Timeline extends AbstractView{
 
     // position with respect to the right part of the window, filled by the timeline
     timeToTimelinePosition(timeSeconds){
-        if (timeSeconds > animationEndTimeSeconds || timeSeconds < 0){
+        if (timeSeconds > controller.animationEndTime() || timeSeconds < 0){
             console.error("Time is out of bounds. Time is ",timeSeconds)
         }
-        return timeSeconds/animationEndTimeSeconds
+        return timeSeconds/controller.animationEndTime()
     }
 
     // position with respect to whole window
@@ -253,7 +252,7 @@ export class Timeline extends AbstractView{
     }
 
     timeLinePositionToTime(position){
-        return position*animationEndTimeSeconds
+        return position*controller.animationEndTime()
     }
 
     globalWidthToTimelineWidth(width){
@@ -349,16 +348,16 @@ export class Timeline extends AbstractView{
     }
 
     snapValueToCellBorder(value){
-        return clamp(Math.round(value/timelineSnapLength)*timelineSnapLength,0,animationEndTimeSeconds)
+        return clamp(Math.round(value/controller.timelineSnapLength())*controller.timelineSnapLength(),0,controller.animationEndTime())
     }
 
     snapValueToCell(value){
-        return clamp(
-            Math.round((value - timelineSnapLength/2)/timelineSnapLength)
-            *timelineSnapLength + timelineSnapLength/2,
-            timelineSnapLength/2,
-            animationEndTimeSeconds-timelineSnapLength/2
-        )
+        return clamp(clamp(
+            Math.round((value - controller.timelineSnapLength()/2)/controller.timelineSnapLength())
+            *controller.timelineSnapLength() + controller.timelineSnapLength()/2,
+            controller.timelineSnapLength()/2,
+            controller.animationEndTime()-controller.timelineSnapLength()/2
+        ),0,controller.animationEndTime())
     }
 
     deselectAll(){
@@ -378,13 +377,13 @@ export class Timeline extends AbstractView{
             case "ArrowRight":
 
                 controller.beginAction()
-                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock()+timelineSnapLength)])
+                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock()+controller.timelineSnapLength())])
                 controller.endAction()
                 return true
 
             case "ArrowLeft":
                 controller.beginAction()
-                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock()-timelineSnapLength)])
+                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock()-controller.timelineSnapLength())])
                 controller.endAction()
                 return true
         }

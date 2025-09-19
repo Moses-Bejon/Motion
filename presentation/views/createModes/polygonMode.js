@@ -1,6 +1,6 @@
 import {ManyPointsMode} from "./manyPointsMode.js";
 import {distanceBetween2dPoints} from "../../../maths.js";
-import {buttonSelectedColour, snappingDistance} from "../../../globalValues.js";
+import {buttonSelectedColour} from "../../../globalValues.js";
 import {controller} from "../../../controller.js";
 import {Drawing} from "../../../model/drawing.js";
 
@@ -69,7 +69,7 @@ export class PolygonMode extends ManyPointsMode{
         if (distanceBetween2dPoints(
             this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
             this.pointArray[0]
-        ) < Math.max(this.thickness,snappingDistance)){
+        ) < Math.max(this.thickness,controller.snappingDistance())){
 
             this.line.remove()
 

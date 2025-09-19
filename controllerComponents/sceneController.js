@@ -21,8 +21,6 @@ export class SceneController {
         this.ZIndexOfHighestShape = 0
         this.ZIndexOfLowestShape = -1
 
-        this.animationEndTimeSeconds = 10
-
         // called here to allow for steps to be carried out silently
         this.beginSteps()
     }

@@ -2,7 +2,7 @@ import {addDragLogicTo} from "../../../dragLogic.js";
 import {distanceBetween2dPoints,decimateLine} from "../../../maths.js";
 import {ManyPointsMode} from "./manyPointsMode.js";
 import {controller} from "../../../controller.js";
-import {buttonSelectedColour, lineSimplificationEpsilon, snappingDistance} from "../../../globalValues.js";
+import {buttonSelectedColour} from "../../../globalValues.js";
 
 export class DrawMode extends ManyPointsMode{
     constructor(createCanvas) {
@@ -33,12 +33,12 @@ export class DrawMode extends ManyPointsMode{
 
     endDrawing(pointerEvent){
 
-        this.pointArray = decimateLine(this.pointArray,lineSimplificationEpsilon)
+        this.pointArray = decimateLine(this.pointArray,controller.lineSimplificationEpsilon())
 
         /* If the last and first points drawn on the shape are close enough together or there is no fill*/
         if (distanceBetween2dPoints(
             this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),this.pointArray[0]
-        ) > Math.max(this.thickness,snappingDistance) || !this.createCanvas.fillColourToggled){
+        ) > Math.max(this.thickness,controller.snappingDistance()) || !this.createCanvas.fillColourToggled){
 
             /* If they're not close together or there is no fill make a drawing*/
 

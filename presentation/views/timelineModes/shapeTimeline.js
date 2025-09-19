@@ -2,10 +2,8 @@ import {addDragLogicTo} from "../../../dragLogic.js";
 import {clamp} from "../../../maths.js";
 import {controller} from "../../../controller.js";
 import {
-    animationEndTimeSeconds,
     bumperTranslation,
-    timelineRightMenuSizePercentage,
-    timelineSnapLength
+    timelineRightMenuSizePercentage
 } from "../../../globalValues.js";
 import {timelineTween} from "./timelineTween.js";
 import {timelineChange} from "./timelineChange.js";
@@ -149,7 +147,7 @@ export class shapeTimeline{
 
         const newEndProportion = clamp(
             this.endProportion + this.parentTimeline.globalWidthToTimelineWidth(currentPosition-this.initialPosition),
-            this.startProportion+timelineSnapLength/animationEndTimeSeconds,
+            this.startProportion+controller.timelineSnapLength()/controller.animationEndTime(),
             1
         )
 
@@ -174,7 +172,7 @@ export class shapeTimeline{
         const newStartProportion = clamp(
             this.startProportion + this.parentTimeline.globalWidthToTimelineWidth(currentPosition-this.initialPosition),
             0,
-            this.endProportion-timelineSnapLength/animationEndTimeSeconds
+            this.endProportion-controller.timelineSnapLength()/controller.animationEndTime()
         )
 
         this.timeline.style.left = 100*newStartProportion + "%"

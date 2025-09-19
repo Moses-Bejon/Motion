@@ -5,10 +5,8 @@ import {
     fontFamily,
     minimumThickness,
     maximumThickness,
-    animationEndTimeSeconds,
     typicalIconSize,
     thicknessLevel,
-    timelineSnapLength,
     buttonSelectedColour,
     timeEpsilon
 } from "../../globalValues.js";
@@ -253,13 +251,13 @@ export class CreateEditCanvas extends Canvas{
         this.persistentTemporarySwitch.onCallback = () => {
             this.timeToShapeAppearanceDisappearanceTime = (time) => {
                 // + epsilon to ensure there are no flashes of white when something disappears and another appears
-                return [time-timelineSnapLength/2,time+timelineSnapLength/2+timeEpsilon]
+                return [time-controller.timelineSnapLength()/2,time+controller.timelineSnapLength()/2+timeEpsilon]
             }
         }
 
         this.persistentTemporarySwitch.offCallback = () => {
             this.timeToShapeAppearanceDisappearanceTime = (time) => {
-                return [0,animationEndTimeSeconds]
+                return [0,controller.animationEndTime()]
             }
         }
 

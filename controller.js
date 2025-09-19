@@ -7,6 +7,7 @@ import {SelectedShapesManager} from "./controllerComponents/selectedShapesManage
 import {downloadFile,readJSONFile} from "./fileStuff.js";
 import {validateShape} from "./validator.js";
 import {PlayingState} from "./controllerComponents/playing.js";
+import {SettingsManager} from "./controllerComponents/settingsManager.js";
 
 class ControllerClass {
     constructor() {
@@ -21,6 +22,7 @@ class ControllerClass {
 
         this.currentScene = new SceneController()
         this.historyManager = new HistoryManager()
+        this.settingsManager = new SettingsManager()
         this.selectedShapesManager = new SelectedShapesManager()
         this.keyboardManager = new KeyboardInputsManager()
         this.onionSkinsManager = new OnionSkinsManager()
@@ -42,12 +44,68 @@ class ControllerClass {
     selectedShapes(){
         return this.selectedShapesManager.selectedShapes
     }
-    animationEndTime(){
-        return this.currentScene.animationEndTimeSeconds
+
+    animationEndTime() {
+        return this.settingsManager.getAnimationEndTimeSeconds()
+    }
+    setAnimationEndTime(time) {
+        this.settingsManager.setAnimationEndTimeSeconds(time)
+    }
+    canvasWidth() {
+        return this.settingsManager.getCanvasWidth()
+    }
+    setCanvasWidth(width) {
+        this.settingsManager.setCanvasWidth(width)
+    }
+    canvasHeight() {
+        return this.settingsManager.getCanvasHeight()
+    }
+    setCanvasHeight(height) {
+        this.settingsManager.setCanvasHeight(height)
+    }
+    snappingDistance() {
+        return this.settingsManager.getSnappingDistance()
+    }
+    defaultTweenLength() {
+        return this.settingsManager.getDefaultTweenLength()
+    }
+    setDefaultTweenLength(length) {
+        this.settingsManager.setDefaultTweenLength(length)
+    }
+    timelineSnapLength() {
+        return this.settingsManager.getTimelineSnapLength()
+    }
+    setTimelineSnapLength(length) {
+        this.settingsManager.setTimelineSnapLength(length)
+    }
+    lineSimplificationEpsilon() {
+        return this.settingsManager.getLineSimplificationEpsilon()
+    }
+    setLineSimplificationEpsilon(epsilon) {
+        this.settingsManager.setLineSimplificationEpsilon(epsilon)
+    }
+    onionSkinTimeGap() {
+        return this.settingsManager.getOnionSkinTimeGap()
+    }
+    setOnionSkinTimeGap(gap) {
+        this.settingsManager.setOnionSkinTimeGap(gap)
+    }
+    onionSkinsOn() {
+        return this.settingsManager.getOnionSkinsOn()
+    }
+    setOnionSkinsOn(on) {
+        this.settingsManager.setOnionSkinsOn(on)
+    }
+    autoAddToTimeline() {
+        return this.settingsManager.getAutoAddToTimeline()
+    }
+    setAutoAddToTimeline(auto) {
+        this.settingsManager.setAutoAddToTimeline(auto)
     }
     getSelectedShapesManager(){
         return this.selectedShapesManager
     }
+
     paste(){
         return this.clipboard
     }

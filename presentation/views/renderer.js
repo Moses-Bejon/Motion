@@ -1,9 +1,6 @@
 import {controller} from "../../controller.js";
 import {Canvas} from "./canvas.js";
 import {
-    animationEndTimeSeconds,
-    canvasHeight,
-    canvasWidth,
     typicalIconSizeInt,
     fontSize,
     fontFamily
@@ -62,8 +59,8 @@ export class Renderer extends Canvas{
         const background = document.createElementNS("http://www.w3.org/2000/svg","rect")
         background.setAttribute("x",0)
         background.setAttribute("y",0)
-        background.setAttribute("width",canvasWidth)
-        background.setAttribute("height",canvasHeight)
+        background.setAttribute("width",controller.canvasWidth())
+        background.setAttribute("height",controller.canvasHeight())
         background.setAttribute("stroke", "white")
         background.setAttribute("fill", "white")
         this.canvas.prepend(background)
@@ -121,8 +118,8 @@ export class Renderer extends Canvas{
             target: new Mp4Muxer.ArrayBufferTarget(),
             video: {
                 codec: 'avc',
-                width: canvasWidth,
-                height: canvasHeight
+                width: controller.canvasWidth(),
+                height: controller.canvasHeight()
             },
             fastStart: 'in-memory'
         })
@@ -133,15 +130,15 @@ export class Renderer extends Canvas{
         })
         this.videoEncoder.configure({
             codec: 'avc1.42001f',
-            width: canvasWidth,
-            height: canvasHeight,
+            width: controller.canvasWidth(),
+            height: controller.canvasHeight(),
             bitrate: 1e6
         })
 
         const timePerFrame = 1/fps
         const timePerTimestamp = Math.round(1000000/fps)
 
-        const numberOfFrames = Math.trunc(animationEndTimeSeconds*fps)
+        const numberOfFrames = Math.trunc(controller.animationEndTime()*fps)
 
         // go to start of animation
         controller.beginAction()
@@ -182,15 +179,15 @@ export class Renderer extends Canvas{
 
         // fun fact, it's actually faster to recreate the canvas each time from scratch than it is to clone the node
         const canvas = document.createElement("canvas")
-        canvas.width = canvasWidth
-        canvas.height = canvasHeight
+        canvas.width = controller.canvasWidth()
+        canvas.height = controller.canvasHeight()
         const ctx = canvas.getContext("2d")
 
         frame.src = this.getSVGURL()
 
         return new Promise((resolve) => {
             frame.onload = () => {
-                ctx.drawImage(frame,0,0,canvasWidth,canvasHeight)
+                ctx.drawImage(frame,0,0,controller.canvasWidth(),controller.canvasHeight())
                 const videoFrame = new VideoFrame(canvas, { timestamp: timeStamp, duration: duration, alpha: "keep"})
                 this.videoEncoder.encode(videoFrame)
                 videoFrame.close()

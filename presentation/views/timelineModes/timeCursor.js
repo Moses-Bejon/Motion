@@ -1,7 +1,7 @@
 import {controller} from "../../../controller.js";
 import {clamp} from "../../../maths.js";
 import {stringToReal} from "../../../dataStructureOperations.js";
-import {animationEndTimeSeconds, typicalIconSize} from "../../../globalValues.js";
+import {typicalIconSize} from "../../../globalValues.js";
 
 export class timeCursor{
     constructor(parentTimeline) {
@@ -33,7 +33,7 @@ export class timeCursor{
 
             controller.beginAction()
             controller.takeStep("goToTime",
-                [clamp(parseFloat(this.currentTime.value),0,animationEndTimeSeconds)])
+                [clamp(parseFloat(this.currentTime.value),0,controller.animationEndTime())])
             controller.endAction()
         }
         this.currentTime.onpointerdown = (pointerEvent) => {

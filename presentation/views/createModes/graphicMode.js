@@ -1,11 +1,10 @@
-import {animationEndTimeSeconds} from "../../../globalValues.js";
 import {controller} from "../../../controller.js";
 
 export class GraphicMode {
 
     constructor(inputFile) {
         controller.beginAction()
-        controller.takeStep("createGraphic",[0,animationEndTimeSeconds,inputFile,[0,0],0])
+        controller.takeStep("createGraphic",[0,controller.animationEndTime(),inputFile,[0,0],0])
         controller.endAction()
     }
 

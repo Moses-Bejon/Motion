@@ -1,6 +1,5 @@
 import {RootAction} from "../model/rootAction.js";
 import {Action} from "../model/action.js";
-import {autoAddToTimeline} from "../globalValues.js";
 import {controller} from "../controller.js";
 import {
     operationToInverse,
@@ -181,7 +180,7 @@ export class HistoryManager{
         this.#updatePreviousAction(newAction)
 
         // if we automatically add timeline events and there are timeline events automatically add them
-        if (autoAddToTimeline && addable){
+        if (controller.autoAddToTimeline() && addable){
             controller.addPreviousTimelineEventToTimeline()
         }
     }

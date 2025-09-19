@@ -1,5 +1,5 @@
 import {IdleState} from "./idle.js";
-import {animationEndTimeSeconds} from "../globalValues.js";
+import {controller} from "../controller.js";
 
 export class PlayingState {
     constructor() {
@@ -12,7 +12,7 @@ export class PlayingState {
 
         let time = getTime()+deltaTime/1000
 
-        if (time > animationEndTimeSeconds){
+        if (time > controller.animationEndTime()){
             time = 0
         }
 

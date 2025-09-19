@@ -1,5 +1,5 @@
-import {defaultTweenLength} from "../../globalValues.js";
 import {randomBrightColour} from "../../random.js";
+import {controller} from "../../controller.js";
 
 export class Tween {
     constructor(shape) {
@@ -9,7 +9,7 @@ export class Tween {
     }
 
     setup(time){
-        this.startTime = Math.max(0,time-defaultTweenLength)
+        this.startTime = Math.max(0,time-controller.defaultTweenLength())
         this.timeLength = time - this.startTime
     }
 

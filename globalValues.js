@@ -21,15 +21,6 @@ export const defaultEdgePosition = 0.5
 // canvas offset from top left on initial appendChild
 export const canvasOffsetX = 250
 export const canvasOffsetY = 40
-// canvas width and height
-export let canvasWidth = 960
-export function changeCanvasWidth(newWidth){
-    canvasWidth = newWidth
-}
-export let canvasHeight = 540
-export function changeCanvasHeight(newHeight){
-    canvasHeight = newHeight
-}
 
 // how quickly the canvas moves when "wasd" pressed
 export const sensitivity = 0.75
@@ -38,48 +29,6 @@ export const sensitivity = 0.75
 export const minimumThickness = 0.1
 export const maximumThickness = 100
 export const thicknessLevel = 0.1
-
-// the number of seconds the animation lasts
-export let animationEndTimeSeconds = 10
-// this can be modified if the user wants a different end time
-export function changeAnimationEndTimeSeconds(newTime){
-    animationEndTimeSeconds = newTime
-}
-
-export let defaultTweenLength = 0.2
-export function changeDefaultTweenLength(newTweenLength){
-    defaultTweenLength = newTweenLength
-}
-
-// snaps to grid where cells of this size
-export let timelineSnapLength = 0.2
-export function changeTimelineSnapLength(newSnapLength){
-    timelineSnapLength = newSnapLength
-}
-
-// how close points have to be to be considered "connected"
-export const snappingDistance = Math.hypot(canvasWidth,canvasHeight)/100
-
-// used to decide how much to simplify user line inputs
-export let lineSimplificationEpsilon = 1
-export function changeLineSimplificationEpsilon(newLineSimplificationEpsilon){
-    lineSimplificationEpsilon = newLineSimplificationEpsilon
-}
-
-export let onionSkinTimeGap = 0.2
-export function changeOnionSkinTimeGap(newOnionSkinTimeGap){
-    onionSkinTimeGap = newOnionSkinTimeGap
-}
-
-export let onionSkinsOn = false
-export function changeOnionSkinsOn(newOnionSkinsOn){
-    onionSkinsOn = newOnionSkinsOn
-}
-
-export let autoAddToTimeline = false
-export function changeAutoAddToTimeline(newAutoAddToTimeline){
-    autoAddToTimeline = newAutoAddToTimeline
-}
 
 // how large UI overlays (like rotate icons) on the canvas typically are
 export const canvasOverlayUISize = 50

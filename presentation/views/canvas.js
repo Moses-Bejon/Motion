@@ -6,8 +6,6 @@ import {AbstractView} from "../view.js"
 import {
     canvasOffsetX,
     canvasOffsetY,
-    canvasWidth,
-    canvasHeight,
     sensitivity
 } from "../../globalValues.js";
 
@@ -126,9 +124,9 @@ export class Canvas extends AbstractView{
         this.shadowRoot.appendChild(template.content.cloneNode(true))
 
         this.canvas = this.shadowRoot.getElementById("canvas")
-        this.canvas.style.width = canvasWidth
-        this.canvas.style.height = canvasHeight
-        this.canvas.setAttribute("viewBox",`0 0 ${canvasWidth} ${canvasHeight}`)
+        this.canvas.style.width = controller.canvasWidth()
+        this.canvas.style.height = controller.canvasHeight()
+        this.canvas.setAttribute("viewBox",`0 0 ${controller.canvasWidth()} ${controller.canvasHeight()}`)
 
         this.canvasPosition = [canvasOffsetX,canvasOffsetY]
 
@@ -201,8 +199,8 @@ export class Canvas extends AbstractView{
         this.previousCanvasScale = save.previousCanvasScale
 
         this.zoomBar.value = this.previousCanvasScale.toString()
-        this.canvas.style.width = this.previousCanvasScale*canvasWidth + "px"
-        this.canvas.style.height = this.previousCanvasScale*canvasHeight + "px"
+        this.canvas.style.width = this.previousCanvasScale*controller.canvasWidth() + "px"
+        this.canvas.style.height = this.previousCanvasScale*controller.canvasHeight() + "px"
     }
 
     errorCheckAggregateModel(aggregateModel){
@@ -273,7 +271,7 @@ export class Canvas extends AbstractView{
         const boundingRect = this.canvas.getBoundingClientRect()
 
         // this is required due to the fact the user has the option to zoom in and out
-        return [canvasWidth*(x-boundingRect.x)/boundingRect.width, canvasHeight*(y-boundingRect.y)/boundingRect.height]
+        return [controller.canvasWidth()*(x-boundingRect.x)/boundingRect.width, controller.canvasHeight()*(y-boundingRect.y)/boundingRect.height]
     }
 
     move(movementVector){
@@ -385,8 +383,8 @@ export class Canvas extends AbstractView{
         const canvasScale = parseFloat(this.zoomBar.value)
 
         // scale canvas to zoom bar input
-        this.canvas.style.width = canvasScale*canvasWidth + "px"
-        this.canvas.style.height = canvasScale*canvasHeight + "px"
+        this.canvas.style.width = canvasScale*controller.canvasWidth() + "px"
+        this.canvas.style.height = canvasScale*controller.canvasHeight() + "px"
 
         const windowRect = this.getBoundingClientRect()
 

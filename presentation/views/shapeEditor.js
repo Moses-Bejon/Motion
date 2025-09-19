@@ -1,7 +1,6 @@
 import {AbstractView} from "../view.js";
 import {controller} from "../../controller.js";
 import {
-    animationEndTimeSeconds,
     fontFamily,
     fontSize,
     fontsList,
@@ -145,7 +144,7 @@ const nameToStringToValue =   {
         }
 
         for (const shape of shapes){
-            value = clamp(value,shape.appearanceTime,animationEndTimeSeconds)
+            value = clamp(value,shape.appearanceTime,controller.animationEndTime())
         }
 
         return value
