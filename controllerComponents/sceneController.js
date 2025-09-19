@@ -7,6 +7,7 @@ import {Polygon} from "../model/polygon.js";
 import {Text} from "../model/text.js";
 import {operationToAttribute} from "../typesOfOperation.js";
 import {operationToValidationViewLevel} from "../validator.js";
+import {Shape} from "../model/shape.js";
 
 export class SceneController {
     constructor() {
@@ -24,6 +25,25 @@ export class SceneController {
 
         // called here to allow for steps to be carried out silently
         this.beginSteps()
+    }
+
+    static async load(save){
+
+        const scene = new SceneController()
+
+        scene.executeInvisibleSteps([["goToTime",[save.aggregateModels.clock]]])
+
+        scene.numberOfEachTypeOfShape = save.numberOfEachTypeOfShape
+        scene.ZIndexOfHighestShape = save.ZIndexOfHighestShape
+        scene.ZIndexOfLowestShape = save.ZIndexOfLowestShape
+
+        for (const shape of save.aggregateModels.allShapes){
+            const loadedShape = await Shape.load(shape)
+
+            scene.executeInvisibleSteps([["restoreShape",[loadedShape]]])
+        }
+
+        return scene
     }
 
     clock(){
@@ -299,6 +319,25 @@ export class SceneController {
                     console.error(`unknown operation: ${operation}`)
                 }
         }
+    }
+
+    save(){
+        const file = {
+            "aggregateModels":{"allShapes":[],"clock":this.clock()},
+            "numberOfEachTypeOfShape":this.numberOfEachTypeOfShape,
+            "ZIndexOfHighestShape":this.ZIndexOfHighestShape,
+            "ZIndexOfLowestShape":this.ZIndexOfLowestShape,
+        }
+
+        const allShapes = []
+
+        for (const shape of this.allShapes()){
+            allShapes.push(shape.save(this))
+        }
+
+        file.aggregateModels.allShapes = allShapes
+
+        return file
     }
 
     #goToTime(time){

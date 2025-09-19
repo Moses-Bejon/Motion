@@ -9,6 +9,7 @@ import {
     fontFamily
 }from "../../globalValues.js";
 import {fontsCSS} from "../../fontsCSS.js";
+import {downloadFile} from "../../fileStuff.js";
 
 const serializer = new XMLSerializer()
 const DOMURL = self.URL || self.webkitURL || self
@@ -50,7 +51,7 @@ export class Renderer extends Canvas{
         this.renderAnimationButton = this.shadowRoot.getElementById("renderAnimationButton")
         this.restoreRenderAnimationButton()
         this.shadowRoot.getElementById("renderFrameButton").onpointerdown = () => {
-            controller.downloadFile(this.getSVGURL(),"animation frame")
+            downloadFile(this.getSVGURL(),"animation frame")
         }
     }
 
@@ -168,7 +169,7 @@ export class Renderer extends Canvas{
 
             const videoUrl = URL.createObjectURL(new Blob([buffer], {type: 'video/mp4'}))
 
-            controller.downloadFile(videoUrl,"animation render")
+            downloadFile(videoUrl,"animation render")
         }
 
         controller.beginAction()

@@ -23,11 +23,8 @@ export class Drawing extends Shape{
 
     static load(save){
         const loadedShape = new Drawing()
-        Shape.load(save,loadedShape)
 
         loadedShape.points = save.points
-
-        loadedShape.updateGeometry()
 
         return loadedShape
     }
@@ -138,3 +135,5 @@ export class Drawing extends Shape{
         return copy
     }
 }
+
+Shape.registerSubclass("drawing",Drawing.load)

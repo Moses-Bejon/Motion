@@ -20,7 +20,7 @@ export class Graphic extends Shape{
     }
 
     static async load(save){
-        const loadedShape = Shape.load(save)
+        const loadedShape = new Graphic()
 
         loadedShape.topLeft = save.topLeft
         loadedShape.rotation = save.rotation
@@ -28,8 +28,6 @@ export class Graphic extends Shape{
         loadedShape.source = save.source
 
         await loadedShape.loadImage()
-
-        loadedShape.updateGeometry()
 
         return loadedShape
     }
@@ -186,3 +184,5 @@ export class Graphic extends Shape{
         return copy
     }
 }
+
+Shape.registerSubclass("graphic",Graphic.load)

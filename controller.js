@@ -4,7 +4,7 @@ import {KeyboardInputsManager} from "./controllerComponents/keyboardInputsManage
 import {OnionSkinsManager} from "./controllerComponents/onionSkinsManager.js";
 import {HistoryManager} from "./controllerComponents/historyManager.js";
 import {SelectedShapesManager} from "./controllerComponents/selectedShapesManager.js"
-import {FileSerializer} from "./controllerComponents/fileSerializer.js";
+import {downloadFile,readJSONFile} from "./fileStuff.js";
 import {validateShape} from "./validator.js";
 import {PlayingState} from "./controllerComponents/playing.js";
 
@@ -24,7 +24,6 @@ class ControllerClass {
         this.selectedShapesManager = new SelectedShapesManager()
         this.keyboardManager = new KeyboardInputsManager()
         this.onionSkinsManager = new OnionSkinsManager()
-        this.fileSerializer = new FileSerializer()
         this.clipboard = new Set()
     }
 
@@ -91,7 +90,7 @@ class ControllerClass {
     async endAction(){
 
         // if the steps fail this is a backup (history manager also gleans some info from this)
-        const beforeSteps = this.fileSerializer.serializeScene(this.currentScene)
+        const beforeSteps = this.currentScene.save()
 
         try {
             const returnValues = await this.currentScene.executeSteps(this.currentState.steps)
@@ -114,7 +113,7 @@ class ControllerClass {
         } catch (e){
             console.error(e)
 
-            this.currentScene = await this.fileSerializer.loadScene(beforeSteps)
+            this.currentScene = await SceneController.load(beforeSteps)
 
             this.#newState(new IdleState())
         }
@@ -133,7 +132,7 @@ class ControllerClass {
         }
 
         // if the steps fail this is a backup (history manager also gleans some info from this)
-        const beforeSteps = this.fileSerializer.serializeScene(this.currentScene)
+        const beforeSteps = this.currentScene.save()
 
         try {
             const [steps,returnValues] = await this.currentScene.executeScript(script,scriptVariables)
@@ -154,7 +153,7 @@ class ControllerClass {
         } catch (e){
             console.error(e)
 
-            this.currentScene = await this.fileSerializer.loadScene(beforeSteps)
+            this.currentScene = await SceneController.load(beforeSteps)
 
             this.#newState(new IdleState())
         }
@@ -196,19 +195,19 @@ class ControllerClass {
 
         const file = {
             "fileVersion":1,
-            "currentScene":this.fileSerializer.serializeScene(this.currentScene),
+            "currentScene":this.currentScene.save(),
             "rootWindow":rootWindowSaved
         }
 
         const jsonFile = JSON.stringify(file)
 
         const blob = new Blob([jsonFile], { type: 'application/json' })
-        this.downloadFile(URL.createObjectURL(blob),fileName)
+        downloadFile(URL.createObjectURL(blob),fileName)
     }
 
     async loadFile(file){
         try {
-            file = await this.fileSerializer.readJSONFile(file)
+            file = await readJSONFile(file)
         } catch (error){
             throw error
         }
@@ -219,23 +218,10 @@ class ControllerClass {
         // clearing out selected shapes
         this.selectedShapesManager = new SelectedShapesManager()
 
-        this.currentScene = await this.fileSerializer.loadScene(file.currentScene)
+        this.currentScene = await SceneController.load(file.currentScene)
 
         // allows the saved root window to be loaded in
         return file.rootWindow
-    }
-
-    downloadFile(fileURL,fileName){
-        const downloadLink = document.createElement('a')
-        downloadLink.href = fileURL
-        downloadLink.download = fileName
-        document.body.appendChild(downloadLink)
-
-        // trigger download automatically
-        downloadLink.click()
-
-        document.body.removeChild(downloadLink)
-        URL.revokeObjectURL(downloadLink.href)
     }
 
     copy(shapes){

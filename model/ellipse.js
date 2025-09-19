@@ -30,7 +30,6 @@ export class Ellipse extends Shape{
 
     static load(save){
         const loadedShape = new Ellipse()
-        Shape.load(save,loadedShape)
 
         loadedShape.centre = save.centre
         loadedShape.rotation = save.rotation
@@ -164,3 +163,5 @@ export class Ellipse extends Shape{
         return copy
     }
 }
+
+Shape.registerSubclass("ellipse",Ellipse.load)

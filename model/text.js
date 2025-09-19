@@ -32,7 +32,6 @@ export class Text extends Shape{
 
     static load(save){
         const loadedShape = new Text()
-        Shape.load(save,loadedShape)
 
         loadedShape.defaultTextReplaced = true
 
@@ -174,3 +173,5 @@ export class Text extends Shape{
         return copy
     }
 }
+
+Shape.registerSubclass("text",Text.load)

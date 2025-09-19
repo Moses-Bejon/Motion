@@ -12,6 +12,12 @@ export class Shape {
         this.attributes = {}
     }
 
+    static subClassRegistry = {}
+
+    static registerSubclass(shapeName,loadShape){
+        Shape.subClassRegistry[shapeName] = loadShape
+    }
+
     setupInScene(appearanceTime,disappearanceTime,ZIndex,name){
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
@@ -102,7 +108,12 @@ export class Shape {
         this.tweens.delete(tween)
     }
 
-    static load(save,shape){
+    static async load(save){
+
+        let shape
+
+        shape = await Shape.subClassRegistry[save.shapeType](save)
+        
         shape.name = save.name
         shape.appearanceTime = save.appearanceTime
         shape.disappearanceTime = save.disappearanceTime
@@ -113,6 +124,8 @@ export class Shape {
         for (const tween of save.tweens){
             shape.tweens.add(this.loadTween(tween,shape))
         }
+
+        return shape
     }
 
     static loadTween(tweenJSON,shape) {

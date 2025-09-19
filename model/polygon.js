@@ -14,11 +14,8 @@ export class Polygon extends Drawing{
 
     static load(save){
         const loadedShape = new Polygon()
-        Shape.load(save,loadedShape)
 
         loadedShape.points = save.points
-
-        loadedShape.updateGeometry()
 
         return loadedShape
     }
@@ -85,3 +82,5 @@ export class Polygon extends Drawing{
         return copy
     }
 }
+
+Shape.registerSubclass("polygon",Polygon.load)
