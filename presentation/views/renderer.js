@@ -1,14 +1,12 @@
 import {controller} from "../../controller.js";
-import {canvas} from "./canvas.js";
+import {Canvas} from "./canvas.js";
 import {
-    animationEndTimeSeconds,
-    canvasHeight,
-    canvasWidth,
     typicalIconSizeInt,
     fontSize,
     fontFamily
 }from "../../globalValues.js";
 import {fontsCSS} from "../../fontsCSS.js";
+import {downloadFile} from "../../fileStuff.js";
 
 const serializer = new XMLSerializer()
 const DOMURL = self.URL || self.webkitURL || self
@@ -39,7 +37,7 @@ template.innerHTML = `
     </div>
 `
 
-export class renderer extends canvas{
+export class Renderer extends Canvas{
     constructor() {
         super()
 
@@ -50,7 +48,7 @@ export class renderer extends canvas{
         this.renderAnimationButton = this.shadowRoot.getElementById("renderAnimationButton")
         this.restoreRenderAnimationButton()
         this.shadowRoot.getElementById("renderFrameButton").onpointerdown = () => {
-            controller.downloadFile(this.getSVGURL(),"animation frame")
+            downloadFile(this.getSVGURL(),"animation frame")
         }
     }
 
@@ -61,8 +59,8 @@ export class renderer extends canvas{
         const background = document.createElementNS("http://www.w3.org/2000/svg","rect")
         background.setAttribute("x",0)
         background.setAttribute("y",0)
-        background.setAttribute("width",canvasWidth)
-        background.setAttribute("height",canvasHeight)
+        background.setAttribute("width",controller.canvasWidth())
+        background.setAttribute("height",controller.canvasHeight())
         background.setAttribute("stroke", "white")
         background.setAttribute("fill", "white")
         this.canvas.prepend(background)
@@ -120,8 +118,8 @@ export class renderer extends canvas{
             target: new Mp4Muxer.ArrayBufferTarget(),
             video: {
                 codec: 'avc',
-                width: canvasWidth,
-                height: canvasHeight
+                width: controller.canvasWidth(),
+                height: controller.canvasHeight()
             },
             fastStart: 'in-memory'
         })
@@ -132,34 +130,32 @@ export class renderer extends canvas{
         })
         this.videoEncoder.configure({
             codec: 'avc1.42001f',
-            width: canvasWidth,
-            height: canvasHeight,
+            width: controller.canvasWidth(),
+            height: controller.canvasHeight(),
             bitrate: 1e6
         })
 
         const timePerFrame = 1/fps
         const timePerTimestamp = Math.round(1000000/fps)
 
-        const numberOfFrames = Math.trunc(animationEndTimeSeconds*fps)
-
-        // no onion skins in render please
-        controller.onionSkinsOff()
+        const numberOfFrames = Math.trunc(controller.animationEndTime()*fps)
 
         // go to start of animation
-        controller.goBackwardToTime(0)
+        controller.beginAction()
+        controller.takeStep("goToTime",[0])
+        await controller.endAction()
 
         for (let i = 0; i<numberOfFrames;i++){
             if (this.renderCancelled){
                 break
             }
 
-            controller.goForwardToTime(i*timePerFrame)
+            controller.beginAction()
+            controller.takeStep("goToTime",[i*timePerFrame])
+            await controller.endAction()
 
             await this.captureFrame(timePerTimestamp*i,timePerTimestamp)
         }
-
-        // telling the clock it is now at the end of the animation
-        controller.aggregateModels.clock.content = (numberOfFrames-1)*timePerFrame
 
         if (!this.renderCancelled) {
 
@@ -170,11 +166,12 @@ export class renderer extends canvas{
 
             const videoUrl = URL.createObjectURL(new Blob([buffer], {type: 'video/mp4'}))
 
-            controller.downloadFile(videoUrl,"animation render")
+            downloadFile(videoUrl,"animation render")
         }
 
-        controller.onionSkinsOn()
-        controller.newClockTime(now)
+        controller.beginAction()
+        controller.takeStep("goToTime",[now])
+        await controller.endAction()
         this.restoreRenderAnimationButton()
     }
 
@@ -182,15 +179,15 @@ export class renderer extends canvas{
 
         // fun fact, it's actually faster to recreate the canvas each time from scratch than it is to clone the node
         const canvas = document.createElement("canvas")
-        canvas.width = canvasWidth
-        canvas.height = canvasHeight
+        canvas.width = controller.canvasWidth()
+        canvas.height = controller.canvasHeight()
         const ctx = canvas.getContext("2d")
 
         frame.src = this.getSVGURL()
 
         return new Promise((resolve) => {
             frame.onload = () => {
-                ctx.drawImage(frame,0,0,canvasWidth,canvasHeight)
+                ctx.drawImage(frame,0,0,controller.canvasWidth(),controller.canvasHeight())
                 const videoFrame = new VideoFrame(canvas, { timestamp: timeStamp, duration: duration, alpha: "keep"})
                 this.videoEncoder.encode(videoFrame)
                 videoFrame.close()
@@ -213,4 +210,4 @@ export class renderer extends canvas{
     }
 }
 
-window.customElements.define("renderer-window",renderer)
+window.customElements.define("renderer-window",Renderer)

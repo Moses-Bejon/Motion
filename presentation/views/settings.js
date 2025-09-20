@@ -1,30 +1,11 @@
-import {abstractView} from "../view.js";
+import {AbstractView} from "../view.js";
 import {
     fontSize,
     fontFamily,
-    typicalIconSize,
-    animationEndTimeSeconds,
-    changeAnimationEndTimeSeconds,
-    canvasWidth,
-    changeCanvasWidth,
-    canvasHeight,
-    changeCanvasHeight,
-    defaultTweenLength,
-    changeDefaultTweenLength,
-    timelineSnapLength,
-    changeTimelineSnapLength,
-    lineSimplificationEpsilon,
-    changeLineSimplificationEpsilon,
-    onionSkinTimeGap,
-    changeOnionSkinsOn,
-    onionSkinsOn,
-    changeOnionSkinTimeGap,
-    autoAddToTimeline,
-    changeAutoAddToTimeline
+    typicalIconSize
 } from "../../globalValues.js";
-import {validateNatural, validatePositiveReal, validateReal, validateBoolean} from "../../dataStructureOperations.js";
+import {stringToNatural, stringToPositiveReal, stringToReal} from "../../dataStructureOperations.js";
 import {controller} from "../../controller.js";
-import {refreshViews} from "../../index.js";
 import {clamp} from "../../maths.js";
 
 const template = document.createElement("template")
@@ -95,7 +76,7 @@ template.innerHTML = `
 </div>
 `
 
-export class settings extends abstractView{
+export class Settings extends AbstractView{
     constructor() {
         super()
 
@@ -115,46 +96,32 @@ export class settings extends abstractView{
     }
 
     setupInputs(){
-        this.animationEndTimeInput.value = animationEndTimeSeconds
+        this.animationEndTimeInput.value = controller.animationEndTime()
         this.animationEndTimeInput.onchange = () => {
 
             // validation
 
-            let value = validateReal(this.animationEndTimeInput.value)
+            let value = stringToReal(this.animationEndTimeInput.value)
 
             if (value === null){
                 alert(this.animationEndTimeInput.value + " is not a number")
-                this.animationEndTimeInput.value = animationEndTimeSeconds
+                this.animationEndTimeInput.value = controller.animationEndTime()
                 return
             }
 
-            const lastThingToHappen = controller.timelineEvents()[controller.timelineEvents().length-1]
-
-            if (lastThingToHappen !== undefined && lastThingToHappen.time > value){
-                alert("Could not set new end time because the last think to happen, likely a shape disappearance, occurred after the new end time")
-                this.animationEndTimeInput.value = animationEndTimeSeconds
-                return
-            }
-            if (controller.clock() > value){
-                alert("Could not set new end time because the current time is after the new end time")
-                this.animationEndTimeInput.value = animationEndTimeSeconds
-                return
-            }
-
-            changeAnimationEndTimeSeconds(parseFloat(this.animationEndTimeInput.value))
-            refreshViews()
+            controller.setAnimationEndTime(parseFloat(this.animationEndTimeInput.value))
         }
 
-        this.canvasWidthInput.value = canvasWidth
+        this.canvasWidthInput.value = controller.canvasWidth()
         this.canvasWidthInput.onchange = () => {
 
             // validation
 
-            let value = validateNatural(this.canvasWidthInput.value)
+            let value = stringToNatural(this.canvasWidthInput.value)
 
             if (value === null){
                 alert("Please enter a valid width in pixels")
-                this.canvasWidthInput.value = canvasWidth
+                this.canvasWidthInput.value = controller.canvasWidth()
                 return
             }
 
@@ -164,20 +131,19 @@ export class settings extends abstractView{
             // codec only supports frames with even dimensions
             value = Math.trunc(value/2)*2
 
-            changeCanvasWidth(value)
-            refreshViews()
+            controller.setCanvasWidth(value)
         }
 
-        this.canvasHeightInput.value = canvasHeight
+        this.canvasHeightInput.value = controller.canvasHeight()
         this.canvasHeightInput.onchange = () => {
 
             // validation
 
-            let value = validateNatural(this.canvasHeightInput.value)
+            let value = stringToNatural(this.canvasHeightInput.value)
 
             if (value === null){
                 alert("Please enter a valid width in pixels")
-                this.canvasHeightInput.value = canvasHeight
+                this.canvasHeightInput.value = controller.canvasHeight()
                 return
             }
 
@@ -187,111 +153,97 @@ export class settings extends abstractView{
             // codec only supports frames with even dimensions
             value = Math.trunc(value/2)*2
 
-            changeCanvasHeight(value)
-            refreshViews()
+            controller.setCanvasHeight(value)
         }
 
-        this.onionSkinsOnInput.checked = onionSkinsOn
-        if (!onionSkinsOn){
+        this.onionSkinsOnInput.checked = controller.onionSkinsOn()
+        if (!controller.onionSkinsOn()){
             this.onionSkinsTimeGap.style.display = "none"
         }
         this.onionSkinsOnInput.onchange = () => {
-            const value = validateBoolean(this.onionSkinsOnInput.checked)
+            const value = this.onionSkinsOnInput.checked
 
             if (value === null){
                 alert("Please enter either true or false")
-                this.onionSkinsOnInput.checked = onionSkinsOn
+                this.onionSkinsOnInput.checked = controller.onionSkinsOn()
                 return
             }
 
-            changeOnionSkinsOn(value)
-            if (onionSkinsOn){
-                this.onionSkinsTimeGap.style.display = "flex"
-                controller.onionSkinsOn()
-            } else {
-                this.onionSkinsTimeGap.style.display = "none"
-                controller.onionSkinsOff()
-            }
+            controller.setOnionSkinsOn(value)
         }
 
-        this.onionSkinsTimeGapInput.value = onionSkinTimeGap
+        this.onionSkinsTimeGapInput.value = controller.onionSkinTimeGap()
         this.onionSkinsTimeGapInput.onchange = () => {
-            const value = validatePositiveReal(this.onionSkinsTimeGapInput.value)
+            const value = stringToPositiveReal(this.onionSkinsTimeGapInput.value)
 
             if (value === null){
                 alert("Please enter a positive number for time")
-                this.onionSkinsTimeGapInput.value = onionSkinTimeGap
+                this.onionSkinsTimeGapInput.value = controller.onionSkinTimeGap()
                 return
             }
 
-            changeOnionSkinTimeGap(value)
-            controller.updateOnionSkins()
-
-            this.onionSkinsTimeGapInput.value = value
+            controller.setOnionSkinTimeGap(value)
         }
 
-        this.autoAddToTimelineInput.checked = autoAddToTimeline
+        this.autoAddToTimelineInput.checked = controller.autoAddToTimeline()
         this.autoAddToTimelineInput.onchange = () => {
-            const value = validateBoolean(this.autoAddToTimelineInput.checked)
+            const value = this.autoAddToTimelineInput.checked
 
             if (value === null){
                     alert("Please enter either true or false")
-                    this.autoAddToTimelineInput.checked = autoAddToTimeline
+                    this.autoAddToTimelineInput.checked = controller.autoAddToTimeline()
                 return
             }
 
-            changeAutoAddToTimeline(this.autoAddToTimelineInput.checked)
+            controller.setAutoAddToTimeline(value)
         }
 
-        this.lineSimplififcationEpsilonInput.value = lineSimplificationEpsilon
+        this.lineSimplififcationEpsilonInput.value = controller.lineSimplificationEpsilon()
         this.lineSimplififcationEpsilonInput.onchange = () => {
 
             // validation
 
-            let value = validateReal(this.lineSimplififcationEpsilonInput.value)
+            let value = stringToReal(this.lineSimplififcationEpsilonInput.value)
 
             if (value === null){
                 alert("Please enter a valid number")
-                this.lineSimplififcationEpsilonInput.value = lineSimplificationEpsilon
+                this.lineSimplififcationEpsilonInput.value = controller.lineSimplificationEpsilon()
                 return
             }
 
             value = Math.max(0,value)
 
-            changeLineSimplificationEpsilon(value)
-            this.lineSimplififcationEpsilonInput.value = lineSimplificationEpsilon
+            controller.setLineSimplificationEpsilon(value)
         }
 
-        this.timelineFPSInput.value = 1/timelineSnapLength
+        this.timelineFPSInput.value = 1/controller.timelineSnapLength()
         this.timelineFPSInput.onchange = () => {
             // validation
 
-            const value = validatePositiveReal(this.timelineFPSInput.value)
+            const value = stringToPositiveReal(this.timelineFPSInput.value)
 
             if (value === null){
                 alert("Please enter a valid fps")
-                this.timelineFPSInput.value = 1/timelineSnapLength
+                this.timelineFPSInput.value = 1/controller.timelineSnapLength()
                 return
             }
 
-            changeTimelineSnapLength(1/this.timelineFPSInput.value)
-            this.timelineFPSInput.value = 1/timelineSnapLength
+            controller.setTimelineSnapLength(1/this.timelineFPSInput.value)
         }
 
-        this.defaultTweenLengthInput.value = defaultTweenLength
+        this.defaultTweenLengthInput.value = controller.defaultTweenLength()
         this.defaultTweenLengthInput.onchange = () => {
             // validation
 
-            const value = Math.max(validateReal(this.defaultTweenLengthInput.value),0)
+            const value = Math.max(stringToReal(this.defaultTweenLengthInput.value),0)
 
             if (value === null){
                 alert("Please enter a valid time in seconds")
-                this.defaultTweenLengthInput.value = defaultTweenLength
+                this.defaultTweenLengthInput.value = controller.defaultTweenLength()
                 return
             }
 
-            changeDefaultTweenLength(value)
-            this.defaultTweenLengthInput.value = defaultTweenLength
+            controller.setDefaultTweenLength(value)
         }
     }
 
@@ -344,4 +296,4 @@ export class settings extends abstractView{
     }
 }
 
-window.customElements.define("settings-window",settings)
+window.customElements.define("settings-window",Settings)

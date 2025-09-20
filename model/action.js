@@ -1,7 +1,8 @@
-export class action{
-    constructor(forwardAction,backwardAction) {
+export class Action{
+    constructor(forwardAction,backwardAction,addableToTimeline) {
         this.forwardAction = forwardAction
         this.backwardAction = backwardAction
+        this.addableToTimeline = addableToTimeline
     }
 
     appendToUndoRedoStack(previousAction){

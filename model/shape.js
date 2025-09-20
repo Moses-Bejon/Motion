@@ -1,98 +1,186 @@
 import {getRotateByAngle, increment2dVectorBy, scale2dVectorAboutPoint, midPoint2d} from "../maths.js";
-import {controller} from "../controller.js";
+import {randomBrightColour} from "../random.js";
+import {binaryInsertion} from "../dataStructureOperations.js";
+import {TranslationTween} from "./tweens/translateTween.js";
+import {RotationTween} from "./tweens/rotationTween.js";
+import {ScaleTween} from "./tweens/scaleTween.js";
 
-export class shape{
-    constructor(appearanceTime,disappearanceTime) {
+export class Shape {
+    constructor() {
+        this.tweens = new Set()
+
+        this.attributes = {}
+    }
+
+    static subClassRegistry = {}
+
+    static registerSubclass(shapeName,loadShape){
+        Shape.subClassRegistry[shapeName] = loadShape
+    }
+
+    setupInScene(appearanceTime,disappearanceTime,ZIndex,name){
         this.appearanceTime = appearanceTime
         this.disappearanceTime = disappearanceTime
 
-        // all the things that occur to the shape throughout the animation
-        this.timelineEvents = new Set()
+        this.ZIndex = ZIndex
+        this.name = name
+    }
 
-        this.modelConstructed = false
+    static copyTimelineEvents(source,destination){
+        for (const tween of source.tweens){
+            const newTween = tween.copy()
+            newTween.shape = destination
+            destination.addTween(newTween)
+        }
+        destination.attributes = structuredClone(source.attributes)
+    }
+
+    static getShapeAttributeChange(time,value){
+        return {
+            "time":time,
+            "value":value,
+            "colour":randomBrightColour(),
+        }
+    }
+
+    updateAttributes(time){
+        for (const [attribute,attributeChanges] of Object.entries(this.attributes)){
+            let attributeIndex = 0
+            while (attributeIndex<attributeChanges.length && attributeChanges[attributeIndex].time <= time){
+                attributeIndex++
+            }
+            attributeIndex--
+
+            this[attribute] = attributeChanges[attributeIndex].value
+        }
+    }
+
+    shapeAttributeUpdate(attribute,value){
+
+        const attributeEntry = this.attributes[attribute]
+
+        // not an attribute that changes over time
+        if (attributeEntry === undefined){
+            this[attribute] = value
+            return
+        }
+
+        // attribute that could change but doesn't currently
+        if (attributeEntry.length === 1){
+            this.attributes[attribute] = [Shape.getShapeAttributeChange(0,value)]
+            this[attribute] = value
+            return
+        }
+
+        // attribute that already changes over time
+        this[attribute] = value
+    }
+
+    insertShapeAttributeChange(attribute,changeAttribute){
+        this.attributes[attribute].splice(
+            binaryInsertion(this.attributes[attribute],changeAttribute.time,(item) => item.time),
+            0,
+            changeAttribute
+        )
+    }
+
+    newShapeAttributeChange(attribute,value,time){
+        this.insertShapeAttributeChange(attribute,Shape.getShapeAttributeChange(time,value))
+    }
+
+    changeTimeOfShapeAttributeChange(attribute,changeAttribute,newTime){
+        const index = this.attributes[attribute].findIndex(change => change === changeAttribute)
+        changeAttribute.time = newTime
+        this.attributes[attribute].splice(index,1)
+        this.insertShapeAttributeChange(attribute,changeAttribute)
+    }
+
+    removeShapeAttributeChange(attribute,value,time){
+        const index = this.attributes[attribute].findIndex(change => change.time === time && change.value === value)
+        this.attributes[attribute].splice(index,1)
+    }
+
+    addTween(tween){
+        this.tweens.add(tween)
+    }
+
+    removeTween(tween){
+        this.tweens.delete(tween)
+    }
+
+    static async load(save){
+
+        let shape
+
+        shape = await Shape.subClassRegistry[save.shapeType](save)
+        
+        shape.name = save.name
+        shape.appearanceTime = save.appearanceTime
+        shape.disappearanceTime = save.disappearanceTime
+        shape.ZIndex = save.ZIndex
+        shape.attributes = save.attributes
+        shape.offset = save.offset
+
+        for (const tween of save.tweens){
+            shape.tweens.add(this.loadTween(tween,shape))
+        }
+
+        return shape
+    }
+
+    static loadTween(tweenJSON,shape) {
+        let newTween
+        switch (tweenJSON.tweenType) {
+            case "translationTween":
+                newTween = TranslationTween.load(tweenJSON, shape)
+                break
+            case "rotationTween":
+                newTween = RotationTween.load(tweenJSON, shape)
+                break
+            case "scaleTween":
+                newTween = ScaleTween.load(tweenJSON, shape)
+                break
+            default:
+                throw new Error("Unknown tween type: " + tweenJSON.tweenType)
+        }
+
+        return newTween
     }
 
     setupOffset(){
         this.offset = midPoint2d([this.left,this.top],[this.right,this.bottom])
     }
 
-    // The model needs to also construct shapes to ensure shapes have attributes which
-    // are necessary for their proper functionality, such as setting a unique name or
-    // initializing the z-index. This function assigns these attributes to the shapes.
-
-    // the function should only be called once
-    // the modelConstructed boolean is used to ensure the controller doesn't do this twice
-    modelConstruct(newZIndex,name,directory){
-        this.ZIndex = newZIndex
-        this.name = name
-
-        // indicates which directory I am a part of
-        this.directory = directory
-
-        // once the controller knows about us we create our appearance and disappearance events
-        this.appearanceEvent = {
-            "type": "appearance",
-            "shape": this,
-            "time": this.appearanceTime,
-            "forward": () => {controller.showShape(this)},
-            "backward": () => {controller.hideShape(this)}
-        }
-        this.disappearanceEvent = {
-            "type": "disappearance",
-            "shape": this,
-            "time": this.disappearanceTime,
-            "forward": () => {controller.hideShape(this)},
-            "backward": () => {controller.showShape(this)}
-        }
-
-        controller.addTimeLineEvent(this.appearanceEvent)
-        controller.addTimeLineEvent(this.disappearanceEvent)
-
-        this.modelConstructed = true
-    }
-
     save(){
 
-        const savedTimelineEvents = []
+        const serialisedTweens = []
 
-        for (const timelineEvent of this.timelineEvents){
-            savedTimelineEvents.push(controller.saveTimelineEvent(timelineEvent))
+        for (const tween of this.tweens){
+            serialisedTweens.push(tween.save())
         }
 
         return {
             "name":this.name,
-            "directory":this.directory,
             "appearanceTime":this.appearanceTime,
             "disappearanceTime":this.disappearanceTime,
             "ZIndex":this.ZIndex,
-            "timelineEvents":savedTimelineEvents
+            "tweens":serialisedTweens,
+            "attributes":this.attributes,
+            "offset":this.offset
         }
     }
 
-    load(save){
-        this.name = save.name
-        this.directory = save.directory
-        this.appearanceTime = save.appearanceTime
-        this.disappearanceTime = save.disappearanceTime
-        this.ZIndex = save.ZIndex
+    goToTime(time){
 
-        this.timelineEvents = new Set()
+        // updating attributes first because when loading from file attributes are undefined which breaks tweens
+        this.updateAttributes(time)
 
-        for (const timelineEvent of save.timelineEvents){
-            this.timelineEvents.add(controller.loadTimelineEvent(this,timelineEvent))
+        // TODO: improve efficiency by only considering active tweens
+        for (const tween of this.tweens){
+            tween.goToTime(time)
         }
 
-        this.modelConstructed = true
-    }
-
-    newAppearanceTime(newTime){
-        this.appearanceTime = newTime
-        controller.changeTimeOfEvent(this.appearanceEvent,newTime)
-    }
-
-    newDisappearanceTime(newTime){
-        this.disappearanceTime = newTime
-        controller.changeTimeOfEvent(this.disappearanceEvent,newTime)
+        this.updateGeometry()
     }
 
     getOffsetPoint(){
@@ -111,22 +199,5 @@ export class shape{
 
     translateOffsetPointBy(translationVector){
         increment2dVectorBy(this.offset,translationVector)
-    }
-
-
-    geometryAttributeUpdate(attribute, newValue){
-        this[attribute] = newValue
-
-        this.updateGeometry()
-
-        controller.updateShape(this)
-    }
-
-    addTimelineEvent(event){
-        this.timelineEvents.add(event)
-    }
-
-    removeTimelineEvent(event){
-        this.timelineEvents.delete(event)
     }
 }

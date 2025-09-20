@@ -1,13 +1,13 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
-import {angleTracker, distanceBetween2dPoints,} from "../../../maths.js";
-import {editMode} from "./editMode.js";
+import {AngleTracker, distanceBetween2dPoints,} from "../../../maths.js";
+import {EditMode} from "./editMode.js";
 import {rotatePath} from "../../../assets/rotatePath.js"
 import {canvasOverlayUISize} from "../../../globalValues.js";
 
 // the rotate overlay needs to be larger than the scale overlay so the scale overlay fits within it
 const rotateOverlaySize = 1.75*canvasOverlayUISize
 
-export class transformMode{
+export class TransformMode {
     constructor(editCanvas) {
         this.editCanvas = editCanvas
 
@@ -88,7 +88,7 @@ export class transformMode{
     beginRotating(pointerEvent){
         const initialPosition = this.editCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY)
 
-        this.angleTracker = new angleTracker(initialPosition,this.centre)
+        this.angleTracker = new AngleTracker(initialPosition,this.centre)
 
         pointerEvent.stopPropagation()
     }
@@ -112,7 +112,7 @@ export class transformMode{
         this.editCanvas.userRotate(rotationAngle,this.transformOrigin)
 
         this.switchMode()
-        this.editCanvas.currentMode = new editMode(this.editCanvas)
+        this.editCanvas.currentMode = new EditMode(this.editCanvas)
 
         pointerEvent.stopPropagation()
     }
@@ -147,7 +147,7 @@ export class transformMode{
         this.editCanvas.userScale(scaleFactor,this.transformOrigin)
 
         this.switchMode()
-        this.editCanvas.currentMode = new editMode(this.editCanvas)
+        this.editCanvas.currentMode = new EditMode(this.editCanvas)
 
         pointerEvent.stopPropagation()
     }

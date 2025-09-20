@@ -3,10 +3,12 @@ import {clamp} from "../../../maths.js";
 import {addDragLogicTo} from "../../../dragLogic.js";
 
 export class timelineChange{
-    constructor(parentTimeline,timelineContainer,changeEvent) {
+    constructor(parentTimeline,timelineContainer,changeEvent,shape,attribute) {
         this.parentTimeline = parentTimeline
         this.timelineContainer = timelineContainer
         this.changeEvent = changeEvent
+        this.shape = shape
+        this.attribute = attribute
 
         this.proportion = this.parentTimeline.timeToTimelinePosition(this.changeEvent.time)
 
@@ -36,14 +38,9 @@ export class timelineChange{
 
         this.eventToken.style.outline = "1px solid"
 
-        this.parentTimeline.cursor.removeEventReady(
-            () => {
-                controller.removeTimeLineEvent(this.changeEvent)
-            },
-            () => {
-                controller.addTimeLineEvent(this.changeEvent)
-            }
-        )
+        this.parentTimeline.cursor.removeEventReady([
+            ["removeShapeAttributeChange",[this.shape,this.attribute,this.changeEvent.value,this.changeEvent.time]
+            ]])
     }
 
     deselect(){
@@ -71,21 +68,16 @@ export class timelineChange{
 
     finishDragging(pointerEvent){
         const newProportion = this.drag(pointerEvent)
-
-        const previousTime = this.changeEvent.time
         const newTime = this.parentTimeline.snapValueToCell(
             this.parentTimeline.timeLinePositionToTime(newProportion)
         )
 
-        controller.newAction(
-            () => {
-                controller.changeTimeOfEvent(this.changeEvent,newTime)
-            },
-            () => {
-                controller.changeTimeOfEvent(this.changeEvent,previousTime)
-            },
-            []
+        controller.beginAction()
+        controller.takeStep(
+            "changeTimeOfShapeAttributeChange",
+            [this.shape,this.attribute,this.changeEvent,newTime]
         )
+        controller.endAction()
 
         this.select()
     }

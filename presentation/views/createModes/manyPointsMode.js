@@ -1,9 +1,9 @@
 import {maximumThickness} from "../../../globalValues.js";
 import {controller} from "../../../controller.js";
-import {polygon} from "../../../model/polygon.js";
-import {drawing} from "../../../model/drawing.js";
+import {Polygon} from "../../../model/polygon.js";
+import {Drawing} from "../../../model/drawing.js";
 
-export class manyPointsMode{
+export class ManyPointsMode {
 
     constructor(createCanvas) {
         this.createCanvas = createCanvas
@@ -46,18 +46,18 @@ export class manyPointsMode{
 
         /* line between previous point and current point */
         this.currentShape.appendChild(
-            drawing.lineBetween(...this.previousPoint,...canvasCoordinates,this.thickness,this.drawingColour)
+            Drawing.lineBetween(...this.previousPoint,...canvasCoordinates,this.thickness,this.drawingColour)
         )
 
         this.previousPoint = canvasCoordinates
 
         /* circle at each vertex to prevent a gap between the lines */
-        this.currentShape.appendChild(drawing.circleAt(...canvasCoordinates,this.thickness/2,this.drawingColour))
+        this.currentShape.appendChild(Drawing.circleAt(...canvasCoordinates,this.thickness/2,this.drawingColour))
     }
 
     completePolygon(pointerEvent){
         this.currentShape.appendChild(
-            drawing.lineBetween(
+            Drawing.lineBetween(
                 ...this.pointArray[0],
                 ...this.pointArray[this.pointArray.length-1],
                 this.thickness,
@@ -72,26 +72,14 @@ export class manyPointsMode{
             fillColour = "transparent"
         }
 
-        this.currentShape.prepend(polygon.fillArea(this.pointArray,fillColour))
+        this.currentShape.prepend(Polygon.fillArea(this.pointArray,fillColour))
 
         const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
 
-        const shape = new polygon(
-            start,
-            end,
-            this.drawingColour,
-            fillColour,
-            this.thickness,
-            this.pointArray)
-
-        controller.newAction(() => {
-                controller.newShape(shape)
-            },
-            () => {
-                controller.removeShape(shape)
-            },
-            []
-        )
+        controller.beginAction()
+        controller.takeStep("createPolygon",
+            [start,end,this.drawingColour,fillColour,this.thickness,this.pointArray])
+        controller.endAction()
 
         this.currentShape.remove()
     }

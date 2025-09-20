@@ -1,8 +1,7 @@
-import {text} from "../../../model/text.js";
 import {controller} from "../../../controller.js";
-import {buttonSelectedColour} from "../../../globalValues.js";
+import {buttonSelectedColour, fontFamily, fontSizeInt} from "../../../globalValues.js";
 
-export class textMode{
+export class TextMode {
     constructor(createCanvas) {
         this.createCanvas = createCanvas
 
@@ -21,8 +20,9 @@ export class textMode{
         switch (key){
             // removes last letter of text
             case "Backspace":
-                shape.geometryAttributeUpdate("text",shape.text.slice(0,-1))
-                shape.defaultTextReplaced = true
+                controller.beginAction()
+                controller.takeStep("newText",[shape,shape.text.slice(0,-1)])
+                controller.endAction()
                 return true
         }
 
@@ -34,10 +34,13 @@ export class textMode{
         // if the default text has been replaced, add on to text
         // otherwise, replace the default text
         if (shape.defaultTextReplaced){
-            shape.geometryAttributeUpdate("text",shape.text+key)
+            controller.beginAction()
+            controller.takeStep("newText",[shape,shape.text+key])
+            controller.endAction()
         } else {
-            shape.defaultTextReplaced = true
-            shape.geometryAttributeUpdate("text",key)
+            controller.beginAction()
+            controller.takeStep("newText",[shape,key])
+            controller.endAction()
         }
         return true
     }
@@ -50,7 +53,7 @@ export class textMode{
         this.createCanvas.canvas.onclick = null
 
         // deselects text once done
-        controller.newAggregateModel("selectedShapes",new Set([]))
+        controller.getSelectedShapesManager().selectNewShapes(new Set())
 
         // remove text mode indication
         this.ourButton.style.backgroundColor = null
@@ -60,24 +63,15 @@ export class textMode{
 
         const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
 
-        const textShape = new text(
-            start,
-            end,
-            this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
-            0,
-            "black"
-        )
+        controller.beginAction()
+        controller.takeStep("createText",
+            [start, end,
+                this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),
+                0, "#000000",fontSizeInt,fontFamily])
 
-        controller.newAction(() => {
-                controller.newShape(textShape)
-            },
-            () => {
-                controller.removeShape(textShape)
-            },
-            []
-        )
-
-        // select the text box by default at creation (to allow the user to type in it)
-        controller.newAggregateModel("selectedShapes",new Set([textShape]))
+        // controller returns the textShape it created
+        controller.endAction().then(([textShape]) => {
+            controller.getSelectedShapesManager().selectNewShapes(new Set([textShape]))
+        })
     }
 }

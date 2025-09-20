@@ -1,11 +1,10 @@
 import {addDragLogicTo} from "../../../dragLogic.js";
 import {distanceBetween2dPoints,decimateLine} from "../../../maths.js";
-import {manyPointsMode} from "./manyPointsMode.js";
-import {drawing} from "../../../model/drawing.js";
+import {ManyPointsMode} from "./manyPointsMode.js";
 import {controller} from "../../../controller.js";
-import {buttonSelectedColour, lineSimplificationEpsilon, snappingDistance} from "../../../globalValues.js";
+import {buttonSelectedColour} from "../../../globalValues.js";
 
-export class drawMode extends manyPointsMode{
+export class DrawMode extends ManyPointsMode{
     constructor(createCanvas) {
         super()
         
@@ -34,32 +33,21 @@ export class drawMode extends manyPointsMode{
 
     endDrawing(pointerEvent){
 
-        this.pointArray = decimateLine(this.pointArray,lineSimplificationEpsilon)
+        this.pointArray = decimateLine(this.pointArray,controller.lineSimplificationEpsilon())
 
         /* If the last and first points drawn on the shape are close enough together or there is no fill*/
         if (distanceBetween2dPoints(
             this.createCanvas.toCanvasCoordinates(pointerEvent.clientX,pointerEvent.clientY),this.pointArray[0]
-        ) > Math.max(this.thickness,snappingDistance) || !this.createCanvas.fillColourToggled){
+        ) > Math.max(this.thickness,controller.snappingDistance()) || !this.createCanvas.fillColourToggled){
 
             /* If they're not close together or there is no fill make a drawing*/
 
             const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
+            controller.beginAction()
+            controller.takeStep("createDrawing",
+                [start, end, this.drawingColour, this.thickness, this.pointArray])
+            controller.endAction()
 
-            const shape = new drawing(
-                start,
-                end,
-                this.drawingColour,
-                this.thickness,
-                this.pointArray)
-
-            controller.newAction(() => {
-                controller.newShape(shape)
-            },
-                () => {
-                controller.removeShape(shape)
-            },
-                []
-            )
         } else {
 
             /* If they are, connect up the shape, make a polygon, and fill the polygon with the fill colour */

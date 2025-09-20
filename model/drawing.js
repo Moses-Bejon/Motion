@@ -1,19 +1,32 @@
-import {shape} from "./shape.js";
+import {Shape} from "./shape.js";
 import {isLess, increment2dVectorBy, scale2dVectorAboutPoint, getRotateByAngle} from "../maths.js";
 import {maximumOfArray} from "../dataStructureOperations.js";
 
-export class drawing extends shape{
-    constructor(appearanceTime,disappearanceTime,colour,thickness,points) {
+export class Drawing extends Shape{
+    constructor() {
+        super()
+    }
 
-        super(appearanceTime,disappearanceTime)
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name,colour,thickness,points) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name)
 
-        this.colour = colour
-        this.thickness = thickness
+        this.attributes.colour = [Shape.getShapeAttributeChange(0,colour)]
+        this.attributes.thickness = [Shape.getShapeAttributeChange(0,thickness)]
         this.points = points
+
+        this.updateAttributes(0)
 
         this.updateGeometry()
 
         super.setupOffset()
+    }
+
+    static load(save){
+        const loadedShape = new Drawing()
+
+        loadedShape.points = save.points
+
+        return loadedShape
     }
 
     static lineBetween(x1,y1,x2,y2,thickness,colour){
@@ -40,8 +53,8 @@ export class drawing extends shape{
         return circle
     }
 
-    save(){
-        const shapeSave = super.save()
+    save(fileSerializer){
+        const shapeSave = super.save(fileSerializer)
 
         shapeSave.colour = this.colour
         shapeSave.thickness = this.thickness
@@ -51,26 +64,15 @@ export class drawing extends shape{
         return shapeSave
     }
 
-    load(save){
-        super.load(save)
-
-        this.colour = save.colour
-        this.thickness = save.thickness
-        this.points = save.points
-
-        this.updateGeometry()
-        this.setupOffset()
-    }
-
     getNewGeometryGroup(){
         const newGeometry = document.createElementNS("http://www.w3.org/2000/svg","g")
 
         for (let i = 0;i<this.points.length-1;i++){
-            newGeometry.appendChild(drawing.circleAt(...this.points[i],this.thickness/2,this.colour))
-            newGeometry.appendChild(drawing.lineBetween(...this.points[i],...this.points[i+1],this.thickness,this.colour))
+            newGeometry.appendChild(Drawing.circleAt(...this.points[i],this.thickness/2,this.colour))
+            newGeometry.appendChild(Drawing.lineBetween(...this.points[i],...this.points[i+1],this.thickness,this.colour))
         }
 
-        newGeometry.appendChild(drawing.circleAt(...this.points[this.points.length-1],this.thickness/2,this.colour))
+        newGeometry.appendChild(Drawing.circleAt(...this.points[this.points.length-1],this.thickness/2,this.colour))
 
         return newGeometry
     }
@@ -89,7 +91,6 @@ export class drawing extends shape{
             increment2dVectorBy(point,translationVector)
         }
 
-        this.updateGeometry()
         this.translateOffsetPointBy(translationVector)
     }
 
@@ -99,8 +100,10 @@ export class drawing extends shape{
         }
 
         this.thickness = Math.abs(scaleFactor*this.thickness)
+        for (const change of this.attributes.thickness){
+            change.value *= Math.abs(scaleFactor)
+        }
 
-        this.updateGeometry()
         this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
@@ -110,17 +113,27 @@ export class drawing extends shape{
             this.points[i] = rotationFunction(this.points[i])
         }
 
-        this.updateGeometry()
         this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 
     copy(){
-        return new drawing(
+
+        const copy = new Drawing()
+
+        copy.setupInScene(
             this.appearanceTime,
             this.disappearanceTime,
+            this.ZIndex,
+            this.name,
             this.colour,
             this.thickness,
             structuredClone(this.points)
         )
+
+        Shape.copyTimelineEvents(this,copy)
+
+        return copy
     }
 }
+
+Shape.registerSubclass("drawing",Drawing.load)

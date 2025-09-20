@@ -1,9 +1,8 @@
-import {abstractView} from "../view.js"
+import {AbstractView} from "../view.js"
 import {shapeTimeline} from "./timelineModes/shapeTimeline.js";
 import {timeCursor} from "./timelineModes/timeCursor.js";
 import {controller} from "../../controller.js";
 import {
-    animationEndTimeSeconds,
     fontFamily,
     timelineLeftMenuSizePercentage,
     timelineRightMenuSizePercentage,
@@ -14,9 +13,10 @@ import {
     timelineRightMenuSize,
     typicalIconSize,
     typicalIconSizeInt,
-    eventTokenWidth, timelineSnapLength
+    eventTokenWidth
 } from "../../globalValues.js";
 import {clamp} from "../../maths.js";
+import {PlayingState} from "../../controllerComponents/playing.js";
 
 const template = document.createElement("template")
 template.innerHTML = `
@@ -174,7 +174,7 @@ template.innerHTML = `
     </div>
 `
 
-export class timeline extends abstractView{
+export class Timeline extends AbstractView{
     constructor() {
         super()
 
@@ -188,11 +188,19 @@ export class timeline extends abstractView{
         this.timelineDiv.appendChild(this.cursor.cursor)
 
         this.timelineDiv.onpointerdown = (pointerEvent) => {
-            controller.newClockTime(this.pointerPositionToTimelinePosition(pointerEvent)*animationEndTimeSeconds)
-            this.snapTimeToCell()
+
+            controller.beginAction()
+            controller.takeStep("goToTime",
+                [this.snapValueToCell(this.pointerPositionToTimelinePosition(pointerEvent)*controller.animationEndTime())]
+            )
+            controller.endAction()
         }
 
         this.playButton = this.shadowRoot.getElementById("playButton")
+        this.playButton.onpointerdown = (pointerEvent) => {
+            controller.play()
+            pointerEvent.stopPropagation()
+        }
     }
 
     connectedCallback() {
@@ -205,11 +213,10 @@ export class timeline extends abstractView{
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
         controller.subscribeToInputs(this)
-        controller.subscribeToAnimationPlaying(this)
-        controller.subscribeToPreviousActionTimelineEvents(this)
-        controller.subscribeTo(this,"selectedShapes")
-        controller.subscribeTo(this,"timelineEvents")
-        controller.subscribeTo(this,"clock")
+        controller.subscribeToControllerState(this)
+        controller.subscribeToPreviousAction(this)
+        controller.subscribeToSelectedShapes(this)
+        controller.subscribeToSceneModel(this,"clock")
     }
 
     disconnectedCallback(){
@@ -217,11 +224,10 @@ export class timeline extends abstractView{
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
         controller.unsubscribeToInputs(this)
-        controller.unsubscribeToAnimationPlaying(this)
-        controller.unsubscribeToPreviousActionTimelineEvents(this)
-        controller.unsubscribeTo(this,"selectedShapes")
-        controller.unsubscribeTo(this,"timelineEvents")
-        controller.unsubscribeTo(this,"clock")
+        controller.unsubscribeToControllerState(this)
+        controller.unsubscribeToPreviousAction(this)
+        controller.unsubscribeToSelectedShapes(this)
+        controller.unsubscribeToSceneModel(this,"clock")
     }
 
     save(){
@@ -234,10 +240,10 @@ export class timeline extends abstractView{
 
     // position with respect to the right part of the window, filled by the timeline
     timeToTimelinePosition(timeSeconds){
-        if (timeSeconds > animationEndTimeSeconds || timeSeconds < 0){
+        if (timeSeconds > controller.animationEndTime() || timeSeconds < 0){
             console.error("Time is out of bounds. Time is ",timeSeconds)
         }
-        return timeSeconds/animationEndTimeSeconds
+        return timeSeconds/controller.animationEndTime()
     }
 
     // position with respect to whole window
@@ -246,7 +252,7 @@ export class timeline extends abstractView{
     }
 
     timeLinePositionToTime(position){
-        return position*animationEndTimeSeconds
+        return position*controller.animationEndTime()
     }
 
     globalWidthToTimelineWidth(width){
@@ -283,9 +289,6 @@ export class timeline extends abstractView{
             case "selectedShapes":
                 new shapeTimeline(this,model)
                 break
-            case "timelineEvents":
-                this.shapeToTimeline.get(model.shape)?.addTimeLineEvent(model)
-                break
             default:
                 console.error("timeline got updates from",aggregateModel)
         }
@@ -296,9 +299,6 @@ export class timeline extends abstractView{
         switch (aggregateModel){
             case "selectedShapes":
                 this.newSelectedShapes(model)
-                break
-            case "timelineEvents":
-                this.newSelectedShapes(controller.selectedShapes())
                 break
             case "clock":
                 this.cursor.updateTimeCursor()
@@ -311,16 +311,9 @@ export class timeline extends abstractView{
     updateModel(aggregateModel,model){
         switch (aggregateModel){
             case "selectedShapes":
-                // selects the part of the html that displays the model name
-                this.shapeToTimeline.get(model).label.innerText = model.name
-                break
-            case "timelineEvents":
-
-                const shape = this.shapeToTimeline.get(model.shape)
-
-                shape.updatePosition()
-                shape.updateTimeLineEvent(model)
-
+                this.shapeToTimeline.get(model).shapeSection.remove()
+                this.shapeToTimeline.delete(model)
+                new shapeTimeline(this,model)
                 break
             default:
                 console.error("timeline got updates from",aggregateModel)
@@ -333,59 +326,38 @@ export class timeline extends abstractView{
                 this.shapeToTimeline.get(model).shapeSection.remove()
                 this.shapeToTimeline.delete(model)
                 break
-            case "timelineEvents":
-                this.shapeToTimeline.get(model.shape)?.removeTimeLineEvent(model)
-                break
             default:
                 console.error("timeline got updates from",aggregateModel)
         }
     }
 
-    animationStarted(){
-        this.playButton.onpointerdown = (pointerEvent) => {
-            controller.pauseAnimation()
-            this.snapTimeToCell()
-            pointerEvent.stopPropagation()
+    newControllerState(state){
+        if (state instanceof PlayingState){
+            this.playButton.src = "assets/pause.svg"
+        } else {
+            this.playButton.src = "assets/play.svg"
         }
-
-        this.playButton.src = "assets/pause.svg"
     }
 
-    animationPaused(){
-        this.playButton.onpointerdown = (pointerEvent) => {
-            controller.playAnimation()
-            pointerEvent.stopPropagation()
+    newPreviousAction(previousAction){
+        if (previousAction.addableToTimeline){
+            this.cursor.previousActionTimelineEventsReady()
+        } else {
+            this.cursor.previousActionTimelineEventsGone()
         }
-
-        this.playButton.src = "assets/play.svg"
-    }
-
-    previousActionTimelineEventsReady(){
-        this.cursor.previousActionTimelineEventsReady()
-    }
-
-    previousActionTimelineEventsGone(){
-        this.cursor.previousActionTimelineEventsGone()
     }
 
     snapValueToCellBorder(value){
-        return Math.round(value/timelineSnapLength)*timelineSnapLength
+        return clamp(Math.round(value/controller.timelineSnapLength())*controller.timelineSnapLength(),0,controller.animationEndTime())
     }
 
     snapValueToCell(value){
-
-        if (value === animationEndTimeSeconds){
-            return timelineSnapLength*Math.floor(animationEndTimeSeconds/timelineSnapLength) - timelineSnapLength/2
-        }
-
-        return Math.round((value - timelineSnapLength/2)/timelineSnapLength)*timelineSnapLength + timelineSnapLength/2
-    }
-
-    snapTimeToCell(){
-        const gridValue = this.snapValueToCell(controller.clock())
-
-        controller.newClockTime(gridValue)
-
+        return clamp(clamp(
+            Math.round((value - controller.timelineSnapLength()/2)/controller.timelineSnapLength())
+            *controller.timelineSnapLength() + controller.timelineSnapLength()/2,
+            controller.timelineSnapLength()/2,
+            controller.animationEndTime()-controller.timelineSnapLength()/2
+        ),0,controller.animationEndTime())
     }
 
     deselectAll(){
@@ -398,22 +370,21 @@ export class timeline extends abstractView{
 
         switch (keyboardEvent.key){
             case " ":
-                if (controller.animationPlaying){
-                    controller.pauseAnimation()
-                    this.snapTimeToCell()
-                } else {
-                    controller.playAnimation()
-                }
+                controller.play()
+
                 return true
 
             case "ArrowRight":
-                controller.newClockTime(controller.clock()+timelineSnapLength)
-                this.snapTimeToCell()
+
+                controller.beginAction()
+                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock()+controller.timelineSnapLength())])
+                controller.endAction()
                 return true
 
             case "ArrowLeft":
-                controller.newClockTime(controller.clock()-timelineSnapLength)
-                this.snapTimeToCell()
+                controller.beginAction()
+                controller.takeStep("goToTime",[this.snapValueToCell(controller.clock()-controller.timelineSnapLength())])
+                controller.endAction()
                 return true
         }
 
@@ -429,4 +400,4 @@ export class timeline extends abstractView{
     }
 }
 
-window.customElements.define("time-line",timeline)
+window.customElements.define("time-line",Timeline)

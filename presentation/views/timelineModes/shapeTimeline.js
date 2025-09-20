@@ -2,10 +2,8 @@ import {addDragLogicTo} from "../../../dragLogic.js";
 import {clamp} from "../../../maths.js";
 import {controller} from "../../../controller.js";
 import {
-    animationEndTimeSeconds,
     bumperTranslation,
-    timelineRightMenuSizePercentage,
-    timelineSnapLength
+    timelineRightMenuSizePercentage
 } from "../../../globalValues.js";
 import {timelineTween} from "./timelineTween.js";
 import {timelineChange} from "./timelineChange.js";
@@ -14,7 +12,7 @@ export class shapeTimeline{
     constructor(parentTimeline,shape) {
 
         // timeline event object to event token geometry on timeline
-        this.timelineEventToEventToken = new Map()
+        this.attributeChangeToEventToken = new Map()
 
         // tween model to relevant tween presentation class
         this.tweenToTimelineTween = new Map()
@@ -40,16 +38,6 @@ export class shapeTimeline{
         // setting up a local stacking context, so the super high z indices in this window don't leak
         // (I need them to be high to ensure that thinner tweens are above thicker tweens)
         this.timelineContainer.style.zIndex = 0
-
-        for (const timelineEvent of shape.timelineEvents){
-            if (timelineEvent.type === "appearance"){
-                this.appearanceEvent = timelineEvent
-            } else if (timelineEvent.type === "disappearance"){
-                this.disappearanceEvent = timelineEvent
-            } else {
-                this.addTimeLineEvent(timelineEvent)
-            }
-        }
 
         this.timeline = document.createElement("div")
         this.timeline.style.position = "relative"
@@ -118,70 +106,18 @@ export class shapeTimeline{
 
         parentTimeline.timelineList.appendChild(this.shapeSection)
         parentTimeline.shapeToTimeline.set(shape,this)
-    }
 
-    possibleNewTween(tween){
-        if (!this.tweenToTimelineTween.has(tween)){
+        for (const tween of shape.tweens){
             this.tweenToTimelineTween.set(tween,new timelineTween(this.parentTimeline,this.timelineContainer,tween))
         }
-    }
 
-    addTimeLineEvent(event){
-
-        switch (event.type){
-            // we use the shapes to tell us about these types of events
-            // since they have appearance and disappearance times
-            case "appearance":
-            case "disappearance":
-                return
-
-            case "change":
-                this.timelineEventToEventToken.set(event,new timelineChange(this.parentTimeline,this.timelineContainer,event))
-
-                break
-
-            case "tweenStart":
-
-                this.possibleNewTween(event.tween)
-
-                this.tweenToTimelineTween.get(event.tween).receiveStart(event)
-
-                break
-
-            case "tweenEnd":
-
-                this.possibleNewTween(event.tween)
-
-                this.tweenToTimelineTween.get(event.tween).receiveEnd(event)
-
-                break
-
-            default:
-                console.error("unexpected shape type",event.type)
-        }
-    }
-
-    removeTimeLineEvent(event){
-
-        if (event.type === "change"){
-            this.timelineEventToEventToken.get(event).remove()
-            this.timelineEventToEventToken.delete(event)
-        } else if (event.type === "tweenStart"){
-            this.tweenToTimelineTween.get(event.tween).removeStart()
-        } else if (event.type === "tweenEnd"){
-            this.tweenToTimelineTween.get(event.tween).removeEnd()
-        }
-    }
-
-    updateTimeLineEvent(event){
-        if (event.type === "change"){
-            this.timelineEventToEventToken.get(event).update()
-        } else if (event.type === "tweenStart"){
-            this.tweenToTimelineTween.get(event.tween).removeStart()
-            this.tweenToTimelineTween.get(event.tween).receiveStart(event)
-        } else if (event.type === "tweenEnd"){
-            this.tweenToTimelineTween.get(event.tween).removeEnd()
-            this.tweenToTimelineTween.get(event.tween).receiveEnd(event)
+        for (const [attribute,changes] of Object.entries(shape.attributes)){
+            for (let i = 1; i < changes.length; i++){
+                this.attributeChangeToEventToken.set(
+                    changes[i],
+                    new timelineChange(this.parentTimeline,this.timelineContainer,changes[i],this.shape,attribute)
+                )
+            }
         }
     }
 
@@ -211,7 +147,7 @@ export class shapeTimeline{
 
         const newEndProportion = clamp(
             this.endProportion + this.parentTimeline.globalWidthToTimelineWidth(currentPosition-this.initialPosition),
-            this.startProportion+timelineSnapLength/animationEndTimeSeconds,
+            this.startProportion+controller.timelineSnapLength()/controller.animationEndTime(),
             1
         )
 
@@ -223,20 +159,11 @@ export class shapeTimeline{
     finishDraggingRightBumper(pointerEvent){
         const newEnd = this.dragRightBumper(pointerEvent)
 
-        const previousTime = this.endTime
         const newTime = this.parentTimeline.snapValueToCellBorder(this.parentTimeline.timeLinePositionToTime(newEnd))
 
-        controller.newAction(
-            () => {
-                this.shape.disappearanceTime = newTime
-                controller.changeTimeOfEvent(this.disappearanceEvent,newTime)
-            },
-            () => {
-                this.shape.disappearanceTime = previousTime
-                controller.changeTimeOfEvent(this.disappearanceEvent,previousTime)
-            },
-            []
-        )
+        controller.beginAction()
+        controller.takeStep("newDisappearanceTime",[this.shape,newTime])
+        controller.endAction()
     }
 
     dragLeftBumper(pointerEvent){
@@ -245,7 +172,7 @@ export class shapeTimeline{
         const newStartProportion = clamp(
             this.startProportion + this.parentTimeline.globalWidthToTimelineWidth(currentPosition-this.initialPosition),
             0,
-            this.endProportion-timelineSnapLength/animationEndTimeSeconds
+            this.endProportion-controller.timelineSnapLength()/controller.animationEndTime()
         )
 
         this.timeline.style.left = 100*newStartProportion + "%"
@@ -257,24 +184,15 @@ export class shapeTimeline{
     finishDraggingLeftBumper(pointerEvent){
         const newStart = this.dragLeftBumper(pointerEvent)
 
-        const previousTime = this.startTime
         const newTime = this.parentTimeline.snapValueToCellBorder(this.parentTimeline.timeLinePositionToTime(newStart))
 
-        controller.newAction(
-            () => {
-                this.shape.appearanceTime = newTime
-                controller.changeTimeOfEvent(this.appearanceEvent,newTime)
-            },
-            () => {
-                this.shape.appearanceTime = previousTime
-                controller.changeTimeOfEvent(this.appearanceEvent,previousTime)
-            },
-            []
-        )
+        controller.beginAction()
+        controller.takeStep("newAppearanceTime",[this.shape,newTime])
+        controller.endAction()
     }
 
     deselectAll(){
-        for (const [event,token] of this.timelineEventToEventToken){
+        for (const [event,token] of this.attributeChangeToEventToken){
             token.deselect()
         }
 

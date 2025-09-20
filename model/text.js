@@ -1,5 +1,4 @@
-import {shape} from "./shape.js";
-import {fontSizeInt,fontFamily} from "../globalValues.js";
+import {Shape} from "./shape.js";
 import {
     add2dVectors,
     getEdgesOfBoxAfterRotation,
@@ -8,51 +7,49 @@ import {
     scale2dVectorAboutPoint
 } from "../maths.js";
 
-export class text extends shape{
-    constructor(appearanceTime,disappearanceTime,bottomLeft,rotation,colour,size=fontSizeInt,family=fontFamily){
-        super(appearanceTime,disappearanceTime)
+export class Text extends Shape{
+    constructor(){
+        super()
+    }
 
-        this.text = "Begin typing"
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name,bottomLeft,rotation,colour,size,family) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name)
+
+        this.attributes.text = [Shape.getShapeAttributeChange(0,"Begin Typing")]
         this.defaultTextReplaced = false
 
         this.bottomLeft = bottomLeft
         this.rotation = rotation
-        this.fontColour = colour
-        this.fontSize = size
-        this.fontFamily = family
+        this.attributes.fontColour = [Shape.getShapeAttributeChange(0,colour)]
+        this.attributes.fontSize = [Shape.getShapeAttributeChange(0,size)]
+        this.attributes.fontFamily = [Shape.getShapeAttributeChange(0,family)]
 
+        this.updateAttributes(0)
         this.updateGeometry()
 
         super.setupOffset()
     }
 
-    save(){
-        const shapeSave = super.save()
+    static load(save){
+        const loadedShape = new Text()
 
-        shapeSave.text = this.text
+        loadedShape.defaultTextReplaced = true
+
+        loadedShape.bottomLeft = save.bottomLeft
+        loadedShape.rotation = save.rotation
+
+        return loadedShape
+    }
+
+    save(fileSerializer){
+        const shapeSave = super.save(fileSerializer)
+
         shapeSave.bottomLeft = this.bottomLeft
-        shapeSave.fontColour = this.fontColour
-        shapeSave.fontSize = this.fontSize
-        shapeSave.fontFamily = this.fontFamily
+        shapeSave.rotation = this.rotation
 
         shapeSave.shapeType = "text"
 
         return shapeSave
-    }
-
-    load(save){
-        super.load(save)
-
-        this.defaultTextReplaced = true
-
-        this.text = save.text
-        this.bottomLeft = save.bottomLeft
-        this.fontColour = save.fontColour
-        this.fontSize = save.fontSize
-        this.fontFamily = save.fontFamily
-
-        this.updateGeometry()
-        this.setupOffset()
     }
 
     updateWidthAndHeightFromText(){
@@ -129,7 +126,6 @@ export class text extends shape{
     translate(translationVector){
         increment2dVectorBy(this.bottomLeft,translationVector)
 
-        this.updateGeometry()
         this.translateOffsetPointBy(translationVector)
     }
 
@@ -137,8 +133,10 @@ export class text extends shape{
         scale2dVectorAboutPoint(this.bottomLeft,aboutCentre,scaleFactor)
 
         this.fontSize *= Math.abs(scaleFactor)
+        for (const change of this.attributes.fontSize){
+            change.value *= Math.abs(scaleFactor)
+        }
 
-        this.updateGeometry()
         this.scaleOffsetPointAbout(aboutCentre,scaleFactor)
     }
 
@@ -148,14 +146,17 @@ export class text extends shape{
         this.bottomLeft = rotation(this.bottomLeft)
 
         this.rotation += angle
-        this.updateGeometry()
         this.rotateOffsetPointAbout(aboutCentre,angle)
     }
 
     copy(){
-        const copy = new text(
+        const copy = new Text()
+
+        copy.setupInScene(
             this.appearanceTime,
             this.disappearanceTime,
+            this.ZIndex,
+            this.name,
             Array.from(this.bottomLeft),
             this.rotation,
             this.fontColour,
@@ -166,8 +167,11 @@ export class text extends shape{
         copy.text = this.text
         copy.defaultTextReplaced = this.defaultTextReplaced
 
+        Shape.copyTimelineEvents(this,copy)
         copy.updateGeometry()
 
         return copy
     }
 }
+
+Shape.registerSubclass("text",Text.load)

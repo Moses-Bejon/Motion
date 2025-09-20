@@ -1,12 +1,23 @@
-import {drawing} from "./drawing.js"
+import {Drawing} from "./drawing.js"
+import {Shape} from "./shape.js";
 
-export class polygon extends drawing{
-    constructor(appearanceTime,disappearanceTime,colour,fillColour,thickness,points){
-        super(appearanceTime,disappearanceTime,colour,thickness,points)
+export class Polygon extends Drawing{
+    constructor(){
+        super()
+    }
 
-        this.fillColour = fillColour
+    setupInScene(appearanceTime, disappearanceTime, ZIndex, name,colour,fillColour,thickness,points) {
+        super.setupInScene(appearanceTime, disappearanceTime, ZIndex, name,colour,thickness,points)
 
-        this.updateGeometry()
+        this.attributes.fillColour = [Shape.getShapeAttributeChange(0,fillColour)]
+    }
+
+    static load(save){
+        const loadedShape = new Polygon()
+
+        loadedShape.points = save.points
+
+        return loadedShape
     }
 
     static fillArea(points,fill){
@@ -25,22 +36,12 @@ export class polygon extends drawing{
         return polygon
     }
 
-    save(){
-        const shapeSave = super.save()
-
-        shapeSave.fillColour = this.fillColour
+    save(fileSerializer){
+        const shapeSave = super.save(fileSerializer)
 
         shapeSave.shapeType = "polygon"
 
         return shapeSave
-    }
-
-    load(save){
-        super.load(save)
-
-        this.fillColour = save.fillColour
-
-        this.updateGeometry()
     }
 
     updateGeometry() {
@@ -50,25 +51,36 @@ export class polygon extends drawing{
         const extraGeometry = document.createElementNS("http://www.w3.org/2000/svg","g")
 
         extraGeometry.appendChild(
-            drawing.lineBetween(...this.points[this.points.length-1],...this.points[0],this.thickness,this.colour)
+            Drawing.lineBetween(...this.points[this.points.length-1],...this.points[0],this.thickness,this.colour)
         )
 
         this.geometry += extraGeometry.innerHTML
 
         extraGeometry.replaceChildren()
 
-        extraGeometry.appendChild(polygon.fillArea(this.points,this.fillColour))
+        extraGeometry.appendChild(Polygon.fillArea(this.points,this.fillColour))
         this.geometry = extraGeometry.innerHTML + this.geometry
     }
 
     copy(){
-        return new polygon(
+
+        const copy = new Polygon()
+
+        copy.setupInScene(
             this.appearanceTime,
             this.disappearanceTime,
+            this.ZIndex,
+            this.name,
             this.colour,
             this.fillColour,
             this.thickness,
             structuredClone(this.points)
         )
+
+        Shape.copyTimelineEvents(this,copy)
+
+        return copy
     }
 }
+
+Shape.registerSubclass("polygon",Polygon.load)

@@ -64,6 +64,10 @@ export function returnInput(x){
     return x
 }
 
+export function returnTrue(){
+    return true
+}
+
 export function distanceBetween2dPoints(point1,point2){
     return Math.hypot(point1[0]-point2[0],point1[1]-point2[1])
 }
@@ -122,7 +126,7 @@ export function angleBetweenThreePoints(A, B, C){
 }
 
 // used to ensure the mouse angle takes into account how many full revolutions the user has made
-export class angleTracker{
+export class AngleTracker {
     constructor(initialPosition,centre) {
         this.initialPosition = initialPosition
         this.centre = centre
@@ -258,4 +262,15 @@ export function getEdgesOfEllipseAfterRotation(width,height,angle,centre){
         centreX-horizontalEdgeToCentre,
         centreX+horizontalEdgeToCentre
     ]
+}
+
+export function subtractSets(set1,set2){
+
+    const outputSet = new Set(set1)
+
+    for (const element of set2){
+        outputSet.delete(element)
+    }
+
+    return outputSet
 }

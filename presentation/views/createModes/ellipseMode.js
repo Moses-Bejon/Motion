@@ -2,9 +2,8 @@ import {addDragLogicTo} from "../../../dragLogic.js";
 import {buttonSelectedColour, maximumThickness} from "../../../globalValues.js";
 import {midPoint2d} from "../../../maths.js";
 import {controller} from "../../../controller.js";
-import {ellipse} from "../../../model/ellipse.js";
 
-export class ellipseMode{
+export class EllipseMode {
 
     constructor(createCanvas) {
         this.createCanvas = createCanvas
@@ -103,26 +102,11 @@ export class ellipseMode{
         const [width,height,centre] = this.continueEllipse(pointerEvent)
 
         const [start,end] = this.createCanvas.timeToShapeAppearanceDisappearanceTime(controller.clock())
-
-        const shape = new ellipse(
-            start,
-            end,
-            centre,
-            height,
-            width,
-            this.outlineColour,
-            this.colour,
-            0,
-            this.thickness)
-
-        controller.newAction(() => {
-                controller.newShape(shape)
-            },
-            () => {
-                controller.removeShape(shape)
-            },
-            []
-        )
+        
+        controller.beginAction()
+        controller.takeStep("createEllipse",
+            [start, end, centre, height, width, this.outlineColour, this.colour, 0, this.thickness])
+        controller.endAction()
 
         this.currentShape.remove()
     }

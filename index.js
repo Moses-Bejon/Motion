@@ -1,10 +1,10 @@
 // main javascript file for the project
 
 import {controller} from "./controller.js";
-import {abstractWindow} from "./presentation/window.js";
+import {replaceRootWindowWithSave} from "./rootWindowOperations.js";
 
-document.getElementById("undoButton").onpointerdown = controller.undoAction.bind(controller)
-document.getElementById("redoButton").onpointerdown = controller.redoAction.bind(controller)
+document.getElementById("undoButton").onpointerdown = () => controller.historyManager.undoAction()
+document.getElementById("redoButton").onpointerdown = () => controller.historyManager.redoAction()
 
 const loadButton = document.getElementById("loadButton")
 const fakeLoadButton = document.getElementById("fakeLoadButton")
@@ -35,9 +35,9 @@ const topEdge = document.getElementById("topEdge")
 const leftEdge = document.getElementById("leftEdge")
 const bottomEdge = document.getElementById("bottomEdge")
 const rightEdge = document.getElementById("rightEdge")
-let rootWindow = document.getElementById("rootWindow")
+window.rootWindow = document.getElementById("rootWindow")
 
-makeWindowFullScreen(rootWindow)
+makeWindowFullScreen(window.rootWindow)
 
 const defaultCanvas = document.createElement("create-edit-canvas")
 const defaultShapeEditor = document.createElement("shape-editor")
@@ -45,7 +45,7 @@ const defaultTopWindow = document.createElement("horizontally-split-window")
 const defaultTimeline = document.createElement("time-line")
 const defaultWindow = document.createElement("vertically-split-window")
 
-rootWindow.switchWindowTo(defaultWindow)
+window.rootWindow.switchWindowTo(defaultWindow)
 defaultWindow.topWindow.switchWindowTo(defaultTopWindow)
 defaultTopWindow.leftWindow.switchWindowTo(defaultCanvas)
 defaultTopWindow.rightWindow.switchWindowTo(defaultShapeEditor)
@@ -53,45 +53,24 @@ defaultTopWindow.updateEdgePosition(0.8)
 defaultWindow.bottomWindow.switchWindowTo(defaultTimeline)
 defaultWindow.updateEdgePosition(0.8)
 
-function replaceRootWindowWithSave(save){
-        // collapse root window into single window
-        while (true){
-                if (rootWindow.constructor.name === "horizontallySplitWindow"){
-                        rootWindow.collapseLeftWindow()
-                } else if (rootWindow.constructor.name === "verticallySplitWindow"){
-                        rootWindow.collapseTopWindow()
-                } else {
-                        break
-                }
-        }
-
-        rootWindow.switchWindowTo(abstractWindow.loadWindow(save))
-        rootWindow.load(save)
-}
-
-export function refreshViews(){
-        const viewsSave = rootWindow.save()
-        replaceRootWindowWithSave(viewsSave)
-}
-
 function setNewRootWindow(newRootWindow){
-        rootWindow.removeAttribute("id")
+        window.rootWindow.removeAttribute("id")
         newRootWindow.id = "rootWindow"
         newRootWindow.removeAttribute("style")
 
         newRootWindow.updateParentFunction = setNewRootWindow
         newRootWindow.setFullScreen(makeWindowFullScreen)
 
-        rootWindow = newRootWindow
+        window.rootWindow = newRootWindow
 
         document.body.appendChild(newRootWindow)
 }
 
 function makeWindowFullScreen(newRootWindow){
-        rootWindow.remove()
+        window.rootWindow.remove()
         setNewRootWindow(newRootWindow)
 
-        const firstTopSubEdge = topEdge.activate(leftEdge,rightEdge,rootWindow,"top",(subEdge) => {
+        const firstTopSubEdge = topEdge.activate(leftEdge,rightEdge,window.rootWindow,"top",(subEdge) => {
 
                 const windowToReplace = subEdge.associatedWindow
                 const replaceWindowWith = document.createElement("vertically-split-window")
@@ -101,7 +80,7 @@ function makeWindowFullScreen(newRootWindow){
 
                 return replaceWindowWith
         })
-        const firstLeftSubEdge = leftEdge.activate(topEdge,bottomEdge,rootWindow,"left",(subEdge) => {
+        const firstLeftSubEdge = leftEdge.activate(topEdge,bottomEdge,window.rootWindow,"left",(subEdge) => {
 
                 const windowToReplace = subEdge.associatedWindow
                 const replaceWindowWith = document.createElement("horizontally-split-window")
@@ -111,7 +90,7 @@ function makeWindowFullScreen(newRootWindow){
 
                 return replaceWindowWith
         })
-        const firstBottomSubEdge = bottomEdge.activate(leftEdge,rightEdge,rootWindow,"bottom",(subEdge) => {
+        const firstBottomSubEdge = bottomEdge.activate(leftEdge,rightEdge,window.rootWindow,"bottom",(subEdge) => {
 
                 const windowToReplace = subEdge.associatedWindow
                 const replaceWindowWith = document.createElement("vertically-split-window")
@@ -121,7 +100,7 @@ function makeWindowFullScreen(newRootWindow){
 
                 return replaceWindowWith
         })
-        const firstRightSubEdge = rightEdge.activate(topEdge,bottomEdge,rootWindow,"right",(subEdge) =>{
+        const firstRightSubEdge = rightEdge.activate(topEdge,bottomEdge,window.rootWindow,"right",(subEdge) =>{
 
                 const windowToReplace = subEdge.associatedWindow
                 const replaceWindowWith = document.createElement("horizontally-split-window")
@@ -132,8 +111,8 @@ function makeWindowFullScreen(newRootWindow){
                 return replaceWindowWith
         })
 
-        rootWindow.addVerticalSubEdge(firstRightSubEdge)
-        rootWindow.addVerticalSubEdge(firstLeftSubEdge)
-        rootWindow.addHorizontalSubEdge(firstTopSubEdge)
-        rootWindow.addHorizontalSubEdge(firstBottomSubEdge)
+        window.rootWindow.addVerticalSubEdge(firstRightSubEdge)
+        window.rootWindow.addVerticalSubEdge(firstLeftSubEdge)
+        window.rootWindow.addHorizontalSubEdge(firstTopSubEdge)
+        window.rootWindow.addHorizontalSubEdge(firstBottomSubEdge)
 }

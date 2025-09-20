@@ -1,7 +1,7 @@
 import {controller} from "../../../controller.js";
 import {clamp} from "../../../maths.js";
-import {validateReal} from "../../../dataStructureOperations.js";
-import {animationEndTimeSeconds, typicalIconSize} from "../../../globalValues.js";
+import {stringToReal} from "../../../dataStructureOperations.js";
+import {typicalIconSize} from "../../../globalValues.js";
 
 export class timeCursor{
     constructor(parentTimeline) {
@@ -21,17 +21,20 @@ export class timeCursor{
 
         // removes non-numeric characters from input
         this.currentTime.oninput = () => {
-            if (validateReal(this.currentTime.value) === null){
+            if (stringToReal(this.currentTime.value) === null){
                 this.currentTime.value = this.currentTime.value.slice(0,this.currentTime.value.length-1)
             }
         }
         this.currentTime.onchange = () => {
 
-            if (validateReal(this.currentTime.value) === null){
+            if (stringToReal(this.currentTime.value) === null){
                 this.currentTime.value = "0"
             }
 
-            controller.newClockTime(clamp(parseFloat(this.currentTime.value),0,animationEndTimeSeconds))
+            controller.beginAction()
+            controller.takeStep("goToTime",
+                [clamp(parseFloat(this.currentTime.value),0,controller.animationEndTime())])
+            controller.endAction()
         }
         this.currentTime.onpointerdown = (pointerEvent) => {
             pointerEvent.stopPropagation()
@@ -48,7 +51,7 @@ export class timeCursor{
 
         this.addToTimelineButton.onpointerdown = (pointerEvent) => {
 
-            controller.addPreviousActionTimelineEventToTimeline()
+            controller.addPreviousTimelineEventToTimeline()
 
             pointerEvent.stopPropagation()
         }
@@ -92,9 +95,13 @@ export class timeCursor{
         this.addToTimelineButton.remove()
     }
 
-    removeEventReady(removeEvent,addEvent){
+    removeEventReady(stepsToRemove){
         this.removeButton.onpointerdown = (pointerEvent) => {
-            controller.newAction(removeEvent,addEvent,[])
+            controller.beginAction()
+            for (const step of stepsToRemove){
+                controller.takeStep(...step)
+            }
+            controller.endAction()
             pointerEvent.stopPropagation()
             this.removeEventGone()
         }

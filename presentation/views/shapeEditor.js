@@ -1,7 +1,6 @@
-import {abstractView} from "../view.js";
+import {AbstractView} from "../view.js";
 import {controller} from "../../controller.js";
 import {
-    animationEndTimeSeconds,
     fontFamily,
     fontSize,
     fontsList,
@@ -11,7 +10,7 @@ import {
     typicalIconSizeInt
 } from "../../globalValues.js";
 import {clamp, returnInput} from "../../maths.js";
-import {validateColour, validatePositiveReal, validateReal} from "../../dataStructureOperations.js";
+import {stringToPositiveReal, stringToReal, stringToColour} from "../../dataStructureOperations.js";
 
 const stringInput = document.createElement("input")
 stringInput.type = "text"
@@ -40,28 +39,27 @@ const shapePropertyToInput = {
 }
 
 const shapeToShapeProperties = {
-    "drawing":{
+    "Drawing":{
         "Colour":colourInput,
         "Thickness":floatInput
     },
-    "polygon":{
+    "Polygon":{
         "Colour":colourInput,
         "Thickness":floatInput,
         "Polygon fill":colourInput
     },
-    "ellipse":{
+    "Ellipse":{
         "Outline colour":colourInput,
         "Width":floatInput,
         "Height":floatInput,
         "Colour":colourInput,
         "Thickness":floatInput
     },
-    "graphic":{
+    "Graphic":{
         "Width":floatInput,
         "Height":floatInput
     },
-    "shapeGroup":{},
-    "text":{
+    "Text":{
         "Text":stringInput,
         "Font colour":colourInput,
         "Font size (pt)":floatInput,
@@ -69,44 +67,19 @@ const shapeToShapeProperties = {
     }
 }
 
-const nameToChangeFunction = {
-    "Appearance time": (shape,value) => {
-        shape.newAppearanceTime(value)
-    },
-    "Disappearance time": (shape,value) => {
-        shape.newDisappearanceTime(value)
-    },
-    "Colour": (shape,value) => {
-        shape.geometryAttributeUpdate("colour",value)
-    },
-    "Thickness": (shape,value) => {
-        shape.geometryAttributeUpdate("thickness",value)
-    },
-    "Polygon fill": (shape,value) => {
-        shape.geometryAttributeUpdate("fillColour",value)
-    },
-    "Outline colour": (shape,value) => {
-        shape.geometryAttributeUpdate("outlineColour",value)
-    },
-    "Width": (shape,value) => {
-        shape.geometryAttributeUpdate("width",value)
-    },
-    "Height": (shape,value) => {
-        shape.geometryAttributeUpdate("height",value)
-    },
-    "Text": (shape,value) => {
-        shape.geometryAttributeUpdate("text",value)
-        shape.defaultTextReplaced = true
-    },
-    "Font colour": (shape,value) => {
-        shape.geometryAttributeUpdate("fontColour",value)
-    },
-    "Font size (pt)": (shape,value) => {
-        shape.geometryAttributeUpdate("fontSize",value)
-    },
-    "Font": (shape,value) => {
-        shape.geometryAttributeUpdate("fontFamily",value)
-    }
+const nameToChangeStep = {
+    "Appearance time": "newAppearanceTime",
+    "Disappearance time": "newDisappearanceTime",
+    "Colour": "newColour",
+    "Thickness": "newThickness",
+    "Polygon fill": "newFillColour",
+    "Outline colour": "newOutlineColour",
+    "Width": "newWidth",
+    "Height": "newHeight",
+    "Text": "newText",
+    "Font colour": "newFontColour",
+    "Font size (pt)": "newFontSize",
+    "Font": "newFont"
 }
 
 const nameToGetFunction = {
@@ -148,10 +121,10 @@ const nameToGetFunction = {
     }
 }
 
-const nameToValidation =   {
+const nameToStringToValue =   {
     "Appearance time": (value,shapes) => {
 
-        value = validateReal(value)
+        value = stringToReal(value)
 
         if (value === null){
             return null
@@ -164,21 +137,21 @@ const nameToValidation =   {
         return value
     },
     "Disappearance time": (value,shapes) => {
-        value = validateReal(value)
+        value = stringToReal(value)
 
         if (value === null){
             return null
         }
 
         for (const shape of shapes){
-            value = clamp(value,shape.appearanceTime,animationEndTimeSeconds)
+            value = clamp(value,shape.appearanceTime,controller.animationEndTime())
         }
 
         return value
     },
-    "Colour":validateColour,
+    "Colour":stringToColour,
     "Thickness":(value) => {
-        value = validateReal(value)
+        value = stringToReal(value)
 
         if (value === null){
             return null
@@ -188,18 +161,13 @@ const nameToValidation =   {
 
         return value
     },
-    "Polygon fill":validateColour,
-    "Outline colour":validateColour,
-    "Width":validatePositiveReal,
-    "Height":validatePositiveReal,
-
-    // all values from html inputs are guaranteed to be strings
-    // validation for stuff like possible code insertion is done in text.js
-    // (not for security, but for client convenience and to prevent unexpected behaviour, as is client side anyway)
+    "Polygon fill":stringToColour,
+    "Outline colour":stringToColour,
+    "Width":stringToPositiveReal,
+    "Height":stringToPositiveReal,
     "Text":returnInput,
-
-    "Font colour":validateColour,
-    "Font size (pt)":validatePositiveReal,
+    "Font colour":stringToColour,
+    "Font size (pt)":stringToPositiveReal,
     "Font":(font)=>{
 
         if (fontsList.includes(font)){
@@ -208,21 +176,6 @@ const nameToValidation =   {
 
         return null
     }
-}
-
-const nameToTimelineAttribute = {
-    "Appearance time": false,
-    "Disappearance time": false,
-    "Colour": "colour",
-    "Thickness": "thickness",
-    "Polygon fill": "fillColour",
-    "Outline colour": "outlineColour",
-    "Width": "width",
-    "Height": "height",
-    "Text": "text",
-    "Font colour":"fontColour",
-    "Font size (pt)": "fontSize",
-    "Font": "fontFamily"
 }
 
 const template = document.createElement("template")
@@ -268,7 +221,7 @@ template.innerHTML = `
     <div id="editableProperties"></div>
 `
 
-export class shapeEditor extends abstractView{
+export class ShapeEditor extends AbstractView{
     constructor() {
         super()
 
@@ -296,16 +249,14 @@ export class shapeEditor extends abstractView{
         // when am disconnected, need to unsubscribe so not taking up space in controller
         // however, am sometimes disconnected due to windows moving around
         // therefore, I subscribe every time I connect and unsubscribe every time I disconnect
-        controller.subscribeTo(this,"selectedShapes")
-        controller.subscribeTo(this,"timelineEvents")
+        controller.subscribeToSelectedShapes(this)
     }
 
     disconnectedCallback(){
 
         // clean stuff up when we get disconnected from the DOM
         this.loseFocus()
-        controller.unsubscribeTo(this,"selectedShapes")
-        controller.unsubscribeTo(this,"timelineEvents")
+        controller.unsubscribeToSelectedShapes(this)
     }
 
     save(){
@@ -317,7 +268,7 @@ export class shapeEditor extends abstractView{
     }
 
     errorCheckAggregateModel(aggregateModel){
-        if (aggregateModel !== "selectedShapes" && aggregateModel !== "timelineEvents"){
+        if (aggregateModel !== "selectedShapes"){
             console.error("shape editor got updates from",aggregateModel)
         }
     }
@@ -348,7 +299,7 @@ export class shapeEditor extends abstractView{
     }
 
     populateShapeProperties(shape){
-        const inputInformation = shapeEditor.shapeToInputInformation(shape)
+        const inputInformation = ShapeEditor.shapeToInputInformation(shape)
 
         for (const [name,element] of Object.entries(inputInformation)) {
 
@@ -384,12 +335,12 @@ export class shapeEditor extends abstractView{
 
     updateProperty(propertyName,newValue){
 
-        newValue = nameToValidation[propertyName](newValue,this.selectedShapesOrdered)
+        newValue = nameToStringToValue[propertyName](newValue,this.selectedShapesOrdered)
 
-        // validated to null
+        // if cannot be converted to a value
         if (newValue === null){
             // don't touch the controller and just rebuild everything from scratch
-            this.updateAggregateModel("selectedShapes",controller.selectedShapes())
+            controller.getSelectedShapesManager().selectNewShapes(controller.selectedShapes())
             return
         }
 
@@ -397,7 +348,7 @@ export class shapeEditor extends abstractView{
 
         for (const shape of this.selectedShapesOrdered) {
 
-            const inputInformation = shapeEditor.shapeToInputInformation(shape)
+            const inputInformation = ShapeEditor.shapeToInputInformation(shape)
 
             // only change shapes with the property we aim to change
             if (propertyName in inputInformation){
@@ -405,48 +356,13 @@ export class shapeEditor extends abstractView{
             }
         }
 
-        const previousValues = shapesAffected.map((shape) => {return nameToGetFunction[propertyName](shape)})
+        const changeStep = nameToChangeStep[propertyName]
 
-        const changeFunction = nameToChangeFunction[propertyName]
-
-        const timelineEvents = []
-        const attribute = nameToTimelineAttribute[propertyName]
-
-        // for example, appearance and disappearance return false since they aren't attribute changes
-        if (attribute) {
-            for (let i = 0; i < shapesAffected.length; i++) {
-                timelineEvents.push(
-                    {
-                        "type": "change",
-                        "shape": shapesAffected[i],
-                        "forward": () => {
-                            changeFunction(shapesAffected[i], newValue)
-                        },
-                        "backward": () => {
-                            changeFunction(shapesAffected[i], previousValues[i])
-                        },
-                        "timeChange": returnInput,
-                        "attribute":attribute,
-                        "previousValue":previousValues[i],
-                        "value":newValue
-                    }
-                )
-            }
+        controller.beginAction()
+        for (const shape of shapesAffected){
+            controller.takeStep(changeStep,[shape,newValue])
         }
-
-        controller.newAction(
-            () => {
-                for (const shape of shapesAffected){
-                    changeFunction(shape,newValue)
-                }
-            },
-            () => {
-                for (let i = 0; i<shapesAffected.length;i++){
-                    changeFunction(shapesAffected[i],previousValues[i])
-                }
-            },
-            timelineEvents
-        )
+        controller.endAction()
     }
 
     sortShapeNames(){
@@ -454,13 +370,6 @@ export class shapeEditor extends abstractView{
     }
 
     addModel(aggregateModel,model){
-
-        // appearance and disappearance events are added before shape added
-        // therefore no timeline event will ever be added that I care about from timelineEvents
-        if (aggregateModel === "timelineEvents"){
-            return
-        }
-
         this.errorCheckAggregateModel(aggregateModel)
         this.selectedShapesOrdered.push(model)
         this.sortShapeNames()
@@ -488,13 +397,6 @@ export class shapeEditor extends abstractView{
     }
 
     removeModel(aggregateModel,model){
-
-        // appearance and disappearance events are removed when shape removed
-        // therefore no timeline event will ever be removed that I care about from timelineEvents
-        if (aggregateModel === "timelineEvents"){
-            return
-        }
-
         this.updateAggregateModel(aggregateModel,controller.selectedShapes())
     }
 
@@ -503,4 +405,4 @@ export class shapeEditor extends abstractView{
     }
 }
 
-window.customElements.define("shape-editor",shapeEditor)
+window.customElements.define("shape-editor",ShapeEditor)

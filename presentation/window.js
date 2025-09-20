@@ -1,5 +1,5 @@
 // The base window class that all types of window are inherited from
-export class abstractWindow extends HTMLElement{
+export class AbstractWindow extends HTMLElement{
     constructor() {
         super()
 
@@ -20,7 +20,9 @@ export class abstractWindow extends HTMLElement{
     }
 
     static loadWindow(save){
-        let window
+
+        // default in case of failure
+        let window = document.createElement("create-edit-canvas")
 
         switch (save.windowType){
             case "horizontallySplit":
@@ -37,9 +39,6 @@ export class abstractWindow extends HTMLElement{
                 break
             case "shapeEditor":
                 window = document.createElement("shape-editor")
-                break
-            case "overview":
-                window = document.createElement("over-view")
                 break
             case "renderer":
                 window = document.createElement("renderer-window")

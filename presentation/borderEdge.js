@@ -1,7 +1,7 @@
 import {addCreateLogicTo} from "../dragLogic.js";
 
 // The border edge contains and manages the creation of subEdges
-export class borderEdge extends HTMLElement{
+export class BorderEdge extends HTMLElement{
     static observedAttributes = ["type"]
 
     constructor() {
@@ -134,4 +134,4 @@ export class borderEdge extends HTMLElement{
 
 }
 
-window.customElements.define("border-edge",borderEdge)
+window.customElements.define("border-edge",BorderEdge)
