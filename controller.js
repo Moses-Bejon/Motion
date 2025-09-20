@@ -104,6 +104,12 @@ class ControllerClass {
     setAutoAddToTimeline(auto) {
         this.settingsManager.setAutoAddToTimeline(auto)
     }
+    penCursor() {
+        return this.settingsManager.getPenCursor()
+    }
+    setPenCursor(penCursor){
+        this.settingsManager.setPenCursor(penCursor)
+    }
     getSelectedShapesManager(){
         return this.selectedShapesManager
     }

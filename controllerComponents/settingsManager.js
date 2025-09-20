@@ -1,5 +1,6 @@
 import {controller} from "../controller.js";
 import {replaceRootWindowWithSave} from "../rootWindowOperations.js";
+import {typicalIconSize} from "../constants.js";
 
 export class SettingsManager {
     constructor() {
@@ -15,6 +16,24 @@ export class SettingsManager {
         this.onionSkinTimeGap = 0.2
         this.onionSkinsOn = false
         this.autoAddToTimeline = false
+        this.penCursor = false
+
+        this.penCursorImage = document.createElement("img")
+        this.penCursorImage.src = "../assets/pen.svg"
+
+        this.penCursorImage.style.position = "absolute"
+        this.penCursorImage.style.width = typicalIconSize
+        this.penCursorImage.style.height = typicalIconSize
+        this.penCursorImage.style.display = "none"
+        this.penCursorImage.style.zIndex = "8"
+        this.penCursorImage.style.transform = "translate(0, -100%)"
+
+        document.body.appendChild(this.penCursorImage)
+
+        this.updatePenCursor = (pointerEvent) => {
+            this.penCursorImage.style.left = pointerEvent.clientX + "px"
+            this.penCursorImage.style.top = pointerEvent.clientY + "px"
+        }
     }
 
     static load(save){
@@ -29,6 +48,7 @@ export class SettingsManager {
         settingsManager.onionSkinTimeGap = save.onionSkinTimeGap
         settingsManager.onionSkinsOn = save.onionSkinsOn
         settingsManager.autoAddToTimeline = save.autoAddToTimeline
+        settingsManager.setPenCursor(save.penCursor)
 
         return settingsManager
     }
@@ -132,6 +152,23 @@ export class SettingsManager {
         this.updateSettings()
     }
 
+    getPenCursor() {
+        return this.penCursor
+    }
+
+    setPenCursor(newPenCursor) {
+        this.penCursor = newPenCursor
+
+        if (this.penCursor){
+            console.log("pen cursor is on")
+            this.penCursorImage.style.display = "block"
+            document.addEventListener("pointermove",this.updatePenCursor)
+        } else {
+            this.penCursorImage.style.display = "none"
+            document.removeEventListener("pointermove",this.updatePenCursor)
+        }
+    }
+
     save(){
         return {
             canvasWidth: this.canvasWidth,
@@ -142,6 +179,8 @@ export class SettingsManager {
             lineSimplificationEpsilon: this.lineSimplificationEpsilon,
             onionSkinTimeGap: this.onionSkinTimeGap,
             onionSkinsOn: this.onionSkinsOn,
+            autoAddToTimeline: this.autoAddToTimeline,
+            penCursor: this.penCursor,
         }
     }
 }

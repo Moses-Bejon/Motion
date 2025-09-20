@@ -54,6 +54,10 @@ template.innerHTML = `
         <input type="checkbox" id="autoAddToTimeline">
     </div>
     <div class="labelInputContainer">
+        <label for="penCursor">Create a pen cursor</label>
+        <input type="checkbox" id="penCursor">
+    </div>
+    <div class="labelInputContainer">
         <label for="canvasWidth">Resolution width (pixels)</label>
         <input type="number" id="canvasWidth">
     </div>
@@ -89,6 +93,7 @@ export class Settings extends AbstractView{
         this.onionSkinsTimeGap = this.shadowRoot.getElementById("onionSkinsTimeGapContainer")
         this.onionSkinsTimeGapInput = this.shadowRoot.getElementById("onionSkinsTimeGap")
         this.autoAddToTimelineInput = this.shadowRoot.getElementById("autoAddToTimeline")
+        this.penCursorInput = this.shadowRoot.getElementById("penCursor")
         this.lineSimplififcationEpsilonInput = this.shadowRoot.getElementById("lineSimplificationEpsilon")
         this.timelineFPSInput = this.shadowRoot.getElementById("timelineFPS")
         this.defaultTweenLengthInput = this.shadowRoot.getElementById("defaultTweenLength")
@@ -196,6 +201,13 @@ export class Settings extends AbstractView{
             }
 
             controller.setAutoAddToTimeline(value)
+        }
+
+        this.penCursorInput.checked = controller.penCursor()
+        this.penCursorInput.onchange = () => {
+            const value = this.penCursorInput.checked
+
+            controller.setPenCursor(value)
         }
 
         this.lineSimplififcationEpsilonInput.value = controller.lineSimplificationEpsilon()
