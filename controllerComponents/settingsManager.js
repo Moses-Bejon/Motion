@@ -19,7 +19,7 @@ export class SettingsManager {
         this.penCursor = false
 
         this.penCursorImage = document.createElement("img")
-        this.penCursorImage.src = "../assets/pen.svg"
+        this.penCursorImage.src = "assets/pen.svg"
 
         this.penCursorImage.style.position = "absolute"
         this.penCursorImage.style.width = typicalIconSize
