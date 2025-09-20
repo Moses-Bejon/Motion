@@ -104,6 +104,8 @@ export class SceneController {
                 this.#updateModelForSubscribers(modelName,model)
             }
         }
+
+        controller.onionSkinsManager.updateOnionSkins()
     }
 
     async executeSteps(steps){

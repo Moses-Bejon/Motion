@@ -1,17 +1,28 @@
+import {controller} from "../controller.js";
+
 export class OnionSkinsManager{
     constructor() {
         // views we need to tell about onion skins
         this.onionSkinSubscribers = new Set()
-
-        this.onionSkinsCurrentlyOn = false
-
-        this.updateOnionSkins()
     }
 
     updateOnionSkins(){
+        if (controller.onionSkinsOn()){
+            const now = controller.clock()
 
-        if (this.onionSkinsCurrentlyOn){
+            controller.currentScene.executeInvisibleSteps([
+                ["goToTime",[Math.max(controller.clock()-controller.onionSkinTimeGap(),0)]]
+            ])
+
             this.onionSkinGeometry = ""
+
+            for (const shape of controller.displayShapes()){
+                this.onionSkinGeometry += shape.geometry
+            }
+
+            controller.currentScene.executeInvisibleSteps([
+                ["goToTime",[now]]
+            ])
 
             for (const onionSkinSubscriber of this.onionSkinSubscribers){
                 try {
@@ -31,22 +42,10 @@ export class OnionSkinsManager{
         }
     }
 
-    onionSkinsOff(){
-        this.onionSkinsCurrentlyOn = false
-
-        this.updateOnionSkins()
-    }
-
-    onionSkinsOn(){
-        this.onionSkinsCurrentlyOn = true
-
-        this.updateOnionSkins()
-    }
-
     subscribeToOnionSkins(subscriber){
         this.onionSkinSubscribers.add(subscriber)
 
-        if (this.onionSkinsCurrentlyOn){
+        if (controller.onionSkinsOn()){
             try {
                 subscriber.updateOnionSkin(this.onionSkinGeometry)
             } catch (e){

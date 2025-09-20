@@ -94,6 +94,7 @@ export class SettingsManager {
     setOnionSkinTimeGap(newOnionSkinTimeGap) {
         this.onionSkinTimeGap = newOnionSkinTimeGap
         this.updateSettings()
+        controller.onionSkinsManager.updateOnionSkins()
     }
 
     getOnionSkinsOn() {
@@ -103,6 +104,7 @@ export class SettingsManager {
     setOnionSkinsOn(newOnionSkinsOn) {
         this.onionSkinsOn = newOnionSkinsOn
         this.updateSettings()
+        controller.onionSkinsManager.updateOnionSkins()
     }
 
     getAutoAddToTimeline() {
