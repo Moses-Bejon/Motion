@@ -3,7 +3,7 @@ import {
     fontSize,
     fontFamily,
     typicalIconSize
-} from "../../globalValues.js";
+} from "../../constants.js";
 import {stringToNatural, stringToPositiveReal, stringToReal} from "../../dataStructureOperations.js";
 import {controller} from "../../controller.js";
 import {clamp} from "../../maths.js";

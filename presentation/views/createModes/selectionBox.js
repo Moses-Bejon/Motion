@@ -4,7 +4,7 @@ import {
     getDistanceToStraightLineThrough,
     subtract2dVectors
 } from "../../../maths.js";
-import {canvasOverlayUISize} from "../../../globalValues.js";
+import {canvasOverlayUISize} from "../../../constants.js";
 
 export class SelectionBox {
     constructor(editCanvas) {

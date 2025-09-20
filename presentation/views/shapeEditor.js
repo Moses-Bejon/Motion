@@ -8,7 +8,7 @@ import {
     minimumThickness,
     typicalIconSize,
     typicalIconSizeInt
-} from "../../globalValues.js";
+} from "../../constants.js";
 import {clamp, returnInput} from "../../maths.js";
 import {stringToPositiveReal, stringToReal, stringToColour} from "../../dataStructureOperations.js";
 

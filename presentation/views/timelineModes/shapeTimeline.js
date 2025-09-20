@@ -4,7 +4,7 @@ import {controller} from "../../../controller.js";
 import {
     bumperTranslation,
     timelineRightMenuSizePercentage
-} from "../../../globalValues.js";
+} from "../../../constants.js";
 import {timelineTween} from "./timelineTween.js";
 import {timelineChange} from "./timelineChange.js";
 

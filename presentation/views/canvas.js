@@ -7,7 +7,7 @@ import {
     canvasOffsetX,
     canvasOffsetY,
     sensitivity
-} from "../../globalValues.js";
+} from "../../constants.js";
 
 // maps keys to their intended movement vectors
 const keyToMovement = {

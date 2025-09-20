@@ -51,3 +51,5 @@ export const timelineLeftMenuSizePercentage = timelineLeftMenuSize*100
 export const timelineRightMenuSizePercentage = timelineRightMenuSize*100
 export const bumperTranslation = -timelineBorderSize/2-timelineBumperSize/2
 export const eventTokenWidth = "5px"
+
+export const currentFileVersion = 1

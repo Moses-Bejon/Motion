@@ -1,7 +1,7 @@
 import {controller} from "../../../controller.js";
 import {clamp} from "../../../maths.js";
 import {stringToReal} from "../../../dataStructureOperations.js";
-import {typicalIconSize} from "../../../globalValues.js";
+import {typicalIconSize} from "../../../constants.js";
 
 export class timeCursor{
     constructor(parentTimeline) {
