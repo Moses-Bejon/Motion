@@ -1,5 +1,5 @@
 import {controller} from "../../../controller.js";
-import {buttonSelectedColour, fontFamily, fontSizeInt} from "../../../globalValues.js";
+import {buttonSelectedColour, fontFamily, fontSizeInt} from "../../../constants.js";
 
 export class TextMode {
     constructor(createCanvas) {

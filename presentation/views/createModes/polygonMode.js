@@ -1,6 +1,6 @@
 import {ManyPointsMode} from "./manyPointsMode.js";
 import {distanceBetween2dPoints} from "../../../maths.js";
-import {buttonSelectedColour} from "../../../globalValues.js";
+import {buttonSelectedColour} from "../../../constants.js";
 import {controller} from "../../../controller.js";
 import {Drawing} from "../../../model/drawing.js";
 

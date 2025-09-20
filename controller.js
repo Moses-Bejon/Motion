@@ -4,10 +4,12 @@ import {KeyboardInputsManager} from "./controllerComponents/keyboardInputsManage
 import {OnionSkinsManager} from "./controllerComponents/onionSkinsManager.js";
 import {HistoryManager} from "./controllerComponents/historyManager.js";
 import {SelectedShapesManager} from "./controllerComponents/selectedShapesManager.js"
-import {downloadFile,readJSONFile} from "./fileStuff.js";
+import {downloadFile,readJSONFile} from "./fileUitilities/fileUserInteraction.js";
 import {validateShape} from "./validator.js";
 import {PlayingState} from "./controllerComponents/playing.js";
 import {SettingsManager} from "./controllerComponents/settingsManager.js";
+import {currentFileVersion} from "./constants.js";
+import {translateToMostRecent} from "./fileUitilities/fileToCurrentVersion.js";
 
 class ControllerClass {
     constructor() {
@@ -252,7 +254,7 @@ class ControllerClass {
         }
 
         const file = {
-            "fileVersion":1,
+            "fileVersion":currentFileVersion,
             "currentScene":this.currentScene.save(),
             "settings":this.settingsManager.save(),
             "rootWindow":rootWindowSaved
@@ -270,6 +272,9 @@ class ControllerClass {
         } catch (error){
             throw error
         }
+
+        // sorting out backwards compatibility, older file versions translated to current version
+        file = await translateToMostRecent(file)
 
         // clearing out undo/redo stack
         this.historyManager = new HistoryManager()

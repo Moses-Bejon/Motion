@@ -1,6 +1,6 @@
 // this is potentially the most bored I've ever been
 
-import {fontsList} from "./globalValues.js";
+import {fontsList} from "./constants.js";
 import {controller} from "./controller.js";
 import {Shape} from "./model/shape.js";
 import {operationToAttribute} from "./typesOfOperation.js";

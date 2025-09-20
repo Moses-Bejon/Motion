@@ -1,5 +1,5 @@
 import { isGreater } from "./maths.js";
-import {canvasEpsilon} from "./globalValues.js";
+import {canvasEpsilon} from "./constants.js";
 import {validateColour} from "./validator.js";
 
 // may be optimised by reduce function if performance becomes concern:

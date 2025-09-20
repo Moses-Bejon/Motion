@@ -4,9 +4,9 @@ import {
     typicalIconSizeInt,
     fontSize,
     fontFamily
-}from "../../globalValues.js";
+}from "../../constants.js";
 import {fontsCSS} from "../../fontsCSS.js";
-import {downloadFile} from "../../fileStuff.js";
+import {downloadFile} from "../../fileUitilities/fileUserInteraction.js";
 
 const serializer = new XMLSerializer()
 const DOMURL = self.URL || self.webkitURL || self

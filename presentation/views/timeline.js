@@ -14,7 +14,7 @@ import {
     typicalIconSize,
     typicalIconSizeInt,
     eventTokenWidth
-} from "../../globalValues.js";
+} from "../../constants.js";
 import {clamp} from "../../maths.js";
 import {PlayingState} from "../../controllerComponents/playing.js";
 

@@ -2,7 +2,7 @@ import {addDragLogicTo} from "../../../dragLogic.js";
 import {distanceBetween2dPoints,decimateLine} from "../../../maths.js";
 import {ManyPointsMode} from "./manyPointsMode.js";
 import {controller} from "../../../controller.js";
-import {buttonSelectedColour} from "../../../globalValues.js";
+import {buttonSelectedColour} from "../../../constants.js";
 
 export class DrawMode extends ManyPointsMode{
     constructor(createCanvas) {

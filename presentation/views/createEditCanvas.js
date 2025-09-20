@@ -9,7 +9,7 @@ import {
     thicknessLevel,
     buttonSelectedColour,
     timeEpsilon
-} from "../../globalValues.js";
+} from "../../constants.js";
 import {Canvas} from "./canvas.js";
 import {DrawMode} from "./createModes/drawMode.js";
 import {PolygonMode} from "./createModes/polygonMode.js";
