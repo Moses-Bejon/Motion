@@ -254,6 +254,7 @@ class ControllerClass {
         const file = {
             "fileVersion":1,
             "currentScene":this.currentScene.save(),
+            "settings":this.settingsManager.save(),
             "rootWindow":rootWindowSaved
         }
 
@@ -277,6 +278,10 @@ class ControllerClass {
         this.selectedShapesManager = new SelectedShapesManager()
 
         this.currentScene = await SceneController.load(file.currentScene)
+
+        this.settingsManager = SettingsManager.load(file.settings)
+
+        this.onionSkinsManager.updateOnionSkins()
 
         // allows the saved root window to be loaded in
         return file.rootWindow

@@ -17,6 +17,22 @@ export class SettingsManager {
         this.autoAddToTimeline = false
     }
 
+    static load(save){
+        const settingsManager = new SettingsManager()
+
+        settingsManager.canvasWidth = save.canvasWidth
+        settingsManager.canvasHeight = save.canvasHeight
+        settingsManager.animationEndTimeSeconds = save.animationEndTimeSeconds
+        settingsManager.defaultTweenLength = save.defaultTweenLength
+        settingsManager.timelineSnapLength = save.timelineSnapLength
+        settingsManager.lineSimplificationEpsilon = save.lineSimplificationEpsilon
+        settingsManager.onionSkinTimeGap = save.onionSkinTimeGap
+        settingsManager.onionSkinsOn = save.onionSkinsOn
+        settingsManager.autoAddToTimeline = save.autoAddToTimeline
+
+        return settingsManager
+    }
+
     updateSettings(){
         const viewsSave = window.rootWindow.save()
         replaceRootWindowWithSave(viewsSave)
@@ -114,5 +130,18 @@ export class SettingsManager {
     setAutoAddToTimeline(newAutoAddToTimeline) {
         this.autoAddToTimeline = newAutoAddToTimeline
         this.updateSettings()
+    }
+
+    save(){
+        return {
+            canvasWidth: this.canvasWidth,
+            canvasHeight: this.canvasHeight,
+            animationEndTimeSeconds: this.animationEndTimeSeconds,
+            defaultTweenLength: this.defaultTweenLength,
+            timelineSnapLength: this.timelineSnapLength,
+            lineSimplificationEpsilon: this.lineSimplificationEpsilon,
+            onionSkinTimeGap: this.onionSkinTimeGap,
+            onionSkinsOn: this.onionSkinsOn,
+        }
     }
 }
