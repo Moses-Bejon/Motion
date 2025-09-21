@@ -24,7 +24,7 @@ export class shapeTimeline{
         labelContainer.className = "labelContainer"
 
         this.label = document.createElement("h2")
-        this.label.innerText = shape.name
+        this.label.textContent = shape.name
         labelContainer.appendChild(this.label)
 
         this.parentTimeline = parentTimeline

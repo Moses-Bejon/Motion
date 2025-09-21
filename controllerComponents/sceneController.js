@@ -106,6 +106,7 @@ export class SceneController {
         }
 
         controller.onionSkinsManager.updateOnionSkins()
+        controller.selectedShapesManager.updateShapes()
     }
 
     async executeSteps(steps){
@@ -532,8 +533,7 @@ export class SceneController {
 
         // ensures selected shape is updated for any subscribers
         if (controller.selectedShapesManager.isSelected(model)){
-            controller.selectedShapesManager.deselectShape(model)
-            controller.selectedShapesManager.selectShape(model)
+            controller.selectedShapesManager.addShapeToUpdate(model)
         }
     }
 

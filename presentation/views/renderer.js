@@ -95,7 +95,7 @@ export class Renderer extends Canvas{
 
     restoreRenderAnimationButton(){
         this.renderAnimationButton.onpointerdown = this.renderAnimation.bind(this)
-        this.renderAnimationButton.innerText = "Render animation"
+        this.renderAnimationButton.textContent = "Render animation"
     }
 
     async renderAnimation(){
@@ -109,7 +109,7 @@ export class Renderer extends Canvas{
         this.renderAnimationButton.onpointerdown = () => {
             this.renderCancelled = true
         }
-        this.renderAnimationButton.innerText = "Cancel render"
+        this.renderAnimationButton.textContent = "Cancel render"
 
         this.renderCancelled = false
         const now = controller.clock()

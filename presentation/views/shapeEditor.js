@@ -27,7 +27,7 @@ for (const font of fontsList){
     const fontOption = document.createElement("option")
 
     fontOption.value = font
-    fontOption.innerText = font
+    fontOption.textContent = font
     fontOption.style.fontFamily = font
 
     fontSelector.appendChild(fontOption)
@@ -233,7 +233,6 @@ export class ShapeEditor extends AbstractView{
         // being ordered (alphabetically by name) means that the order in which shape properties appear is consistent
         this.selectedShapesOrdered = []
         this.propertyInputs = []
-        this.propertyNames = new Set()
     }
 
     static shapeToInputInformation(shape){
@@ -278,24 +277,28 @@ export class ShapeEditor extends AbstractView{
         for (const propertyInput of this.propertyInputs){
             propertyInput.remove()
         }
+        this.propertyToIndex = {}
         this.propertyInputs = []
-        this.propertyNames = new Set()
+        this.propertyShapes = []
 
         if (this.selectedShapesOrdered.length === 0){
-            this.shapeName.innerText = "No shapes selected"
+            this.shapeName.textContent = "No shapes selected"
             return
         }
 
-        this.shapeName.innerText = this.selectedShapesOrdered[0].name
         this.populateShapeProperties(this.selectedShapesOrdered[0])
+
+        let shapePropertiesTitle = this.selectedShapesOrdered[0].name
 
         for (let i = 1; i<this.selectedShapesOrdered.length; i++){
             const shape = this.selectedShapesOrdered[i]
 
-            this.shapeName.innerText += ", " + shape.name
+            shapePropertiesTitle += ", " + shape.name
 
             this.populateShapeProperties(shape)
         }
+
+        this.shapeName.textContent = shapePropertiesTitle
     }
 
     populateShapeProperties(shape){
@@ -303,7 +306,7 @@ export class ShapeEditor extends AbstractView{
 
         for (const [name,element] of Object.entries(inputInformation)) {
 
-            if (this.propertyNames.has(name)){
+            if (Object.hasOwn(this.propertyToIndex,name)){
                 continue
             }
 
@@ -311,7 +314,7 @@ export class ShapeEditor extends AbstractView{
             labelledElement.className = "labelInputContainer"
 
             const label = document.createElement("label")
-            label.innerText = name
+            label.textContent = name
             label.for = name
             labelledElement.appendChild(label)
 
@@ -328,8 +331,9 @@ export class ShapeEditor extends AbstractView{
 
             this.propertiesList.appendChild(labelledElement)
 
+            this.propertyToIndex[name] = this.propertyInputs.length
             this.propertyInputs.push(labelledElement)
-            this.propertyNames.add(name)
+            this.propertyShapes.push(shape)
         }
     }
 
@@ -393,7 +397,12 @@ export class ShapeEditor extends AbstractView{
 
     updateModel(aggregateModel,model){
         // in this case, updating the whole list should be the same as updating one item in the list
-        this.updateAggregateModel(aggregateModel,controller.selectedShapes())
+
+        for (const [propertyName,index] in Object.entries(this.propertyToIndex)){
+            if (this.propertyShapes[index] === model){
+                this.propertyInputs[index].children[1].value = nameToGetFunction[propertyName](model)
+            }
+        }
     }
 
     removeModel(aggregateModel,model){

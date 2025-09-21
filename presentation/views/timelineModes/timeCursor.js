@@ -47,7 +47,7 @@ export class timeCursor{
         this.cursor.appendChild(this.buttonContainer)
 
         this.addToTimelineButton = document.createElement("button")
-        this.addToTimelineButton.innerText = "Add to timeline"
+        this.addToTimelineButton.textContent = "Add to timeline"
 
         this.addToTimelineButton.onpointerdown = (pointerEvent) => {
 
@@ -57,7 +57,7 @@ export class timeCursor{
         }
 
         this.removeButton = document.createElement("button")
-        this.removeButton.innerText = "Remove from timeline"
+        this.removeButton.textContent = "Remove from timeline"
 
         const stem = document.createElement("div")
         stem.id = "timeCursorStem"

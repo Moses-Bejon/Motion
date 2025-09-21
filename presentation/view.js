@@ -87,7 +87,7 @@ export class AbstractView extends AbstractWindow{
 
         for (const [windowName,windowType] of Object.entries(typesOfWindow)){
             const option = document.createElement("option")
-            option.innerText = windowName
+            option.textContent = windowName
             option.value = windowType
             switchWindowDropDown.appendChild(option)
         }

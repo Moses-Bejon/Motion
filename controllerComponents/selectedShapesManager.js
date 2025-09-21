@@ -5,6 +5,8 @@ export class SelectedShapesManager{
         this.selectedShapes = new Set()
 
         this.selectedShapesSubscribers = new Set()
+
+        this.shapesToUpdate = new Set()
     }
 
     subscribeToSelectedShapes(subscriber){
@@ -71,9 +73,29 @@ export class SelectedShapesManager{
         }
     }
 
+    addShapeToUpdate(shape){
+        if (!this.isSelected(shape)){
+            throw new Error("attempt to update unselected shape")
+        }
+
+        this.shapesToUpdate.add(shape)
+    }
+
+    updateShapes(){
+        for (const shape of this.shapesToUpdate){
+            for (const subscriber of this.selectedShapesSubscribers){
+                try{
+                    subscriber.updateModel("selectedShapes",shape)
+                } catch (e){
+                    console.error(e)
+                }
+            }
+        }
+
+        this.shapesToUpdate = new Set()
+    }
+
     isSelected(shape){
         return this.selectedShapes.has(shape)
     }
-
-
 }

@@ -51,9 +51,9 @@ export class SwitchElement extends HTMLElement{
 
     attributeChangedCallback(name,oldValue,newValue){
         if (name === "off-text") {
-            this.off.innerText = newValue
+            this.off.textContent = newValue
         } else if (name === "on-text"){
-            this.on.innerText = newValue
+            this.on.textContent = newValue
         }
     }
 
