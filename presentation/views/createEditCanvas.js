@@ -223,6 +223,7 @@ export class CreateEditCanvas extends Canvas{
         this.shadowRoot.appendChild(template.content.cloneNode(true))
 
         this.create = this.shadowRoot.getElementById("create")
+        this.main = this.shadowRoot.getElementById("main")
 
         /* by default, we are in create mode, so edit is not shown */
         this.edit = this.shadowRoot.getElementById("edit")

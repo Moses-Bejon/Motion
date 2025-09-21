@@ -5,7 +5,7 @@ export class TextMode {
     constructor(createCanvas) {
         this.createCanvas = createCanvas
 
-        this.createCanvas.canvas.onclick = this.createTextBox.bind(this)
+        this.createCanvas.main.onclick = this.createTextBox.bind(this)
 
         this.ourButton = this.createCanvas.shadowRoot.getElementById("text")
 
@@ -50,7 +50,7 @@ export class TextMode {
     }
 
     switchMode(){
-        this.createCanvas.canvas.onclick = null
+        this.createCanvas.main.onclick = null
 
         // deselects text once done
         controller.getSelectedShapesManager().selectNewShapes(new Set())

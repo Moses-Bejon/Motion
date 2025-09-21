@@ -107,6 +107,10 @@ template.innerHTML = `
     
     border: dashed;
 }
+#main{
+    width: 100%;
+    height: 100%;
+}
 </style>
 <div id="zoom">
 <img id="zoomOut" src="assets/zoomOut.svg" alt="zoom in button">
@@ -114,7 +118,9 @@ template.innerHTML = `
 <img id="zoomIn" src="assets/zoomIn.svg" alt="zoom out button">
 </div>
 
-<svg id="canvas" preserveAspectRatio="none"></svg>
+<div id="main">
+    <svg id="canvas" preserveAspectRatio="none"></svg>
+</div>
 `
 
 export class Canvas extends AbstractView{

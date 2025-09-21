@@ -8,7 +8,7 @@ export class EllipseMode {
     constructor(createCanvas) {
         this.createCanvas = createCanvas
 
-        addDragLogicTo(this.createCanvas.canvas,
+        addDragLogicTo(this.createCanvas.main,
             this.continueEllipse.bind(this),
             this.endEllipse.bind(this),
             this.beginEllipse.bind(this),
@@ -32,7 +32,7 @@ export class EllipseMode {
 
     switchMode(){
         this.ellipse?.remove()
-        this.createCanvas.canvas.onpointerdown = null
+        this.createCanvas.main.onpointerdown = null
 
         // remove ellipse mode indication
         this.ourButton.style.backgroundColor = null

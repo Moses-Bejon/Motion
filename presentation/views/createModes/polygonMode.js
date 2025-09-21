@@ -13,7 +13,7 @@ export class PolygonMode extends ManyPointsMode{
         // required to remove event listeners that use this function
         this.bindedPreviewNextLine = this.previewNextLine.bind(this)
 
-        this.createCanvas.canvas.onclick = this.beginPolygon.bind(this)
+        this.createCanvas.main.onclick = this.beginPolygon.bind(this)
 
         this.ourButton = this.createCanvas.shadowRoot.getElementById("polygon")
 
@@ -23,8 +23,8 @@ export class PolygonMode extends ManyPointsMode{
 
     // called to remove this mode
     switchMode(){
-        this.createCanvas.canvas.onclick = null
-        this.createCanvas.canvas.removeEventListener("pointermove",this.bindedPreviewNextLine)
+        this.createCanvas.main.onclick = null
+        this.createCanvas.main.removeEventListener("pointermove",this.bindedPreviewNextLine)
         this.line?.remove()
         this.currentShape?.remove()
 
@@ -45,8 +45,8 @@ export class PolygonMode extends ManyPointsMode{
 
             this.currentShape?.remove()
             this.line?.remove()
-            this.createCanvas.canvas.removeEventListener("pointermove",this.bindedPreviewNextLine)
-            this.createCanvas.canvas.onclick = this.beginPolygon.bind(this)
+            this.createCanvas.main.removeEventListener("pointermove",this.bindedPreviewNextLine)
+            this.createCanvas.main.onclick = this.beginPolygon.bind(this)
 
             return true
         } else {
@@ -58,9 +58,9 @@ export class PolygonMode extends ManyPointsMode{
     beginPolygon(pointerEvent){
         this.begin(pointerEvent)
 
-        this.createCanvas.canvas.onclick = this.continuePolygon.bind(this)
+        this.createCanvas.main.onclick = this.continuePolygon.bind(this)
 
-        this.createCanvas.canvas.addEventListener("pointermove",this.bindedPreviewNextLine)
+        this.createCanvas.main.addEventListener("pointermove",this.bindedPreviewNextLine)
     }
 
     continuePolygon(pointerEvent){
@@ -74,8 +74,8 @@ export class PolygonMode extends ManyPointsMode{
             this.line.remove()
 
             this.completePolygon(pointerEvent)
-            this.createCanvas.canvas.removeEventListener("pointermove",this.bindedPreviewNextLine)
-            this.createCanvas.canvas.onclick = this.beginPolygon.bind(this)
+            this.createCanvas.main.removeEventListener("pointermove",this.bindedPreviewNextLine)
+            this.createCanvas.main.onclick = this.beginPolygon.bind(this)
 
             return
         }

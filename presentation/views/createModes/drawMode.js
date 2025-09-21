@@ -10,7 +10,7 @@ export class DrawMode extends ManyPointsMode{
         
         this.createCanvas = createCanvas
         
-        addDragLogicTo(this.createCanvas.canvas,
+        addDragLogicTo(this.createCanvas.main,
             this.continue.bind(this),
             this.endDrawing.bind(this),
             this.begin.bind(this),
@@ -25,7 +25,7 @@ export class DrawMode extends ManyPointsMode{
 
     switchMode(){
         this.currentShape?.remove()
-        this.createCanvas.canvas.onpointerdown = null
+        this.createCanvas.main.onpointerdown = null
 
         // remove draw mode indication
         this.ourButton.style.backgroundColor = null
