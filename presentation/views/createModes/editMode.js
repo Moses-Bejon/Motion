@@ -10,7 +10,7 @@ export class EditMode {
         // when you click on the canvas, but not on any particular shape, deselect all selected shapes
         this.editCanvas.addFunctionToPerformOnClick(this.bindedDeselectAll)
 
-        addDragLogicTo(this.editCanvas.canvas,
+        addDragLogicTo(this.editCanvas.main,
             this.continueBoxSelection.bind(this),
             this.finishBoxSelection.bind(this),
             this.beginBoxSelection.bind(this),
