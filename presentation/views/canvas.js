@@ -305,7 +305,7 @@ export class Canvas extends AbstractView{
         const key = keyboardEvent.key.toLowerCase()
 
         // handle zoom
-        if (keyboardEvent.ctrlKey){
+        if (keyboardEvent.ctrlKey || keyboardEvent.metaKey){
 
             // account for different keys both indicating +
             if (key === "+" || key === "="){

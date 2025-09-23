@@ -110,7 +110,7 @@ export class EditMode {
             // stop the canvas from being clicked and deselecting everything
             event.stopPropagation()
 
-            if (event.shiftKey || event.ctrlKey){
+            if (event.shiftKey || event.ctrlKey || event.metaKey){
                 controller.getSelectedShapesManager().selectShape(model)
             } else {
                 controller.getSelectedShapesManager().selectNewShapes(new Set([model]))

@@ -1,9 +1,13 @@
+import {controller} from "../controller.js";
+
 export class KeyboardInputsManager {
 
     constructor() {
         // ordered list of views that hear about keyboard inputs
         // the higher in the hierarchy, the more likely informed (more "in focus")
         this.inputSubscribersHierarchy = []
+
+        this.keysDown = new Set()
 
         document.addEventListener("keydown",this.keyDown.bind(this))
         document.addEventListener("keyup",this.keyUp.bind(this))
@@ -58,6 +62,36 @@ export class KeyboardInputsManager {
 
     keyDown(event){
 
+        // if the user is holding down a key, we don't need to fire the event again
+        if (this.keysDown.has(event.key)){
+            return
+        }
+
+        this.keysDown.add(event.key)
+
+        if (event.ctrlKey || event.metaKey){
+
+            if (((event.key === "z" || event.key === "Z") && event.shiftKey) || (event.key === "y" || event.key === "Y")){
+                controller.historyManager.redoAction()
+                return
+            }
+            
+            if (event.key === "z" || event.key === "Z"){
+                controller.historyManager.undoAction()
+                return
+            }
+            
+            if (event.key === "s" || event.key === "S"){
+                controller.saveFile(rootWindow.save())
+                event.preventDefault()
+                return
+            }
+        }
+
+        if (event.key === "a"){
+            console.log("a from controller")
+        }
+
         // find active element
         let activeElement = document.activeElement
         while (activeElement.shadowRoot) {
@@ -101,6 +135,8 @@ export class KeyboardInputsManager {
     }
 
     keyUp(event){
+
+        this.keysDown.delete(event.key)
 
         try {
             if (this.hoveringOver?.acceptKeyUp(event)) {

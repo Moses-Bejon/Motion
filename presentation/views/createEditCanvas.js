@@ -328,24 +328,13 @@ export class CreateEditCanvas extends Canvas{
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("paste").onpointerdown = (pointerEvent) => {
-
-            controller.executeScript(`
-            for (const shape of copiedShapes){
-                const newShape = duplicate(shape)
-                translate(newShape,[50,50])
-            }
-            `,{"copiedShapes":controller.paste()}).then((duplicates) => {
-                controller.getSelectedShapesManager().selectNewShapes(duplicates)
-            })
-
+            CreateEditCanvas.paste()
             pointerEvent.stopPropagation()
         }
         this.shadowRoot.getElementById("delete").onpointerdown = () => {
 
-            const toRemove = new Set(this.selectedShapes)
-
             controller.beginAction()
-            for (const shape of toRemove) {
+            for (const shape of this.selectedShapes) {
                 controller.takeStep("deleteShape",[shape])
             }
             controller.endAction()
@@ -452,6 +441,17 @@ export class CreateEditCanvas extends Canvas{
 
         controller.unsubscribeToSelectedShapes(this)
         controller.unsubscribeToOnionSkins(this)
+    }
+
+    static paste(){
+        controller.executeScript(`
+            for (const shape of copiedShapes){
+                const newShape = duplicate(shape)
+                translate(newShape,[50,50])
+            }
+            `,{"copiedShapes":controller.paste()}).then((duplicates) => {
+            controller.getSelectedShapesManager().selectNewShapes(duplicates)
+        })
     }
 
     save(){
@@ -577,6 +577,34 @@ export class CreateEditCanvas extends Canvas{
 
         if (acceptedBySelectedShape){
             return true
+        }
+
+        if (keyboardEvent.ctrlKey || keyboardEvent.metaKey){
+            switch (keyboardEvent.key){
+                case "c":
+                case "C":
+                    controller.copy(this.selectedShapes)
+                    return true
+                case "v":
+                case "V":
+                    CreateEditCanvas.paste()
+                    return true
+                case "x":
+                case "X":
+                    console.log(controller.currentState.constructor.name)
+                    controller.copy(this.selectedShapes)
+                    controller.beginAction()
+                    for (const shape of this.selectedShapes) {
+                        controller.takeStep("deleteShape",[shape])
+                    }
+                    controller.endAction()
+                    return true
+                case "a":
+                case "A":
+                    controller.getSelectedShapesManager().selectNewShapes(controller.displayShapes())
+                    keyboardEvent.preventDefault()
+                    return true
+            }
         }
 
         return super.acceptKeyDown(keyboardEvent)

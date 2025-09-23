@@ -160,7 +160,6 @@ export class SettingsManager {
         this.penCursor = newPenCursor
 
         if (this.penCursor){
-            console.log("pen cursor is on")
             this.penCursorImage.style.display = "block"
             document.addEventListener("pointermove",this.updatePenCursor)
         } else {
