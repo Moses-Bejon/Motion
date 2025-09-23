@@ -240,10 +240,7 @@ export class Timeline extends AbstractView{
 
     // position with respect to the right part of the window, filled by the timeline
     timeToTimelinePosition(timeSeconds){
-        if (timeSeconds > controller.animationEndTime() || timeSeconds < 0){
-            console.error("Time is out of bounds. Time is ",timeSeconds)
-        }
-        return timeSeconds/controller.animationEndTime()
+        return clamp(timeSeconds/controller.animationEndTime(),0,1)
     }
 
     // position with respect to whole window
