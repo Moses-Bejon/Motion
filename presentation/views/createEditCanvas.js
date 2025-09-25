@@ -607,7 +607,48 @@ export class CreateEditCanvas extends Canvas{
             }
         }
 
+        switch (keyboardEvent.key){
+            case "Tab":
+                this.createEditSwitch.click()
+                return true
+
+            case "d":
+            case "D":
+                this.switchToCreateMode()
+                this.currentMode = new DrawMode(this)
+
+                return true
+
+            case "p":
+            case "P":
+                this.switchToCreateMode()
+                this.currentMode = new PolygonMode(this)
+
+                return true
+
+            case "e":
+            case "E":
+                this.switchToCreateMode()
+                this.currentMode = new EllipseMode(this)
+                
+                return true
+
+            case "t":
+            case "T":
+                this.switchToCreateMode()
+                this.currentMode = new TextMode(this)
+
+                return true
+        }
+
         return super.acceptKeyDown(keyboardEvent)
+    }
+
+    switchToCreateMode(){
+        if (this.currentMode instanceof EditMode){
+            this.createEditSwitch.click()
+        }
+        this.currentMode.switchMode()
     }
 
     updateSelectionBox(){
