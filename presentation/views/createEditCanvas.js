@@ -612,13 +612,6 @@ export class CreateEditCanvas extends Canvas{
                 this.createEditSwitch.click()
                 return true
 
-            case "d":
-            case "D":
-                this.switchToCreateMode()
-                this.currentMode = new DrawMode(this)
-
-                return true
-
             case "p":
             case "P":
                 this.switchToCreateMode()
