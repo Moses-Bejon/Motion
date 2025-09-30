@@ -41,7 +41,7 @@ export class Renderer extends Canvas{
     constructor() {
         super()
 
-        this.shadowRoot.appendChild(template.content.cloneNode(true))
+        this.main.appendChild(template.content.cloneNode(true))
 
         this.fps = this.shadowRoot.getElementById("fpsInput")
 

@@ -129,6 +129,8 @@ export class Canvas extends AbstractView{
 
         this.shadowRoot.appendChild(template.content.cloneNode(true))
 
+        this.main = this.shadowRoot.getElementById("main")
+
         this.canvas = this.shadowRoot.getElementById("canvas")
         this.canvas.style.width = controller.canvasWidth()
         this.canvas.style.height = controller.canvasHeight()

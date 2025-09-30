@@ -88,10 +88,6 @@ export class KeyboardInputsManager {
             }
         }
 
-        if (event.key === "a"){
-            console.log("a from controller")
-        }
-
         // find active element
         let activeElement = document.activeElement
         while (activeElement.shadowRoot) {
