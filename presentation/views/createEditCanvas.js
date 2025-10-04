@@ -630,6 +630,23 @@ export class CreateEditCanvas extends Canvas{
                 this.currentMode = new TextMode(this)
 
                 return true
+
+            case "Backspace":
+            case "Delete":
+
+                // don't eat up the event if you're not going to use it to delete anything
+                if (this.selectedShapes.size === 0){
+                    break
+                }
+
+                controller.beginAction()
+                for (const shape of this.selectedShapes) {
+                    controller.takeStep("deleteShape",[shape])
+                }
+                controller.endAction()
+
+                return true
+
         }
 
         return super.acceptKeyDown(keyboardEvent)
