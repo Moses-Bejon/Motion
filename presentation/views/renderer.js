@@ -25,13 +25,14 @@ template.innerHTML = `
             font-family: ${fontFamily};
             font-size: ${fontSize};
         }
-        #renderAnimationButton,#renderFrameButton{
+        #renderAnimationButton,#renderPNG,#renderSVG{
             cursor: pointer;
         }
     </style>
     <div id="buttonsContainer">
         <button id="renderAnimationButton"></button>
-        <button id="renderFrameButton">Render current frame</button>
+        <button id="renderSVG">Render as SVG</button>
+        <button id="renderPNG">Render as PNG</button>
         <label for="fpsInput">FPS: </label>
         <input type="number" id="fpsInput" min="1" max="120" value="30">
     </div>
@@ -47,8 +48,13 @@ export class Renderer extends Canvas{
 
         this.renderAnimationButton = this.shadowRoot.getElementById("renderAnimationButton")
         this.restoreRenderAnimationButton()
-        this.shadowRoot.getElementById("renderFrameButton").onpointerdown = () => {
+        this.shadowRoot.getElementById("renderSVG").onpointerdown = () => {
             downloadFile(this.getSVGURL(),"animation frame")
+        }
+        this.shadowRoot.getElementById("renderPNG").onpointerdown = () => {
+            this.sendVectorCanvasToPixelCanvas().then(canvas => {
+                downloadFile(canvas.toDataURL("image/png"), "animation frame")
+            })
         }
     }
 
@@ -174,8 +180,8 @@ export class Renderer extends Canvas{
         await controller.endAction()
         this.restoreRenderAnimationButton()
     }
-
-    async captureFrame(timeStamp,duration){
+    
+    async sendVectorCanvasToPixelCanvas(){
 
         // fun fact, it's actually faster to recreate the canvas each time from scratch than it is to clone the node
         const canvas = document.createElement("canvas")
@@ -188,12 +194,22 @@ export class Renderer extends Canvas{
         return new Promise((resolve) => {
             frame.onload = () => {
                 ctx.drawImage(frame,0,0,controller.canvasWidth(),controller.canvasHeight())
-                const videoFrame = new VideoFrame(canvas, { timestamp: timeStamp, duration: duration, alpha: "keep"})
-                this.videoEncoder.encode(videoFrame)
-                videoFrame.close()
-
-                resolve()
+                resolve(canvas)
             }
+        })
+    }
+
+    async captureFrame(timeStamp,duration){
+        return new Promise((resolve) => {
+            this.sendVectorCanvasToPixelCanvas().then(
+                (canvas) => {
+                    const videoFrame = new VideoFrame(canvas, { timestamp: timeStamp, duration: duration, alpha: "keep"})
+                    this.videoEncoder.encode(videoFrame)
+                    videoFrame.close()
+
+                    resolve()
+                }
+            )
         })
     }
 
